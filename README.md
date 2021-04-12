@@ -23,3 +23,16 @@ From the build directory created in the compilation step:
 ```
 ./LabMat
 ```
+
+# Unit tests
+
+This project implements unit tests with the [GoogleTest](https://github.com/google/googletest) unit testing library.
+
+## Run unit tests
+
+To run the unit tests, first follow the above compilation instructions. Then, from the `<project root>/build` directory:
+
+```
+cd tests/
+./Google_Tests_run
+```
