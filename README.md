@@ -2,7 +2,9 @@
 
 Taking inspiration from Matlab's admirable qualities and peculiar idosyncracies.
 
-# Usage:
+# Usage
+
+Make sure to clone with the `--recurse-submodules` flag.
 
 ## Compilation
 
