@@ -1,6 +1,10 @@
-/* Main routine for mini_lisp
+/* Main routine for LabMat
  *
- * Duncan and Anna SoftSys Project 1
+ * Duncan and Junwon LabMat SoftSys Project 1
+ *
+ * Acknowledgement: The code in this file was adapted from the ArticulateLisp
+ * project authored by Duncan Mazza and Anna Griffin.
+ *
  */
 
 #include "../include/main.h"
