@@ -21,16 +21,16 @@ mat = randn([3, 1]).transpose()
 This combination of characteristics has inspired us to create a new programming language that combines some of the best (in our opinion) features of MATLAB and traditional programming languages. Additionally, between both of us, our first SoftSys projects included a language interpreter and a signal processing library. The combination of both of these projects provides a natural jumping-off point for this project.
 
 ### MVP
-* Building off of Duncan’s first SoftSys project (Lisp interpreter):
+
+Building off of Duncan’s first SoftSys project (Lisp interpreter):
 - Define language grammar/syntax
 - Implement the language grammar into the mpc abstract syntax tree builder.
 - Implement evaluation of expressions from the command line
+
 * Implement the ability to create variables that are matrices.
-* Implement basic matrix operations (addition, multiplication).
-- Supported as both dot-operations on matrix variables and as stand-alone functions.
+* Implement basic matrix operations (addition, multiplication). Supported as both dot-operations on matrix variables and as stand-alone functions.
 - Be conscious of CPU caching (e.g., being smart about what lines of memory are loaded into the cache).
-* Incorporate Junwon’s first SoftSys project
-- Implement at least 1 function from the signal processing library by adapting it to work with the matrix data structure.
+* Incorporate Junwon’s first SoftSys project: Implement at least 1 function from the signal processing library by adapting it to work with the matrix data structure.
 
 ### Stretch Goals
 * Implement multi-threading for matrix operations
@@ -46,8 +46,6 @@ I would like to learn how to write custom programming languages. I also want to 
 
 ### Duncan
 Building off of my first project, I am interested in learning more about how interpreted programming languages operate under the hood. I intend to use this project as a vehicle to increase my skills in general software topics, such as multi-threading, computation time optimization, etc. Because I have experience in signal processing applications, I hope for this project to reinforce my understanding of the relevant mathematical theory. If we are able to implement the MVP with time to spare, then implementing complex numbers, for example, will definitely progress me towards this goal.
-
-
 
 ## Resources
 
