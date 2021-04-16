@@ -18,14 +18,14 @@ mpc_parser_t *mpc_setup(mpc_parser_t **all_parsers) {
     mpc_parser_t *Bit_op = mpc_new("bit_op");
     all_parsers[2] = Bit_op;
 
-    mpc_parser_t *Qexpr = mpc_new("qexpr");
-    all_parsers[3] = Qexpr;
+    mpc_parser_t *Log_op = mpc_new("log_op");
+    all_parsers[5] = Log_op;
 
     mpc_parser_t *Expr = mpc_new("expr");
     all_parsers[4] = Expr;
 
-    mpc_parser_t *lab_mat = mpc_new("lab_mat");
-    all_parsers[5] = lab_mat;
+    mpc_parser_t *Lab_mat = mpc_new("lab_mat");
+    all_parsers[5] = Lab_mat;
 
     /* Define them with the following Language */
     mpca_lang(MPCA_LANG_DEFAULT, "\
@@ -33,8 +33,9 @@ mpc_parser_t *mpc_setup(mpc_parser_t **all_parsers) {
         float   : /-?([0-9]*[.])[0-9]+/ ;\
         math_op : '+' | '-' | '*' | '/' | '%' ;\
         bit_op  : '&' | '^' | '|' ;\
-        expr    : (<float> | <int>) <math_op> (<float> | <int>) | <int> <bit_op> <int> ;\
+        log_op  : \"&&\" | \"||\" ;\
+        expr    : (<float>|<int>) <math_op> (<float>|<int>) | <int> <bit_op> <int> | <int> <log_op> <int> ;\
         lab_mat : /^/ <expr>* /$/ ;\
-        ", Int, Float, Math_op, Bit_op, Expr, lab_mat);
-    return lab_mat;
+        ", Int, Float, Math_op, Bit_op, Log_op, Expr, Lab_mat);
+    return Lab_mat;
 }
