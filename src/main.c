@@ -17,7 +17,7 @@ extern "C" {
 #pragma ide diagnostic ignored "EndlessLoop"
 
 int main(int argc, char **argv) {
-    mpc_parser_t *all_parsers[6];
+    mpc_parser_t *all_parsers[9];
     mpc_parser_t *lab_mat = mpc_setup(all_parsers);
 
     // Loop for testing command line input
