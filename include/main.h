@@ -10,16 +10,23 @@
 #ifndef MINI_LISP_MAIN_H
 #define MINI_LISP_MAIN_H
 
-#ifdef __cplusplus
-extern "C" {
-#endif
-
-#include <regex.h>
 #include <stdio.h>
+#include <regex.h>
 #include <stdlib.h>
 #include <string.h>
 #include <ctype.h>
 #include <math.h>
+
+#include "../lib/mpc/mpc.h"
+
+#include "dll.h"
+#include "grammar.h"
+#include "cl_input.h"
+
+
+#ifdef __cplusplus
+extern "C" {
+#endif
 
 #ifdef __cplusplus
 }
