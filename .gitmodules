@@ -1,3 +1,6 @@
 [submodule "tests/googletest"]
 	path = tests/googletest
 	url = git@github.com:google/googletest.git
+[submodule "lib/mpc"]
+	path = lib/mpc
+	url = git@github.com:orangeduck/mpc.git

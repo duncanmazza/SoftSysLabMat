@@ -8,6 +8,7 @@ set(LIB_SRC_DIR_NAME src)
 project(SoftSys${PROJECT_NAME} C)
 
 add_subdirectory(tests)
+add_subdirectory(lib)
 include_directories(.)
 include_directories(include)
 
@@ -16,6 +17,7 @@ add_library(
         ${LIB_SRC_DIR_NAME}/cl_input.c
         ${LIB_SRC_DIR_NAME}/dll.c
         ${LIB_SRC_DIR_NAME}/sll.c
+        ${LIB_SRC_DIR_NAME}/grammar.c
 )
 
 add_executable(
