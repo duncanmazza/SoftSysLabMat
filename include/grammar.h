@@ -11,7 +11,7 @@
 extern "C" {
 #endif
 
-mpc_parser_t *mpc_setup(mpc_parser_t *all_parsers[]);
+mpc_parser_t *mpc_setup(mpc_parser_t **all_parsers);
 
 #ifdef __cplusplus
 }

@@ -26,4 +26,4 @@ add_executable(
 )
 
 set_property(TARGET ${EXECUTABLE_NAME} PROPERTY CXX_STANDARD 20)
-target_link_libraries(${EXECUTABLE_NAME} PRIVATE m ${LIB_NAME} mpc)
+target_link_libraries(${EXECUTABLE_NAME} PRIVATE m ${LIB_NAME} mpc dsp)
