@@ -7,8 +7,8 @@
 
 SLL *mpc_rules_match(const char *const to_match) {
     const char *rule_matcher = "^\\w+[^\\s]";\
-    const char* delimiter = " ;";
-    size_t delimiter_len  = strlen(delimiter);
+    const char *delimiter = " ;";
+    size_t delimiter_len = strlen(delimiter);
 
     regex_t rx;
     int regex_comp_ret = regcomp(&rx, rule_matcher, REG_EXTENDED);
@@ -64,25 +64,29 @@ SLL *mpc_rules_match(const char *const to_match) {
 
 int mpc_setup(mpc_parser_t **parser) {
     const char *grammar =
-            "int     : /-?[0-9]+/ ;"
-            "float   : /-?[0-9]+[.][0-9]+/ ;"
-            "num     : <float> | <int> ;"  // Order matters here for mpc
-            "mth_op  : '+' | '-' | '*' | '/' | '%' ;"
-            "bit_op  : '&' | '^' | '|' ;"
-            "log_op  : \"&&\" | \"||\" ;"
+            // -- Atomic rules --
+            "int     : /-?[0-9]+/ ;"  // Integer number
+            "float   : /-?[0-9]+[.][0-9]+/ ;"  // Floating point number
+            "num     : <float> | <int> ;"  // [order matters] Any number
+            "mth_op  : '+' | '-' | '*' | '/' | '%' ;"  // Arithmetic operators
+            "bit_op  : '&' | '^' | '|' ;"  // Bit operators
+            "log_op  : \"&&\" | \"||\" ;"  // Logical operators
             "allchar : /[^\"]*/ ;"  // Do not allow double quotes
-            "str_lit : '\"'<allchar>'\"' ;"
-            "mat_dlm : (',' | ' ') | ';' ;"
-            "mat_lit : '['((<num><mat_dlm>)+ <num>?)']' ;"
-            "expr    : <num> <mth_op> <num> "
-            "        | <int> <bit_op> <int> "
-            "        | <int> <log_op> <int> "
+            "name    : /[a-zA-Z_][a-zA-Z0-9_]*/ ;"  // Any valid token name
+            "mat_dlm : (',' | ' ') | ';' ;"  // Matrix delimiter
+            "assmt   : '=' ;"
+
+            // -- Compound rules --
+            "str_lit : '\"'<allchar>'\"' ;"  // String literal
+            "mat_lit : '['((<num><mat_dlm>)+ <num>?)']' ;"  // Matrix literal
+            "expr    : <num> <mth_op> <num> "  // Expression
+            "        | <int> (<log_op> | <bit_op>) <int> "  // [order matters]
             "        | <str_lit> "
             "        | <num> "
             "        | <mat_lit> ;"
-            "name    : /[a-zA-Z_][a-zA-Z0-9_]*/ ;"
-            "a_stmt  : (<name> <name> '=' <expr> "
-            "        | <name> '=' <expr>';') ;"
+            "type    : <name> ;"
+            "a_stmt  : (<type> <name> <assmt> <expr> "  // Assignment statement
+            "        | <name> '=' <expr>)';' ;"
             "stmt    : <a_stmt> ;"
             "lab_mat : /^/ (<stmt>)* /$/ ;";
 
@@ -113,8 +117,10 @@ int mpc_setup(mpc_parser_t **parser) {
     mpc_parser_t *p12 = mpc_new(rule_names_arr[12]);
     mpc_parser_t *p13 = mpc_new(rule_names_arr[13]);
     mpc_parser_t *p14 = mpc_new(rule_names_arr[14]);
+    mpc_parser_t *p15 = mpc_new(rule_names_arr[15]);
+    mpc_parser_t *p16 = mpc_new(rule_names_arr[16]);
     mpca_lang(MPCA_LANG_DEFAULT, grammar, p00, p01, p02, p03, p04, p05,
-              p06, p07, p08, p09, p10, p11, p12, p13, p14);
-    *parser = p14;
-    return 15;
+              p06, p07, p08, p09, p10, p11, p12, p13, p14, p15, p16);
+    *parser = p16;
+    return 17;
 }
