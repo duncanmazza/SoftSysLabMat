@@ -62,15 +62,19 @@ SLL *mpc_rules_match(const char *const to_match) {
 }
 
 
-int *mpc_setup(mpc_parser_t **parser) {
+int mpc_setup(mpc_parser_t **parser) {
     const char *grammar =
             "int     : /-?[0-9]+/ ;"
             "float   : /-?([0-9]*[.])[0-9]+/ ;"
             "mth_op  : '+' | '-' | '*' | '/' | '%' ;"
             "bit_op  : '&' | '^' | '|' ;"
             "log_op  : \"&&\" | \"||\" ;"
+            "allchar : /[^\"]*/ ;"  // Do not allow double quotes
+            "str_lit : '\"'<allchar>'\"' ;"
             "expr    : (<float>|<int>) <mth_op> (<float>|<int>) "
-            "        | <int> <bit_op> <int> | <int> <log_op> <int> ;"
+            "        | <int> <bit_op> <int> "
+            "        | <int> <log_op> <int> "
+            "        | <str_lit> ;"
             "name    : /[a-zA-Z_][a-zA-Z0-9_]*/ ;"
             "a_stmt  : <name>{1} <name> '=' <expr>';' | <name> '=' <expr>';' ;"
             "stmt    : <a_stmt> ;"
@@ -98,8 +102,10 @@ int *mpc_setup(mpc_parser_t **parser) {
     mpc_parser_t *p07 = mpc_new(rule_names_arr[7]);
     mpc_parser_t *p08 = mpc_new(rule_names_arr[8]);
     mpc_parser_t *p09 = mpc_new(rule_names_arr[9]);
-//    mpc_parser_t *p10 = mpc_new(rule_names_arr[10]);
+    mpc_parser_t *p10 = mpc_new(rule_names_arr[10]);
+    mpc_parser_t *p11 = mpc_new(rule_names_arr[11]);
     mpca_lang(MPCA_LANG_DEFAULT, grammar, p00, p01, p02, p03, p04, p05,
-              p06, p07, p08, p09);
-    *parser = p09;
+              p06, p07, p08, p09, p10, p11);
+    *parser = p11;
+    return 12;
 }
