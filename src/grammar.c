@@ -6,7 +6,10 @@
 
 
 SLL *mpc_rules_match(const char *const to_match) {
-    const char *rule_matcher = "^\\w+[^\\s]";
+    const char *rule_matcher = "^\\w+[^\\s]";\
+    const char* delimiter = " ;";
+    size_t delimiter_len  = strlen(delimiter);
+
     regex_t rx;
     int regex_comp_ret = regcomp(&rx, rule_matcher, REG_EXTENDED);
     if (regex_comp_ret != 0) {
@@ -16,16 +19,19 @@ SLL *mpc_rules_match(const char *const to_match) {
 
     SLL *rule_definitions = SLL_create();
     SLL_Node *prev_rule_def = NULL;
-    char *to_match_copy = malloc(strlen(to_match) + 1);
+    size_t grammar_len = strlen(to_match);
+    char *to_match_copy = malloc(grammar_len + 1);
+    char *to_match_copy_copy = to_match_copy;
     strcpy(to_match_copy, to_match);
-    char *pch = strtok(to_match_copy, ";");
-
-    while (pch != NULL) {
-        char *pch_copy = malloc(strlen(pch) + 1);
-        strcpy(pch_copy, pch);
-        prev_rule_def = SLL_insert_after(rule_definitions, pch_copy,
+    char *next_found = strstr(to_match_copy, delimiter);
+    while (next_found != NULL) {
+        size_t token_len = (next_found - to_match_copy);
+        char *token = malloc(token_len);
+        strncpy(token, to_match_copy, token_len);
+        prev_rule_def = SLL_insert_after(rule_definitions, token,
                                          prev_rule_def);
-        pch = strtok(NULL, ";");
+        to_match_copy = next_found + delimiter_len;
+        next_found = strstr(to_match_copy, delimiter);
     }
 
     SLL *rule_names = SLL_create();
@@ -50,7 +56,7 @@ SLL *mpc_rules_match(const char *const to_match) {
     }
 
     regfree(&rx);
-    free(to_match_copy);
+    free(to_match_copy_copy);
     SLL_clean(rule_definitions);
     return rule_names;
 }
@@ -65,11 +71,10 @@ int *mpc_setup(mpc_parser_t **parser) {
             "log_op  : \"&&\" | \"||\" ;"
             "expr    : (<float>|<int>) <mth_op> (<float>|<int>) "
             "        | <int> <bit_op> <int> | <int> <log_op> <int> ;"
-            "token   : /[a-zA-Z_][a-zA-Z0-9_]*/ ;"
-            "var     : <token> ;"
-            "asmt    : '=' ;"
-            "stmt    : <var> <asmt> <expr> ;"
-            "lab_mat : /^/ <stmt> /$/ ;";
+            "name    : /[a-zA-Z_][a-zA-Z0-9_]*/ ;"
+            "a_stmt  : <name>{1} <name> '=' <expr>';' | <name> '=' <expr>';' ;"
+            "stmt    : <a_stmt> ;"
+            "lab_mat : /^/ (<stmt>)* /$/ ;";
 
     SLL *matched_rule_names = mpc_rules_match(grammar);
     char *rule_names_arr[matched_rule_names->len];
@@ -93,8 +98,8 @@ int *mpc_setup(mpc_parser_t **parser) {
     mpc_parser_t *p07 = mpc_new(rule_names_arr[7]);
     mpc_parser_t *p08 = mpc_new(rule_names_arr[8]);
     mpc_parser_t *p09 = mpc_new(rule_names_arr[9]);
-    mpc_parser_t *p10 = mpc_new(rule_names_arr[10]);
+//    mpc_parser_t *p10 = mpc_new(rule_names_arr[10]);
     mpca_lang(MPCA_LANG_DEFAULT, grammar, p00, p01, p02, p03, p04, p05,
-              p06, p07, p08, p09, p10);
-    *parser = p10;
+              p06, p07, p08, p09);
+    *parser = p09;
 }
