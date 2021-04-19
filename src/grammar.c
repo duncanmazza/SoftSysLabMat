@@ -65,18 +65,24 @@ SLL *mpc_rules_match(const char *const to_match) {
 int mpc_setup(mpc_parser_t **parser) {
     const char *grammar =
             "int     : /-?[0-9]+/ ;"
-            "float   : /-?([0-9]*[.])[0-9]+/ ;"
+            "float   : /-?[0-9]+[.][0-9]+/ ;"
+            "num     : <float> | <int> ;"  // Order matters here for mpc
             "mth_op  : '+' | '-' | '*' | '/' | '%' ;"
             "bit_op  : '&' | '^' | '|' ;"
             "log_op  : \"&&\" | \"||\" ;"
             "allchar : /[^\"]*/ ;"  // Do not allow double quotes
             "str_lit : '\"'<allchar>'\"' ;"
-            "expr    : (<float>|<int>) <mth_op> (<float>|<int>) "
+            "mat_dlm : (',' | ' ') | ';' ;"
+            "mat_lit : '['((<num><mat_dlm>)+ <num>?)']' ;"
+            "expr    : <num> <mth_op> <num> "
             "        | <int> <bit_op> <int> "
             "        | <int> <log_op> <int> "
-            "        | <str_lit> ;"
+            "        | <str_lit> "
+            "        | <num> "
+            "        | <mat_lit> ;"
             "name    : /[a-zA-Z_][a-zA-Z0-9_]*/ ;"
-            "a_stmt  : <name>{1} <name> '=' <expr>';' | <name> '=' <expr>';' ;"
+            "a_stmt  : (<name> <name> '=' <expr> "
+            "        | <name> '=' <expr>';') ;"
             "stmt    : <a_stmt> ;"
             "lab_mat : /^/ (<stmt>)* /$/ ;";
 
@@ -104,8 +110,11 @@ int mpc_setup(mpc_parser_t **parser) {
     mpc_parser_t *p09 = mpc_new(rule_names_arr[9]);
     mpc_parser_t *p10 = mpc_new(rule_names_arr[10]);
     mpc_parser_t *p11 = mpc_new(rule_names_arr[11]);
+    mpc_parser_t *p12 = mpc_new(rule_names_arr[12]);
+    mpc_parser_t *p13 = mpc_new(rule_names_arr[13]);
+    mpc_parser_t *p14 = mpc_new(rule_names_arr[14]);
     mpca_lang(MPCA_LANG_DEFAULT, grammar, p00, p01, p02, p03, p04, p05,
-              p06, p07, p08, p09, p10, p11);
-    *parser = p11;
-    return 12;
+              p06, p07, p08, p09, p10, p11, p12, p13, p14);
+    *parser = p14;
+    return 15;
 }
