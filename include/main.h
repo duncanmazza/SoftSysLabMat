@@ -22,6 +22,7 @@
 #include "dll.h"
 #include "grammar.h"
 #include "cl_input.h"
+#include "otree.h"
 
 
 #ifdef __cplusplus

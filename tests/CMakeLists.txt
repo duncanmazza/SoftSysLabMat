@@ -10,7 +10,7 @@ add_executable(Google_Tests_run
         test_all.cpp
         test_DLL.cpp
         test_SLL.cpp
-)
+        )
 
 set_property(TARGET Google_Tests_run PROPERTY CXX_STANDARD 20)
 
