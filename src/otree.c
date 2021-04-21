@@ -24,8 +24,6 @@ const char *const otree_label_strs[] = {
         "LM_CHAR",
         "LM_STATEMENT",
         "LM_STATEMENT_ASSIGNMENT",
-        "LM_TYPE",
-        "LM_VARNAME",
         "LM_ANY_EXPRESSION",
         "LM_FUNCTION_CALL_EXPRESSION",
         "LM_SIMPLE_EXPRESSION",
@@ -44,6 +42,34 @@ const char *const otree_label_strs[] = {
         "LM_INT",
         "LM_ARGUMENT_LIST",
         "LM_LAB_MAT",
+};
+
+
+/* This must correspond exactly to the order as prescribed in the OTreeLabel
+ * enum */
+const char *const otree_rule_strs[] = {
+        "",  // LM_NO_LABEL
+        "",  // LM_CHAR
+        "stmt",
+        "a_stmt",
+        "anyexpr",
+        "fexpr",
+        "smpexpr",
+        "mat_lit",
+        "str_lit",
+        "num",
+        "al_dlm",
+        "assmt",
+        "mat_dlm",
+        "name",
+        "all_char",
+        "log_op",
+        "bit_op",
+        "math_op",
+        "float",
+        "int",
+        "arglist",
+        ">",  // LM_LAB_MAT
 };
 
 
@@ -68,55 +94,11 @@ OTreeLabel get_tree_label_enum(const char *const label) {
         }
     }
 
-    if (strncmp(end_label, "int", end_label_len) == 0) {
-        return LM_INT;
-    } else if (strncmp(end_label, "float", end_label_len) == 0) {
-        return LM_FLOAT;
-    } else if (strncmp(end_label, "math_op", end_label_len) == 0) {
-        return LM_MATH_OP;
-    } else if (strncmp(end_label, "bit_op", end_label_len) == 0) {
-        return LM_BIT_OP;
-    } else if (strncmp(end_label, "log_op", end_label_len) == 0) {
-        return LM_LOGICAL_OP;
-    } else if (strncmp(end_label, "allchar", end_label_len) == 0) {
-        return LM_ALL_CHARACTERS;
-    } else if (strncmp(end_label, "name", end_label_len) == 0) {
-        return LM_TOKEN_NAME;
-    } else if (strncmp(end_label, "mat_dlm", end_label_len) == 0) {
-        return LM_MATRIX_DELIMITER;
-    } else if (strncmp(end_label, "assmt", end_label_len) == 0) {
-        return LM_ASSIGNMENT_OP;
-    } else if (strncmp(end_label, "al_dlm", end_label_len) == 0) {
-        return LM_ARGUMENT_LIST_DELIMITER;
-    } else if (strncmp(end_label, "num", end_label_len) == 0) {
-        return LM_ANY_NUMBER;
-    } else if (strncmp(end_label, "str_lit", end_label_len) == 0) {
-        return LM_STRING_LITERAL;
-    } else if (strncmp(end_label, "mat_lit", end_label_len) == 0) {
-        return LM_MATRIX_LITERAL;
-    } else if (strncmp(end_label, "smpexpr", end_label_len) == 0) {
-        return LM_SIMPLE_EXPRESSION;
-    } else if (strncmp(end_label, "", end_label_len) == 0) {
-        return LM_ARGUMENT_LIST;
-    } else if (strncmp(end_label, "fexpr", end_label_len) == 0) {
-        return LM_FUNCTION_CALL_EXPRESSION;
-    } else if (strncmp(end_label, "anyexpr", end_label_len) == 0) {
-        return LM_ANY_EXPRESSION;
-    } else if (strncmp(end_label, "type", end_label_len) == 0) {
-        return LM_TYPE;
-    } else if (strncmp(end_label, "varname", end_label_len) == 0) {
-        return LM_VARNAME;
-    } else if (strncmp(end_label, "a_stmt", end_label_len) == 0) {
-        return LM_STATEMENT_ASSIGNMENT;
-    } else if (strncmp(end_label, "stmt", end_label_len) == 0) {
-        return LM_STATEMENT;
-    } else if (strncmp(end_label, ">", end_label_len) == 0) {
-        return LM_LAB_MAT;
-    } else if (strncmp(end_label, "char", end_label_len) == 0) {
-        return LM_CHAR;
-    } else {
-        return LM_NO_LABEL;
+    for (int i = 0; i < NUM_OTREE_LABELS; i++) {
+        if (strncmp(end_label, otree_rule_strs[i], end_label_len) == 0)
+            return (OTreeLabel) i;
     }
+    return LM_NO_LABEL;
 }
 
 
@@ -227,20 +209,6 @@ int otree_parse_literal(const mpc_ast_t *const ast, OTree *const otree) {
 }
 
 
-int otree_parse_name(const char *const contents, OTree *const otree) {
-    switch (otree->label) {
-        case LM_VARNAME:
-        case LM_TYPE:
-            otree->val = format_msg("%s", CTYPE_STR, 1, contents);
-            return 0;
-        default:
-            fprintf(stderr, "otree_parse_name invoked with non-atomic "
-                            "label");
-            return 1;
-    }
-}
-
-
 OTree *make_empty_otree() {
     OTree *otree = malloc(sizeof(OTree));
     otree->val = NULL;
@@ -255,7 +223,6 @@ OTreeValType otree_classify_val(const OTree *const otree) {
         case LM_CHAR:
         case LM_ANY_NUMBER:
         case LM_MATRIX_DELIMITER:
-        case LM_VARNAME:
         case LM_ALL_CHARACTERS:
             return OTREE_SHOULD_NOT_EXIST;
         case LM_STATEMENT:
@@ -266,7 +233,6 @@ OTreeValType otree_classify_val(const OTree *const otree) {
         case LM_ARGUMENT_LIST:
         case LM_LAB_MAT:
             return OTREE_VAL_SLL;
-        case LM_TYPE:
         case LM_STRING_LITERAL:
         case LM_TOKEN_NAME:
             return OTREE_VAL_STR;
@@ -420,10 +386,6 @@ OTree *ast_2_otree(const mpc_ast_t *const ast, int *status) {
         case LM_STRING_LITERAL:
         case LM_MATRIX_LITERAL:
             *status |= otree_parse_literal(ast, otree);
-            return otree;
-        case LM_VARNAME:
-        case LM_TYPE:
-            *status |= otree_parse_name(ast->contents, otree);
             return otree;
         case LM_NO_LABEL:
             *status |= 1;

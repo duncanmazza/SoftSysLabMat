@@ -30,8 +30,6 @@ typedef enum {
     LM_CHAR,
     LM_STATEMENT,
     LM_STATEMENT_ASSIGNMENT,
-    LM_TYPE,
-    LM_VARNAME,
     LM_ANY_EXPRESSION,
     LM_FUNCTION_CALL_EXPRESSION,
     LM_SIMPLE_EXPRESSION,
@@ -52,7 +50,10 @@ typedef enum {
     LM_LAB_MAT,
 } OTreeLabel;
 
+#define NUM_OTREE_LABELS LM_LAB_MAT + 1
+
 extern const char* const otree_label_strs[];
+extern const char* const otree_rule_strs[];
 
 typedef enum {
     OTREE_SHOULD_NOT_EXIST,
@@ -109,8 +110,6 @@ int _otree_atomic_parse_int(const char *const contents, OTree *const otree);
 OTree *make_empty_otree();
 
 int otree_parse_literal(const mpc_ast_t *const ast, OTree *const otree);
-
-int otree_parse_name(const char *const contents, OTree *const otree);
 
 int _otree_atomic_parse_op(const char* const symb, OTree *const otree);
 
