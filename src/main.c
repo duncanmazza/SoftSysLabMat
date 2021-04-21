@@ -31,14 +31,15 @@ int main(int argc, char **argv) {
                       parser, &r)) {
 
             int status = 0;
-            ast_2_otree(r.output, &status);
+            OTree *otree = ast_2_otree(r.output, &status);
             if (status != 0) {
                 fprintf(stderr, "Cannot evaluate due to static parsing error\n");
                 usleep(50000);
             }
+            disp_otree(otree);
 
             /* print the AST */
-            mpc_ast_print(r.output);
+//            mpc_ast_print(r.output);
             mpc_ast_delete(r.output);
         } else {
             /* Otherwise Print the Error */

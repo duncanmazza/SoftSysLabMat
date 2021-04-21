@@ -52,6 +52,19 @@ typedef enum {
     LM_LAB_MAT,
 } OTreeLabel;
 
+extern const char* const otree_label_strs[];
+
+typedef enum {
+    OTREE_SHOULD_NOT_EXIST,
+    OTREE_VAL_NULL,
+    OTREE_VAL_STR,
+    OTREE_VAL_LONG,
+    OTREE_VAL_DOUBLE,
+    OTREE_VAL_SLL,
+    OTREE_VAL_MAT,
+    OTREE_VAL_OP_ENUM,
+} OTreeValType;
+
 typedef struct {
     OTreeLabel label;
     void *val;
@@ -76,9 +89,11 @@ typedef enum {
     OP_ASSIGNMENT,
 } OP_Enum;
 
+extern const char* const op_enum_strs[];
 #define NUM_OPS OP_ASSIGNMENT + 1
 
-extern const char* const op_enum_strs[];
+
+#define INDENT_SZ 2
 
 
 OTree *ast_2_otree(const mpc_ast_t *const ast, int *status);
@@ -98,6 +113,11 @@ int otree_parse_literal(const mpc_ast_t *const ast, OTree *const otree);
 int otree_parse_name(const char *const contents, OTree *const otree);
 
 int _otree_atomic_parse_op(const char* const symb, OTree *const otree);
+
+void _disp_otree(const OTree *const otree, DLL *const repr_dll, size_t indent);
+
+void disp_otree(const OTree *const otree);
+
 
 #ifdef __cplusplus
 }

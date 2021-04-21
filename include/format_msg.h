@@ -24,6 +24,11 @@ typedef enum {
     CTYPE_STR,
 } CType;
 
+extern const char *const ctype_str_formatting[];
+
+
+#define QUICK_MSG(msg) format_msg("%s", CTYPE_STR, 1, (msg))
+#define QUICK_MSG_ENDL(msg) format_msg("%s\n", CTYPE_STR, 1, (msg))
 
 char *format_msg(const char *templ, CType type, size_t nargs, ...);
 
