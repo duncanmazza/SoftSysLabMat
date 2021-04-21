@@ -29,16 +29,16 @@ int main(int argc, char **argv) {
         mpc_result_t r;
         if (mpc_parse("input", (char *) history_dll->s->prev->val,
                       parser, &r)) {
-            /* print the AST */
-            mpc_ast_print(r.output);
 
-            int status;
+            int status = 0;
             ast_2_otree(r.output, &status);
             if (status != 0) {
-                fprintf(stderr, "Cannot evaluate due to static parsing error");
-                continue;
+                fprintf(stderr, "Cannot evaluate due to static parsing error\n");
+                usleep(50000);
             }
 
+            /* print the AST */
+            mpc_ast_print(r.output);
             mpc_ast_delete(r.output);
         } else {
             /* Otherwise Print the Error */

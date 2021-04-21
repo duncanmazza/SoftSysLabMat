@@ -73,18 +73,17 @@ int mpc_setup(mpc_parser_t **parser) {
             "math_op : '+' | '-' | '*' | '/' | '%' ;"  // Arithmetic operators
             "bit_op  : '&' | '^' | '|' ;"  // Bit operators
             "log_op  : \"&&\" | \"||\" ;"  // Logical operators
+            "assmt   : '=' ;"  // Assignment operator
+
             "allchar : /[^\"]*/ ;"  // Do not allow double quotes
             "name    : /[a-zA-Z_][a-zA-Z0-9_]*/ ;"  // Any valid token name
             "mat_dlm : (',' | ' ') | ';' ;"  // Matrix delimiter
-            "assmt   : '=' ;"  // Assignment operator
             "al_dlm  : ','/\s*/ ;"  // Argument list delimiter
 
             // -- Compound rules --
             "num     : <float> | <int> ;"  // [order matters] Any number
             "str_lit : '\"'<allchar>'\"' ;"  // String literal
             "mat_lit : '['((<num><mat_dlm>)+ <num>?)']' ;"  // Matrix literal
-            "type    : <name> ;"
-            "varname : <name> ;"
             "smpexpr : <num> <math_op> <num> "  // Simple expression
             "        | <int> (<log_op> | <bit_op>) <int> "  // [order matters]
             "        | <str_lit> "
@@ -94,7 +93,7 @@ int mpc_setup(mpc_parser_t **parser) {
             "arglist : ((<smpexpr><al_dlm>)+<smpexpr> | <smpexpr>) ;"
             "fexpr   : <name>'('/\s*/<arglist>?/\s*/')' ;"  // Expression: function call
             "anyexpr : ('('(<fexpr> | <smpexpr>)')') | (<fexpr> | <smpexpr>) ;"
-            "a_stmt  : (<type> <name> <assmt> <anyexpr> "  // Assignment statement
+            "a_stmt  : (<name> <name> <assmt> <anyexpr> "  // Assignment statement
             "        | <name> <assmt> <anyexpr>"
             "        | <fexpr>)';' ;"
             "stmt    : <a_stmt> ;"
@@ -132,11 +131,9 @@ int mpc_setup(mpc_parser_t **parser) {
     mpc_parser_t *p17 = mpc_new(rule_names_arr[17]);
     mpc_parser_t *p18 = mpc_new(rule_names_arr[18]);
     mpc_parser_t *p19 = mpc_new(rule_names_arr[19]);
-    mpc_parser_t *p20 = mpc_new(rule_names_arr[20]);
-    mpc_parser_t *p21 = mpc_new(rule_names_arr[21]);
     mpca_lang(MPCA_LANG_DEFAULT, grammar, p00, p01, p02, p03, p04, p05,
               p06, p07, p08, p09, p10, p11, p12, p13, p14, p15, p16, p17, p18,
-              p19, p20, p21);
-    *parser = p21;
-    return 21;
+              p19);
+    *parser = p19;
+    return 20;
 }

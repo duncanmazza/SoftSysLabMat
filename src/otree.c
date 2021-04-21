@@ -6,6 +6,15 @@
 
 #include "../include/otree.h"
 
+/* This must correspond exactly to the order as prescribed in the OP_Enum
+ * enum */
+const char* const op_enum_strs[] = {
+        "+", "-", "*", "/", "%",
+        "&", "^", "|",
+        "&&", "||",
+        "=",
+};
+
 
 OTreeLabel get_tree_label_enum(const char *const label) {
     const char *end_label = label;
@@ -72,6 +81,8 @@ OTreeLabel get_tree_label_enum(const char *const label) {
         return LM_STATEMENT;
     } else if (strncmp(end_label, ">", end_label_len) == 0) {
         return LM_LAB_MAT;
+    } else if (strncmp(end_label, "char", end_label_len) == 0) {
+        return LM_CHAR;
     } else {
         return LM_NO_LABEL;
     }
@@ -81,19 +92,22 @@ OTreeLabel get_tree_label_enum(const char *const label) {
 int otree_parse_atomic(const char *const contents, OTree *const otree) {
     switch (otree->label) {
         case LM_INT:
-            return _otree_parse_atomic_int(contents, otree);
+            return _otree_atomic_parse_int(contents, otree);
         case LM_FLOAT:
-            return _otree_parse_atomic_float(contents, otree);
+            return _otree_atomic_parse_float(contents, otree);
         case LM_ASSIGNMENT_OP:
         case LM_MATH_OP:
         case LM_BIT_OP:
         case LM_LOGICAL_OP:
-        case LM_ALL_CHARACTERS:
+            return _otree_atomic_parse_op(contents, otree);
         case LM_TOKEN_NAME:
+        case LM_ALL_CHARACTERS:
+            otree->val = format_msg("%s", CTYPE_STR, 1, contents);
+            return 0;
         case LM_MATRIX_DELIMITER:
         case LM_ARGUMENT_LIST_DELIMITER:
-            fprintf(stderr, "unhandled case in otree_parse_atomic\n");
-            return 1;
+            otree->val = NULL;
+            return 0;
         default:
             fprintf(stderr, "otree_parse_atomic invoked with non-atomic "
                             "label\n");
@@ -102,7 +116,7 @@ int otree_parse_atomic(const char *const contents, OTree *const otree) {
 }
 
 
-int _otree_parse_atomic_int(const char *const contents, OTree *const otree) {
+int _otree_atomic_parse_int(const char *const contents, OTree *const otree) {
     char *endptr;
     long str_as_l = strtol(contents, &endptr, 10);
     if (errno == ERANGE) {
@@ -121,7 +135,7 @@ int _otree_parse_atomic_int(const char *const contents, OTree *const otree) {
 }
 
 
-int _otree_parse_atomic_float(const char *const contents, OTree *const otree) {
+int _otree_atomic_parse_float(const char *const contents, OTree *const otree) {
     char *endptr;
     double str_as_d = strtod(contents, &endptr);
     if (errno == ERANGE) {
@@ -140,20 +154,34 @@ int _otree_parse_atomic_float(const char *const contents, OTree *const otree) {
 }
 
 
-int otree_parse_literal(const char *const contents, OTree *const otree) {
+int _otree_atomic_parse_op(const char *const symb, OTree *const otree) {
+    size_t symb_strlen = strlen(symb);
+    for (int i = 0; i < NUM_OPS; i++) {
+        if (strncmp(op_enum_strs[i], symb, symb_strlen) != 0) continue;
+        otree->label = (OTreeLabel) i;
+        otree->val = NULL;
+        return 0;
+    }
+    fprintf(stderr, "unhandled case encountered when parsing an operator\n");
+    return 1;
+}
+
+
+int otree_parse_literal(const mpc_ast_t *const ast, OTree *const otree) {
     switch (otree->label) {
         case LM_ANY_NUMBER:
-            if (strstr(contents, ".")) {
+            if (strstr(ast->contents, ".")) {
                 otree->label = LM_FLOAT;
-                return _otree_parse_atomic_float(contents, otree);
+                return _otree_atomic_parse_float(ast->contents, otree);
             } else {
                 otree->label = LM_INT;
-                return _otree_parse_atomic_int(contents, otree);
+                return _otree_atomic_parse_int(ast->contents, otree);
             }
         case LM_STRING_LITERAL:
             // Format msg takes care of allocation of memory to copy the
             // contents string into a new memory chunk.
-            otree->val = format_msg("%s", CTYPE_STR, 1, contents);
+            otree->val = format_msg("%s", CTYPE_STR, 1,
+                                    ast->children[1]->contents);
             return 0;
         case LM_MATRIX_LITERAL:
             fprintf(stderr, "unhandled case in otree_parse_atomic\n");
@@ -208,7 +236,7 @@ OTree *ast_2_otree(const mpc_ast_t *const ast, int *status) {
         case LM_ANY_NUMBER:
         case LM_STRING_LITERAL:
         case LM_MATRIX_LITERAL:
-            *status |= otree_parse_literal(ast->contents, otree);
+            *status |= otree_parse_literal(ast, otree);
             return otree;
         case LM_VARNAME:
         case LM_TYPE:
