@@ -40,8 +40,7 @@ char *format_msg(const char *templ, CType type, size_t nargs, ...) {
             break;
         case CTYPE_STR:
             for (int i = 0; i < nargs; i++) {
-                msg_buffer_len += strlen(va_arg(ap,
-                                                char *));
+                msg_buffer_len += strlen(va_arg(ap, char *));
             }
             // Reset ap
             va_start(ap, nargs);
