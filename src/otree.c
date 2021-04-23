@@ -33,7 +33,8 @@ const char *const otree_label_strs[] = {
         "LM_ANY_NUMBER",
         "LM_ARGUMENT_LIST_DELIMITER",
         "LM_ASSIGNMENT_OP",
-        "LM_MATRIX_DELIMITER",
+        "LM_MATRIX_COMMA_DELIMITER",
+        "LM_MATRIX_SEMICOLON_DELIMITER",
         "LM_TOKEN_NAME",
         "LM_ALL_CHARACTERS",
         "LM_LOGICAL_OP",
@@ -62,7 +63,8 @@ const char *const otree_rule_strs[] = {
         "num",
         "al_dlm",
         "assmt",
-        "mat_dlm",
+        "matcdlm",
+        "matsdlm",
         "name",
         "all_char",
         "log_op",
@@ -119,9 +121,12 @@ int otree_parse_atomic(const char *const contents, OTree *const otree) {
         case LM_ALL_CHARACTERS:
             otree->val = format_msg("%s", CTYPE_STR, 1, contents);
             return 0;
-        case LM_MATRIX_DELIMITER:
         case LM_ARGUMENT_LIST_DELIMITER:
-            otree->val = NULL;
+        case LM_MATRIX_COMMA_DELIMITER:
+            otree->val = format_msg("%s", CTYPE_STR, 1, ",");
+            return 0;
+        case LM_MATRIX_SEMICOLON_DELIMITER:
+            otree->val = format_msg("%s", CTYPE_STR, 1, ";");
             return 0;
         default:
             fprintf(stderr, "otree_parse_atomic invoked with non-atomic "
@@ -182,6 +187,13 @@ int _otree_atomic_parse_op(const char *const symb, OTree *const otree) {
     return 1;
 }
 
+int _otree_construct_matrix(const mpc_ast_t *const ast, OTree *const otree) {
+    // TODO: replace with actual matrix construction; current code is just a
+    //  placeholder
+
+    otree->val = NULL;
+    return 0;
+}
 
 int otree_parse_literal(const mpc_ast_t *const ast, OTree *const otree) {
     switch (otree->label) {
@@ -200,9 +212,7 @@ int otree_parse_literal(const mpc_ast_t *const ast, OTree *const otree) {
                                     ast->children[1]->contents);
             return 0;
         case LM_MATRIX_LITERAL:
-            fprintf(stderr, "Unhandled case in otree_parse_atomic: "
-                            "evaluating a matrix literal\n");
-            return 1;
+            return _otree_construct_matrix(ast, otree);
         default:
             fprintf(stderr, "otree_parse_atomic invoked with non-atomic "
                             "label\n");
@@ -224,7 +234,6 @@ OTreeValType otree_classify_val(const OTree *const otree) {
         case LM_NO_LABEL:
         case LM_CHAR:
         case LM_ANY_NUMBER:
-        case LM_MATRIX_DELIMITER:
         case LM_ALL_CHARACTERS:
             return OTREE_SHOULD_NOT_EXIST;
         case LM_STATEMENT:
@@ -246,8 +255,9 @@ OTreeValType otree_classify_val(const OTree *const otree) {
             return OTREE_VAL_OP_ENUM;
         case LM_MATRIX_LITERAL:
             return OTREE_VAL_MAT;
+        case LM_MATRIX_COMMA_DELIMITER:
         case LM_ARGUMENT_LIST_DELIMITER:
-            return OTREE_VAL_NULL;
+            return OTREE_DELIM;
         case LM_FLOAT:
             return OTREE_VAL_DOUBLE;
         case LM_INT:
@@ -325,9 +335,7 @@ void _disp_otree(const OTree *const otree, DLL *const repr_dll, size_t indent) {
     char *value_disp;
     OTreeValType classification = otree_classify_val(otree);
     switch (classification) {
-        case OTREE_VAL_NULL:
-            value_disp = QUICK_MSG("NULL");
-            break;
+        case OTREE_DELIM:
         case OTREE_VAL_STR:
             value_disp = QUICK_MSG((char *) otree->val);
             break;
@@ -370,7 +378,7 @@ void _disp_otree(const OTree *const otree, DLL *const repr_dll, size_t indent) {
 
 OTree *ast_2_otree(const mpc_ast_t *const ast, int *status) {
     OTree *otree = make_empty_otree();
-    otree->label = get_tree_label_enum(ast->tag);;
+    otree->label = get_tree_label_enum(ast->tag);
 
     switch (otree->label) {
         case LM_INT:
@@ -380,8 +388,9 @@ OTree *ast_2_otree(const mpc_ast_t *const ast, int *status) {
         case LM_LOGICAL_OP:
         case LM_ALL_CHARACTERS:
         case LM_TOKEN_NAME:
-        case LM_MATRIX_DELIMITER:
         case LM_ASSIGNMENT_OP:
+        case LM_MATRIX_COMMA_DELIMITER:
+        case LM_MATRIX_SEMICOLON_DELIMITER:
         case LM_ARGUMENT_LIST_DELIMITER:
             *status |= otree_parse_atomic(ast->contents, otree);
             return otree;

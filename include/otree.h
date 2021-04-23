@@ -39,7 +39,8 @@ typedef enum {
     LM_ANY_NUMBER,
     LM_ARGUMENT_LIST_DELIMITER,
     LM_ASSIGNMENT_OP,
-    LM_MATRIX_DELIMITER,
+    LM_MATRIX_COMMA_DELIMITER,
+    LM_MATRIX_SEMICOLON_DELIMITER,
     LM_TOKEN_NAME,
     LM_ALL_CHARACTERS,
     LM_LOGICAL_OP,
@@ -58,13 +59,13 @@ extern const char* const otree_rule_strs[];
 
 typedef enum {
     OTREE_SHOULD_NOT_EXIST,
-    OTREE_VAL_NULL,
     OTREE_VAL_STR,
     OTREE_VAL_LONG,
     OTREE_VAL_DOUBLE,
     OTREE_VAL_SLL,
     OTREE_VAL_MAT,
     OTREE_VAL_OP_ENUM,
+    OTREE_DELIM,
 } OTreeValType;
 
 typedef struct {
@@ -109,6 +110,8 @@ int otree_parse_atomic(const char *const contents, OTree *const otree);
 int _otree_atomic_parse_int(const char *const contents, OTree *const otree);
 
 OTree *make_empty_otree();
+
+int _otree_construct_matrix(const mpc_ast_t *const ast, OTree *const otree);
 
 int otree_parse_literal(const mpc_ast_t *const ast, OTree *const otree);
 
