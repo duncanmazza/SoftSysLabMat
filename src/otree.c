@@ -25,6 +25,7 @@ const char *const otree_label_strs[] = {
         "LM_STATEMENT",
         "LM_STATEMENT_ASSIGNMENT",
         "LM_ANY_EXPRESSION",
+        "LM_EXPRESSION",
         "LM_FUNCTION_CALL_EXPRESSION",
         "LM_SIMPLE_EXPRESSION",
         "LM_MATRIX_LITERAL",
@@ -53,6 +54,7 @@ const char *const otree_rule_strs[] = {
         "stmt",
         "a_stmt",
         "anyexpr",
+        "expr",
         "fexpr",
         "smpexpr",
         "mat_lit",
@@ -228,6 +230,7 @@ OTreeValType otree_classify_val(const OTree *const otree) {
         case LM_STATEMENT:
         case LM_STATEMENT_ASSIGNMENT:
         case LM_ANY_EXPRESSION:
+        case LM_EXPRESSION:
         case LM_FUNCTION_CALL_EXPRESSION:
         case LM_SIMPLE_EXPRESSION:
         case LM_ARGUMENT_LIST:

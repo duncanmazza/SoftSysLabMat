@@ -84,19 +84,18 @@ int mpc_setup(mpc_parser_t **parser) {
             "num     : <float> | <int> ;"  // [order matters] Any number
             "str_lit : '\"'<allchar>'\"' ;"  // String literal
             "mat_lit : '['((<num><mat_dlm>)+ <num>?)']' ;"  // Matrix literal
-            "smpexpr : <num> <math_op> <num> "  // Simple expression
-            "        | <int> (<log_op> | <bit_op>) <int> "  // [order matters]
+            "smpexpr : (<num>|<name>) (<math_op> (<num>|<name>|<anyexpr>))* "  // Simple expression
+            "        | (<int>|<name>) ((<log_op> | <bit_op>) (<int>|<name>|<anyexpr>))* "  // [order matters]
             "        | <str_lit> "
-            "        | <num> "
-            "        | <mat_lit> "
-            "        | <name> ;"
+            "        | <mat_lit> ;"
             "arglist : ((<smpexpr><al_dlm>)+<smpexpr> | <smpexpr>) ;"
+
             "fexpr   : <name>'('/\s*/<arglist>?/\s*/')' ;"  // Expression: function call
-            "anyexpr : ('('(<fexpr> | <smpexpr>)')') | (<fexpr> | <smpexpr>) ;"
-            "a_stmt  : (<name> <name> <assmt> <anyexpr> "  // Assignment statement
-            "        | <name> <assmt> <anyexpr>"
-            "        | <fexpr>)';' ;"
-            "stmt    : <a_stmt> ;"
+            "anyexpr : <fexpr> | '(' <expr>+ ')' | <smpexpr> ;"
+            "expr    : <anyexpr> ;"  // This enables mutual recursion with anyexpr
+            "a_stmt  : <name> <name> <assmt> <expr> "  // Assignment statement
+            "        | <name> <assmt> <expr> ;"
+            "stmt    : (<a_stmt> | <fexpr>)';' ;"
             "lab_mat : /^/ ((<stmt>)/\s*/)+ /$/ ;";
 
     SLL *matched_rule_names = mpc_rules_match(grammar);
@@ -131,9 +130,10 @@ int mpc_setup(mpc_parser_t **parser) {
     mpc_parser_t *p17 = mpc_new(rule_names_arr[17]);
     mpc_parser_t *p18 = mpc_new(rule_names_arr[18]);
     mpc_parser_t *p19 = mpc_new(rule_names_arr[19]);
+    mpc_parser_t *p20 = mpc_new(rule_names_arr[20]);
     mpca_lang(MPCA_LANG_DEFAULT, grammar, p00, p01, p02, p03, p04, p05,
               p06, p07, p08, p09, p10, p11, p12, p13, p14, p15, p16, p17, p18,
-              p19);
-    *parser = p19;
-    return 20;
+              p19, p20);
+    *parser = p20;
+    return 21;
 }
