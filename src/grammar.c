@@ -85,8 +85,7 @@ int mpc_setup(mpc_parser_t **parser) {
             "num     : <float> | <int> ;"  // [order matters] Any number
             "str_lit : '\"'<allchar>'\"' ;"  // String literal
             "mat_lit : '['/\s*/((<num>(<matcdlm> | <matsdlm>))+ <num>?)/\s*/']' ;"  // Matrix literal
-            "smpexpr : (<num>|<name>) (<math_op> (<anyexpr>|<name>|<num>))* "  // Simple expression
-            "        | (<int>|<name>) ((<log_op> | <bit_op>) (<anyexpr>|<name>|<num>))* "
+            "smpexpr : (<num>|<name>) ((<math_op>|<log_op>|<bit_op>) (<anyexpr>|<name>|<num>))* "  // Simple expression
             "        | <str_lit> "
             "        | <mat_lit> ;"
             "arglist : ((<anyexpr><al_dlm>)+<anyexpr> | <anyexpr>) ;"

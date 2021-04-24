@@ -88,6 +88,7 @@ OTreeLabel get_tree_label_enum(const char *const label) {
         } else {
             if (strncmp(seek + 1, "char", strlen("char")) == 0 ||
                 strncmp(seek + 1, "regex", strlen("regex")) == 0 ||
+                strncmp(seek + 1, "string", strlen("string")) == 0 ||
                 strncmp(seek + 1, ">", strlen(">")) == 0) {
                 end_label_len = seek - end_label;
                 break;
