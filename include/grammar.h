@@ -1,6 +1,8 @@
-//
-// Created by duncan on 4/15/21.
-//
+/* Grammar definition
+ *
+ * Duncan and Junwon LabMat SoftSys Project 1
+ *
+ */
 
 #ifndef SOFTSYSSOFTSYSLABMAT_GRAMMAR_H
 #define SOFTSYSSOFTSYSLABMAT_GRAMMAR_H
@@ -13,6 +15,7 @@
 extern "C" {
 #endif
 
+
 int mpc_setup(mpc_parser_t **parser);
 
 SLL *mpc_rules_match(const char *const to_match);
@@ -20,7 +23,6 @@ SLL *mpc_rules_match(const char *const to_match);
 #ifdef __cplusplus
 }
 #endif
-
 
 
 #endif //SOFTSYSSOFTSYSLABMAT_GRAMMAR_H

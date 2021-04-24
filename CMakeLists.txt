@@ -18,6 +18,8 @@ add_library(
         ${LIB_SRC_DIR_NAME}/dll.c
         ${LIB_SRC_DIR_NAME}/sll.c
         ${LIB_SRC_DIR_NAME}/grammar.c
+        ${LIB_SRC_DIR_NAME}/otree.c
+        ${LIB_SRC_DIR_NAME}/format_msg.c
 )
 
 add_executable(
@@ -26,4 +28,4 @@ add_executable(
 )
 
 set_property(TARGET ${EXECUTABLE_NAME} PROPERTY CXX_STANDARD 20)
-target_link_libraries(${EXECUTABLE_NAME} PRIVATE m ${LIB_NAME} mpc dsp)
+target_link_libraries(${EXECUTABLE_NAME} PRIVATE m ${LIB_NAME} mpc)

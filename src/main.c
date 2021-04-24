@@ -17,9 +17,8 @@ extern "C" {
 #pragma ide diagnostic ignored "EndlessLoop"
 
 int main(int argc, char **argv) {
-//    mpc_parser_t *all_parsers[9];
-    mpc_parser_t *lab_mat;
-    mpc_setup(&lab_mat);
+    mpc_parser_t *parser;
+    int num_parsers = mpc_setup(&parser);
 
     // Loop for testing command line input
     while (1) {
@@ -29,9 +28,18 @@ int main(int argc, char **argv) {
         /* Attempt to Parse the user Input */
         mpc_result_t r;
         if (mpc_parse("input", (char *) history_dll->s->prev->val,
-                      lab_mat, &r)) {
+                      parser, &r)) {
+
+            int status = 0;
+            OTree *otree = ast_2_otree(r.output, &status);
+            if (status != 0) {
+                fprintf(stderr, "Cannot evaluate due to static parsing error\n");
+                usleep(50000);
+            }
+            disp_otree(otree);
+
             /* print the AST */
-            mpc_ast_print(r.output);
+//            mpc_ast_print(r.output);
             mpc_ast_delete(r.output);
         } else {
             /* Otherwise Print the Error */

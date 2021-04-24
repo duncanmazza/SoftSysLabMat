@@ -1,6 +1,9 @@
-//
-// Created by duncan on 4/15/21.
-//
+/* Grammar definition
+ *
+ * Duncan and Junwon LabMat SoftSys Project 1
+ *
+ */
+
 
 #include "../include/grammar.h"
 
@@ -67,33 +70,33 @@ int mpc_setup(mpc_parser_t **parser) {
             // -- Atomic rules --
             "int     : /-?[0-9]+/ ;"  // Integer number
             "float   : /-?[0-9]+[.][0-9]+/ ;"  // Floating point number
-            "num     : <float> | <int> ;"  // [order matters] Any number
-            "mth_op  : '+' | '-' | '*' | '/' | '%' ;"  // Arithmetic operators
+            "math_op : '+' | '-' | '*' | '/' | '%' ;"  // Arithmetic operators
             "bit_op  : '&' | '^' | '|' ;"  // Bit operators
             "log_op  : \"&&\" | \"||\" ;"  // Logical operators
+            "assmt   : '=' ;"  // Assignment operator
+
             "allchar : /[^\"]*/ ;"  // Do not allow double quotes
             "name    : /[a-zA-Z_][a-zA-Z0-9_]*/ ;"  // Any valid token name
-            "mat_dlm : (',' | ' ') | ';' ;"  // Matrix delimiter
-            "assmt   : '=' ;"  // Assignment operator
-            "al_dlm  : ','/\s*/ ;"  // Argument list delimiter
+            "matcdlm : /\s*/ (',' | ' ') /\s*/ ;"  // Matrix comma delimiter
+            "matsdlm : /\s*/ ';' /\s*/ ;"  // Matrix semicolon delimiter
+            "al_dlm  : /\s*/ ',' /\s*/ ;"  // Argument list delimiter
 
             // -- Compound rules --
+            "num     : <float> | <int> ;"  // [order matters] Any number
             "str_lit : '\"'<allchar>'\"' ;"  // String literal
-            "mat_lit : '['((<num><mat_dlm>)+ <num>?)']' ;"  // Matrix literal
-            "smpexpr : <num> <mth_op> <num> "  // Simple expression
-            "        | <int> (<log_op> | <bit_op>) <int> "  // [order matters]
+            "mat_lit : '['/\s*/((<num>(<matcdlm> | <matsdlm>))+ <num>?)/\s*/']' ;"  // Matrix literal
+            "smpexpr : (<num>|<name>) (<math_op> (<anyexpr>|<name>|<num>))* "  // Simple expression
+            "        | (<int>|<name>) ((<log_op> | <bit_op>) (<anyexpr>|<name>|<num>))* "
             "        | <str_lit> "
-            "        | <num> "
-            "        | <mat_lit> "
-            "        | <name> ;"
-            "arglist : ((<smpexpr><al_dlm>)+<smpexpr> | <smpexpr>) ;"
+            "        | <mat_lit> ;"
+            "arglist : ((<anyexpr><al_dlm>)+<anyexpr> | <anyexpr>) ;"
+
             "fexpr   : <name>'('/\s*/<arglist>?/\s*/')' ;"  // Expression: function call
-            "allexpr : <fexpr> | <smpexpr> ;"  // All expressions [order matters]
-            "type    : <name> ;"
-            "a_stmt  : (<type> <name> <assmt> <allexpr> "  // Assignment statement
-            "        | <name> '=' <allexpr>"
-            "        | <fexpr>)';' ;"
-            "stmt    : <a_stmt> ;"
+            "anyexpr : <fexpr> | '(' <expr>+ ')' | <smpexpr> ;"
+            "expr    : <anyexpr> ;"  // This enables mutual recursion with anyexpr
+            "a_stmt  : <name> <name> <assmt> <expr> "  // Assignment statement
+            "        | <name> <assmt> <expr> ;"
+            "stmt    : (<a_stmt> | <fexpr>)';' ;"
             "lab_mat : /^/ ((<stmt>)/\s*/)+ /$/ ;";
 
     SLL *matched_rule_names = mpc_rules_match(grammar);
@@ -129,9 +132,10 @@ int mpc_setup(mpc_parser_t **parser) {
     mpc_parser_t *p18 = mpc_new(rule_names_arr[18]);
     mpc_parser_t *p19 = mpc_new(rule_names_arr[19]);
     mpc_parser_t *p20 = mpc_new(rule_names_arr[20]);
+    mpc_parser_t *p21 = mpc_new(rule_names_arr[21]);
     mpca_lang(MPCA_LANG_DEFAULT, grammar, p00, p01, p02, p03, p04, p05,
               p06, p07, p08, p09, p10, p11, p12, p13, p14, p15, p16, p17, p18,
-              p19, p20);
-    *parser = p20;
-    return 21;
+              p19, p20, p21);
+    *parser = p21;
+    return 22;
 }
