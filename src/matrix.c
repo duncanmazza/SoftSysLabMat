@@ -49,7 +49,7 @@ void complete_matrix(matrix* mat, float input[], int row, int col) {
     int i, j;
     for (i =0;i < row;i++) {
       for (j = 0;j < col;j++) {
-        mat->data[i][j] = input[i][j];
+        mat->data[i][j] = input[col*i+j];
         //printf("%f", input[i+j]);
       }
     }
@@ -82,7 +82,7 @@ int main() {
   int i = 3;
   int j = 3;
   matrix *mat1 = make_matrix(i, j);
-  float cell[3][3] = {{1,2,3},{4,5,6},{7,8,9}};
+  float cell[] = {1,2,3,4,5,6,7,8,9};
   //mat = add(mat, i);
   complete_matrix(mat1, cell, i, j);
   matrix *mat2 = make_matrix(i,j);
