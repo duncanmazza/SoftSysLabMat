@@ -30,7 +30,6 @@ void print_matrix(matrix *mat) {
 
 
 void complete_matrix(matrix* mat, float input[], int row, int col) {
-
     if (mat->rows != row || mat->column != col) {
         printf("nothing");
         return;
