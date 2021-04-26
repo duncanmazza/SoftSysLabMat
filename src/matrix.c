@@ -29,7 +29,7 @@ void print_matrix(matrix *mat) {
 }
 
 
-void complete_matrix(matrix *mat, float (*input)[3], int row, int col) {
+void complete_matrix(matrix* mat, float input[], int row, int col) {
 
     if (mat->rows != row || mat->column != col) {
         printf("nothing");
@@ -55,7 +55,6 @@ matrix *add_int(matrix *mat, float k) {
     }
     return total;
 }
-
 
 matrix *add_matrix(matrix *mat1, matrix *mat2) {
     if (mat1->rows != mat2->rows && mat1->column != mat2->column) {
