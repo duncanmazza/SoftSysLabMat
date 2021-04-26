@@ -24,7 +24,7 @@ matrix *make_matrix(int row, int col);
 
 void print_matrix(matrix *mat);
 
-void complete_matrix(matrix *mat, float input[], int row, int col);\
+void complete_matrix(matrix *mat, const float input[], int row, int col);\
 
 matrix *add_int(matrix *mat, float k);
 
