@@ -37,7 +37,7 @@ void complete_matrix(matrix* mat, float input[], int row, int col) {
     int i, j;
     for (i = 0; i < row; i++) {
         for (j = 0; j < col; j++) {
-            mat->data[i][j] = input[i][j];
+            mat->data[i][j] = input[col*i+j];
             //printf("%f", input[i+j]);
         }
     }
