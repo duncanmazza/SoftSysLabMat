@@ -17,6 +17,11 @@ const char *const op_enum_strs[] = {
 };
 
 
+const char *const get_tree_label_enum_ignore_arr[4] = {"char", "regex",
+                                                       "string", ">"};
+const size_t get_tree_label_enum_ignore_arr_strlen[4] = {4, 5, 6, 1};
+
+
 /* This must correspond exactly to the order as prescribed in the OTreeLabel
  * enum */
 const char *const otree_label_strs[] = {
@@ -76,9 +81,10 @@ const char *const otree_rule_strs[] = {
         ">",  // LM_LAB_MAT
 };
 
-
-OTreeLabel get_tree_label_enum(const char *const label) {
-    const char *end_label = label;
+size_t
+get_mpc_end_label_ignore(const char *const label, const char *const *ignore,
+                         size_t ignore_len, const size_t *ignore_str_len,
+                         const char **end_label) {
     size_t end_label_len = strlen(label);
     const char *seek = label;
     while (*seek) {
@@ -86,18 +92,30 @@ OTreeLabel get_tree_label_enum(const char *const label) {
             seek++;
             continue;
         } else {
-            if (strncmp(seek + 1, "char", strlen("char")) == 0 ||
-                strncmp(seek + 1, "regex", strlen("regex")) == 0 ||
-                strncmp(seek + 1, "string", strlen("string")) == 0 ||
-                strncmp(seek + 1, ">", strlen(">")) == 0) {
-                end_label_len = seek - end_label;
-                break;
+            int encountered_ignore = 0;
+            for (int i = 0; i < ignore_len; i++) {
+                encountered_ignore |= strncmp(seek + 1, ignore[i],
+                                              ignore_str_len[i]) == 0;
+            }
+            if (encountered_ignore) {
+                end_label_len = seek - *end_label;
+                return end_label_len;
             } else {
                 seek++;
-                end_label = seek;
+                *end_label = seek;
             }
         }
     }
+    return end_label_len;
+}
+
+
+OTreeLabel get_tree_label_enum(const char *const label) {
+    const char *end_label = label;
+    size_t end_label_len = \
+        get_mpc_end_label_ignore(label, get_tree_label_enum_ignore_arr, 4,
+                                 get_tree_label_enum_ignore_arr_strlen,
+                                 &end_label);
 
     for (int i = 0; i < NUM_OTREE_LABELS; i++) {
         if (strncmp(end_label, otree_rule_strs[i], end_label_len) == 0)
@@ -188,9 +206,14 @@ int _otree_atomic_parse_op(const char *const symb, OTree *const otree) {
     return 1;
 }
 
+
 int _otree_construct_matrix(const mpc_ast_t *const ast, OTree *const otree) {
     // TODO: replace with actual matrix construction; current code is just a
     //  placeholder
+//    int rows, columns = -1;
+//    for (int i = 0; i < ast->children_num; i++) {
+//
+//    }
 
     otree->val = NULL;
     return 0;

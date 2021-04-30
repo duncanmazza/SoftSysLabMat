@@ -12,6 +12,9 @@
 #include <string.h>
 #include "format_msg.h"
 
+#ifdef __cplusplus
+extern "C" {
+#endif
 
 #define ERR_MSG_STATIC(msg) format_msg("STATIC_PARSING_ERR: %s", CTYPE_STR, 1, \
     (msg))
@@ -21,9 +24,9 @@
     "a long due to over/underflow", CTYPE_STR, 1, (culprit))
 
 
-#ifdef __cplusplus
-extern "C" {
-#endif
+extern const char *const get_tree_label_enum_ignore_arr[];
+extern const size_t get_tree_label_enum_ignore_arr_strlen[];
+
 
 typedef enum {
     LM_NO_LABEL,
@@ -51,11 +54,10 @@ typedef enum {
     LM_ARGUMENT_LIST,
     LM_LAB_MAT,
 } OTreeLabel;
-
 #define NUM_OTREE_LABELS LM_LAB_MAT + 1
+extern const char *const otree_label_strs[];
+extern const char *const otree_rule_strs[];
 
-extern const char* const otree_label_strs[];
-extern const char* const otree_rule_strs[];
 
 typedef enum {
     OTREE_SHOULD_NOT_EXIST,
@@ -91,8 +93,7 @@ typedef enum {
 
     OP_ASSIGNMENT,
 } OP_Enum;
-
-extern const char* const op_enum_strs[];
+extern const char *const op_enum_strs[];
 #define NUM_OPS OP_ASSIGNMENT + 1
 
 
@@ -102,6 +103,11 @@ extern const char* const op_enum_strs[];
 OTree *ast_2_otree(const mpc_ast_t *const ast, int *status);
 
 OTreeLabel get_tree_label_enum(const char *const label);
+
+size_t
+get_mpc_end_label_ignore(const char *const label, const char *const ignore[],
+                         size_t ignore_len, const size_t ignore_str_len[],
+                         const char **end_label);
 
 int _otree_atomic_parse_float(const char *const contents, OTree *const otree);
 
@@ -115,7 +121,7 @@ int _otree_construct_matrix(const mpc_ast_t *const ast, OTree *const otree);
 
 int otree_parse_literal(const mpc_ast_t *const ast, OTree *const otree);
 
-int _otree_atomic_parse_op(const char* const symb, OTree *const otree);
+int _otree_atomic_parse_op(const char *const symb, OTree *const otree);
 
 void _disp_otree(const OTree *const otree, DLL *const repr_dll, size_t indent);
 
