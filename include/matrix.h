@@ -30,6 +30,8 @@ matrix *add_int(matrix *mat, float k);
 
 matrix *add_matrix(matrix *mat1, matrix *mat2);
 
+matrix *multiply_matrix(matrix *mat1, matrix *mat2);
+
 #ifdef __cplusplus
 }
 #endif

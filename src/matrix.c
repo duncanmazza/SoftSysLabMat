@@ -77,6 +77,21 @@ matrix *add_matrix(matrix *mat1, matrix *mat2) {
     return total;
 }
 
+matrix *multiply_matrix(matrix *mat1, matrix *mat2) {
+    if (mat1->column != mat2->rows) {
+      return 0;
+    }
+    matrix *product = make_matrix(mat1->rows, mat2->column);
+    for (int x = 0; x < product->rows; x++) {
+        for (int y = 0; y < product->column; y++) {
+          for (int z = 0; z < mat1 ->column; z++) {
+              product->data[x][y] += mat1->data[x][z] * mat2->data[z][y];
+          }
+        }
+    }
+    return product;
+}
+
 /*
 int main() {
     int i = 3;
