@@ -82,11 +82,11 @@ const char *const otree_rule_strs[] = {
 };
 
 size_t
-get_mpc_end_label_ignore(const char *const label, const char *const *ignore,
-                         size_t ignore_len, const size_t *ignore_str_len,
-                         const char **end_label) {
-    size_t end_label_len = strlen(label);
-    const char *seek = label;
+_get_mpc_end_label_ignore(const char *const *ignore, const size_t ignore_len,
+                          const size_t *ignore_str_len,
+                          const char **end_label) {
+    size_t end_label_len = strlen(*end_label);
+    const char *seek = *end_label;
     while (*seek) {
         if (*seek != '|') {
             seek++;
@@ -113,9 +113,9 @@ get_mpc_end_label_ignore(const char *const label, const char *const *ignore,
 OTreeLabel get_tree_label_enum(const char *const label) {
     const char *end_label = label;
     size_t end_label_len = \
-        get_mpc_end_label_ignore(label, get_tree_label_enum_ignore_arr, 4,
-                                 get_tree_label_enum_ignore_arr_strlen,
-                                 &end_label);
+        _get_mpc_end_label_ignore(get_tree_label_enum_ignore_arr, 4,
+                                  get_tree_label_enum_ignore_arr_strlen,
+                                  &end_label);
 
     for (int i = 0; i < NUM_OTREE_LABELS; i++) {
         if (strncmp(end_label, otree_rule_strs[i], end_label_len) == 0)

@@ -104,10 +104,27 @@ OTree *ast_2_otree(const mpc_ast_t *const ast, int *status);
 
 OTreeLabel get_tree_label_enum(const char *const label);
 
+/** Parse mpc abstract syntax tree node label string by extracting the last
+ * label.
+ *
+ * mpc label strings look something like "num|int|regex". This function modifies
+ * the string pointed to by *end_label such that the last label in this list
+ * (where the delimiter is '|') is pointed to that is not in the ignore_str_len
+ * array. For example, specifying that "regex" should be ignored should result
+ * in *end_label = "int|regex"; the return value would be 3 to specify the
+ * length of the "int" label.
+ *
+ * @param ignore Array labels to ignore at the end of the label string.
+ * @param ignore_len Length of the ignore array
+ * @param ignore_str_len Array corresponding to the lengths of the strings in
+ *                       ignore
+ * @param end_label Pointer to the character pointer of the label string
+ * @return Length of the label pointed to by *end_label
+ */
 size_t
-get_mpc_end_label_ignore(const char *const label, const char *const ignore[],
-                         size_t ignore_len, const size_t ignore_str_len[],
-                         const char **end_label);
+_get_mpc_end_label_ignore(const char *const *ignore, const size_t ignore_len,
+                          const size_t *ignore_str_len,
+                          const char **end_label);
 
 int _otree_atomic_parse_float(const char *const contents, OTree *const otree);
 
