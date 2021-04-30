@@ -16,9 +16,9 @@
 
 
 namespace MATRIX_Gtests {
-#define ASSERT_EMPTY_MATRIX(mat) ({                                               \
-    ASSERT_EQ((mat)->rows, 0);                                                  \
-    ASSERT_EQ((mat)->column, 0)
+#define ASSERT_EMPTY_MATRIX(mat) ({                                            \
+    ASSERT_EQ((mat)->rows, 0);                                                 \
+    ASSERT_EQ((mat)->column, 0);                                               \
 })
 
     NUM_VECS  // Create the num_vecs variable
@@ -51,7 +51,7 @@ namespace MATRIX_Gtests {
         free(mat);
     }
 
-    TEST(MAT_Tests, MAT_add_int) {
+    TEST(MAT_Tests, MAT_add_int_1) {
       int i = 2;
       int j = 3;
       matrix* mat = make_matrix(i,j);
@@ -69,7 +69,7 @@ namespace MATRIX_Gtests {
       free(mat);
     }
 
-    TEST(MAT_Tests, MAT_add_int) {
+    TEST(MAT_Tests, MAT_add_int_2) {
       int i = 2;
       int j = 3;
       matrix* mat = make_matrix(i,j);
