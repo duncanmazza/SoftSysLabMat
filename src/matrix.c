@@ -22,10 +22,18 @@ matrix *make_matrix(int row, int col) {
 
 void print_matrix(matrix *mat) {
     for (int x = 0; x < mat->rows; x++) {
+        printf("%c", x == 0 ? '[' : ' ');
         for (int y = 0; y < mat->column; y++) {
-            printf("%f \n", mat->data[x][y]);
+            printf("%g", mat->data[x][y]);
+            if (y != mat->column - 1) {
+                printf(" ");
+            } else {
+                if (x != mat->rows - 1)
+                    printf("\n");
+            }
         }
     }
+    printf("]\n");
 }
 
 
@@ -76,13 +84,13 @@ int main() {
     matrix *mat1 = make_matrix(i, j);
     float cell[3][3] = {{1,2,3},{4,5,6},{7,8,9}};
     //mat = add(mat, i);
-    complete_matrix(mat1, cell, i, j);
+    complete_matrix(mat1, (const float *) cell, i, j);
     matrix *mat2 = make_matrix(i,j);
     //float cell[3][3] = {{1,2,3},{4,5,6},{7,8,9}};
-    mat1 = add_int(mat1, i);
+    //mat1 = add_int(mat1, i);
     //complete_matrix(mat2, cell, i, j);
     //matrix *sum = add_matrix(mat1, mat2);
     print_matrix(mat1);
     return 0;
 }
- */
+*/
