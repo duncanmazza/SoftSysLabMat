@@ -42,10 +42,10 @@ namespace MATRIX_Gtests {
         // Check that the SLL was updated correctly
         ASSERT_EQ(mat->data[0][0], 1);
         ASSERT_EQ(mat->data[0][1], 2);
-        ASSERT_EQ(mat->data[0][2], 3);
-        ASSERT_EQ(mat->data[1][0], 4);
-        ASSERT_EQ(mat->data[1][1], 5);
-        ASSERT_EQ(mat->data[1][2], 6);
+        ASSERT_EQ(mat->data[1][0], 3);
+        ASSERT_EQ(mat->data[1][1], 4);
+        ASSERT_EQ(mat->data[2][0], 5);
+        ASSERT_EQ(mat->data[2][1], 6);
         ASSERT_EQ(mat->rows, i);
         ASSERT_EQ(mat->column, j);
         free(mat);
@@ -60,10 +60,10 @@ namespace MATRIX_Gtests {
       matrix *sum = add_int(mat, 3);
       ASSERT_EQ(mat->data[0][0], 4);
       ASSERT_EQ(mat->data[0][1], 5);
-      ASSERT_EQ(mat->data[0][2], 6);
-      ASSERT_EQ(mat->data[1][0], 7);
-      ASSERT_EQ(mat->data[1][1], 8);
-      ASSERT_EQ(mat->data[1][2], 9);
+      ASSERT_EQ(mat->data[1][0], 6);
+      ASSERT_EQ(mat->data[1][1], 7);
+      ASSERT_EQ(mat->data[2][0], 8);
+      ASSERT_EQ(mat->data[2][1], 9);
       ASSERT_EQ(mat->rows, i);
       ASSERT_EQ(mat->column, j);
       free(mat);
@@ -78,10 +78,10 @@ namespace MATRIX_Gtests {
       matrix *sum = add_int(mat, 3);
       ASSERT_EQ(mat->data[0][0], 4);
       ASSERT_EQ(mat->data[0][1], 5);
-      ASSERT_EQ(mat->data[0][2], 6);
-      ASSERT_EQ(mat->data[1][0], 7);
-      ASSERT_EQ(mat->data[1][1], 8);
-      ASSERT_EQ(mat->data[1][2], 9);
+      ASSERT_EQ(mat->data[1][0], 6);
+      ASSERT_EQ(mat->data[1][1], 7);
+      ASSERT_EQ(mat->data[2][0], 8);
+      ASSERT_EQ(mat->data[2][1], 9);
       ASSERT_EQ(mat->rows, i);
       ASSERT_EQ(mat->column, j);
       free(mat);
