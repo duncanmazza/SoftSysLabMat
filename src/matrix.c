@@ -37,19 +37,19 @@ void print_matrix(matrix *mat) {
 }
 
 
-void complete_matrix(matrix *mat, const float input[], int row, int col) {
+int complete_matrix(matrix *mat, const float *input, int row, int col) {
     if (mat->rows != row || mat->column != col) {
-        printf("nothing");
-        return;
+        fprintf(stderr, "Specified rows and columns of input array "
+                        "do not match the matrix dimensions");
+        return 0;
     }
     int i, j;
     for (i = 0; i < row; i++) {
         for (j = 0; j < col; j++) {
             mat->data[i][j] = input[col*i+j];
-            //printf("%f", input[i+j]);
         }
     }
-    //return mat;
+    return 1;
 }
 
 

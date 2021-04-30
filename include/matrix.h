@@ -24,7 +24,15 @@ matrix *make_matrix(int row, int col);
 
 void print_matrix(matrix *mat);
 
-void complete_matrix(matrix *mat, const float input[], int row, int col);
+/** Fills out the values of a matrix
+ *
+ * @param mat Matrix to populate
+ * @param input Flattened array representing the 2d matrix
+ * @param row Number of rows represented in the input array
+ * @param col Number of columns represented in the input array
+ * @return 0 if dimensions do not match and 1 if they do
+ */
+int complete_matrix(matrix *mat, const float *input, int row, int col);
 
 matrix *add_int(matrix *mat, float k);
 
