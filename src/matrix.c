@@ -29,7 +29,7 @@ void print_matrix(matrix *mat) {
 }
 
 
-void complete_matrix(matrix* mat, float input[], int row, int col) {
+void complete_matrix(matrix *mat, const float input[], int row, int col) {
     if (mat->rows != row || mat->column != col) {
         printf("nothing");
         return;
@@ -55,6 +55,7 @@ matrix *add_int(matrix *mat, float k) {
     return total;
 }
 
+
 matrix *add_matrix(matrix *mat1, matrix *mat2) {
     if (mat1->rows != mat2->rows && mat1->column != mat2->column) {
         return 0;
@@ -68,18 +69,20 @@ matrix *add_matrix(matrix *mat1, matrix *mat2) {
     return total;
 }
 
-//int main() {
-//  int i = 3;
-//  int j = 3;
-//  matrix *mat1 = make_matrix(i, j);
-//  float cell[3][3] = {{1,2,3},{4,5,6},{7,8,9}};
-//  //mat = add(mat, i);
-//  complete_matrix(mat1, cell, i, j);
-//  matrix *mat2 = make_matrix(i,j);
-//  //float cell[3][3] = {{1,2,3},{4,5,6},{7,8,9}};
-//  mat1 = add_int(mat1, i);
-//  //complete_matrix(mat2, cell, i, j);
-//  //matrix *sum = add_matrix(mat1, mat2);
-//  print_matrix(mat1);
-//  return 0;
-//}
+/*
+int main() {
+    int i = 3;
+    int j = 3;
+    matrix *mat1 = make_matrix(i, j);
+    float cell[3][3] = {{1,2,3},{4,5,6},{7,8,9}};
+    //mat = add(mat, i);
+    complete_matrix(mat1, cell, i, j);
+    matrix *mat2 = make_matrix(i,j);
+    //float cell[3][3] = {{1,2,3},{4,5,6},{7,8,9}};
+    mat1 = add_int(mat1, i);
+    //complete_matrix(mat2, cell, i, j);
+    //matrix *sum = add_matrix(mat1, mat2);
+    print_matrix(mat1);
+    return 0;
+}
+ */
