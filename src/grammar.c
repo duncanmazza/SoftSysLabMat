@@ -66,6 +66,8 @@ SLL *mpc_rules_match(const char *const to_match) {
 
 
 int mpc_setup(mpc_parser_t **parser) {
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wunknown-escape-sequence"
     const char *grammar =
             // -- Atomic rules --
             "int     : /-?[0-9]+/ ;"  // Integer number
@@ -97,6 +99,7 @@ int mpc_setup(mpc_parser_t **parser) {
             "        | <name> <assmt> <expr> ;"
             "stmt    : (<a_stmt> | <fexpr>)';' ;"
             "lab_mat : /^/ ((<stmt>)/\s*/)+ /$/ ;";
+#pragma clang diagnostic pop
 
     SLL *matched_rule_names = mpc_rules_match(grammar);
     char *rule_names_arr[matched_rule_names->len];
