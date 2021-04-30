@@ -29,7 +29,7 @@ void print_matrix(matrix *mat) {
 }
 
 
-void complete_matrix(matrix* mat, const float input[], int row, int col) {
+void complete_matrix(matrix* mat, float input[], int row, int col) {
     if (mat->rows != row || mat->column != col) {
         printf("nothing");
         return;
@@ -38,8 +38,10 @@ void complete_matrix(matrix* mat, const float input[], int row, int col) {
     for (i = 0; i < row; i++) {
         for (j = 0; j < col; j++) {
             mat->data[i][j] = input[col*i+j];
+            //printf("%f", input[i+j]);
         }
     }
+    //return mat;
 }
 
 
@@ -52,7 +54,6 @@ matrix *add_int(matrix *mat, float k) {
     }
     return total;
 }
-
 
 matrix *add_matrix(matrix *mat1, matrix *mat2) {
     if (mat1->rows != mat2->rows && mat1->column != mat2->column) {
