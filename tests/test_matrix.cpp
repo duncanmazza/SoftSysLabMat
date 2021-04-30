@@ -70,22 +70,25 @@ namespace MATRIX_Gtests {
       free(sum);
     }
 
-    TEST(MAT_Tests, MAT_add_int_2) {
+    TEST(MAT_Tests, MAT_add_matrix) {
       int i = 2;
       int j = 3;
-      matrix* mat = make_matrix(i,j);
+      matrix* mat1 = make_matrix(i,j);
       float test[] = {1,2,3,4,5,6};
-      complete_matrix(mat, test, i, j);
-      matrix *sum = add_int(mat, 3);
-      ASSERT_EQ(sum->data[0][0], 4);
-      ASSERT_EQ(sum->data[0][1], 5);
+      matrix* mat2 = make_matrix(i,j);
+      complete_matrix(mat1, test, i, j);
+      complete_matrix(mat2, test, i, j);
+      matrix *sum = add_matrix(mat1, mat2);
+      ASSERT_EQ(sum->data[0][0], 2);
+      ASSERT_EQ(sum->data[0][1], 4);
       ASSERT_EQ(sum->data[0][2], 6);
-      ASSERT_EQ(sum->data[1][0], 7);
-      ASSERT_EQ(sum->data[1][1], 8);
-      ASSERT_EQ(sum->data[1][2], 9);
+      ASSERT_EQ(sum->data[1][0], 8);
+      ASSERT_EQ(sum->data[1][1], 10);
+      ASSERT_EQ(sum->data[1][2], 12);
       ASSERT_EQ(sum->rows, i);
       ASSERT_EQ(sum->column, j);
-      free(mat);
+      free(mat1);
+      free(mat2);
       free(sum);
     }
 
