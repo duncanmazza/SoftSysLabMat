@@ -21,8 +21,6 @@ namespace MATRIX_Gtests {
     ASSERT_EQ((mat)->column, 0);                                               \
 })
 
-    NUM_VECS  // Create the num_vecs variable
-
     TEST(MAT_Tests, MAT_Create) {
         int i = 0;
         int j = 0;
@@ -32,14 +30,12 @@ namespace MATRIX_Gtests {
     }
 
     TEST(MAT_Tests, MAT_Complete_Matrix) {
-        // Create SLL with integers in the order: 1, 2, 3
         int i = 2;
         int j = 3;
         matrix* mat = make_matrix(i,j);
         float test[] = {1,2,3,4,5,6};
         complete_matrix(mat, test, i, j);
 
-        // Check that the SLL was updated correctly
         ASSERT_EQ(mat->data[0][0], 1);
         ASSERT_EQ(mat->data[0][1], 2);
         ASSERT_EQ(mat->data[0][2], 3);
@@ -113,8 +109,6 @@ namespace MATRIX_Gtests {
       free(mat2);
       free(product);
     }
-
-
 
 } // namespace SLL_Gtests
 
