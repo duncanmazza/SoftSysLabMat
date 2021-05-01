@@ -68,6 +68,20 @@ int HT_insert(HashTable *ht, const unsigned char *key, size_t value) {
 }
 
 
+int HT_remove(HashTable *ht, const unsigned char *key) {
+    size_t key_hash = HT_MOD_HASH(hash_str_djb2(key), ht->n_slots);
+    DLL* slot = ht->slots[key_hash];
+
+    DLL_Node *slot_node = HT_slot_contains(slot, key_hash);
+    if (slot_node) {
+        DLL_remove(slot, slot_node);
+        DLL_NODE_FREE(slot_node);
+        return 0;
+    }
+    return 1;
+}
+
+
 DLL_Node * HT_slot_contains(const DLL *slot, size_t key) {
     DLL_Node *node = slot->s->next;
     while (node != slot->s) {
@@ -83,4 +97,3 @@ void HT_clean(HashTable *const ht) {
     for (int i = 0; i < ht->n_slots; i++)
         DLL_clean(ht->slots[i]);
 }
-

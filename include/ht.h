@@ -73,6 +73,16 @@ DLL_Node * HT_slot_contains(const DLL* slot, size_t key);
 int HT_get(const HashTable * ht, const unsigned char * key, size_t *value);
 
 
+/** Removes the specified key-value pair from the hash table (including freeing
+ * it from memory).
+ *
+ * @param ht Hash table to remove from
+ * @param key Key of the key-value pair to remove and free
+ * @return 0 if key-value pair was present and removed and 1 otherwise.
+ */
+int HT_remove(HashTable *ht, const unsigned char *key);
+
+
 /** Runs DLL_clean on all of the slots
  *
  * @param ht Hash table to clean
