@@ -95,8 +95,9 @@ int mpc_setup(mpc_parser_t **parser) {
             "fexpr   : <name>'('/\s*/<arglist>?/\s*/')' ;"  // Expression: function call
             "anyexpr : <fexpr> | '(' <expr>+ ')' | <smpexpr> ;"
             "expr    : <anyexpr> ;"  // This enables mutual recursion with anyexpr
-            "a_stmt  : <name> <name> <assmt> <expr> "  // Assignment statement
-            "        | <name> <assmt> <expr> ;"
+//            "a_stmt  : <name> <name> <assmt> <expr> "  // Assignment statement
+//            "        | <name> <assmt> <expr> ;"
+            "a_stmt  : <name> <assmt> <expr> ;"
             "stmt    : (<a_stmt> | <fexpr>)';' ;"
             "lab_mat : /^/ ((<stmt>)/\s*/)+ /$/ ;";
 #pragma clang diagnostic pop
