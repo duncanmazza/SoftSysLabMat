@@ -11,13 +11,13 @@
 int eval_func_call_expr(OTree *otree) {
     if (otree->label != LM_FUNCTION_CALL_EXPRESSION) {
         fprintf(stderr, "Attempted to evaluate an otree object as a function "
-                        "call expression but it was labeled in stead as %s",
+                        "call expression but it was labeled in stead as %s\n",
                 otree_label_strs[otree->label]);
         exit(-1);
     }
 
     fprintf(stderr, "Function call expression evaluation has not yet "
-                    "been implemented");
+                    "been implemented\n");
     return 1;
 }
 
@@ -25,13 +25,13 @@ int eval_func_call_expr(OTree *otree) {
 int eval_assmt_stmt(OTree *otree) {
     if (otree->label != LM_STATEMENT_ASSIGNMENT) {
         fprintf(stderr, "Attempted to evaluate an otree object as an "
-                        "assignment statement but it was labeled in stead as %s",
+                        "assignment statement but it was labeled in stead as %s\n",
                 otree_label_strs[otree->label]);
         exit(-1);
     }
 
     fprintf(stderr, "Assignment statement evaluation has not yet been "
-                    "implemented");
+                    "implemented\n");
     return 1;
 }
 

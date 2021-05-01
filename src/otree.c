@@ -218,7 +218,7 @@ int otree_construct_matrix(const mpc_ast_t *ast, OTree *otree) {
             rows++;
             if (columns != 1 && columns_check != columns) {
                 fprintf(stderr, "Inconsistent columns given in the "
-                                "matrix literal");
+                                "matrix literal\n");
                 return 1;
             }
             columns = columns_check;
@@ -350,7 +350,7 @@ OTreeValType otree_classify_val(const OTree *const otree) {
         case LM_INT:
             return OTREE_VAL_LONG;
         default:
-            fprintf(stderr, "Unhandled case in OTree type classification");
+            fprintf(stderr, "Unhandled case in OTree type classification\n");
             exit(-1);
     }
 }
@@ -424,14 +424,14 @@ void disp_otree_recursive(const OTree *otree, DLL *const repr_dll, size_t indent
             break;
         case OTREE_VAL_PARENT:
             fprintf(stderr, "Contradiction: OTree object classified as being a "
-                    "parent but was found to a null children field");
+                    "parent but was found to a null children field\n");
             exit(-1);
         case OTREE_VAL_INDETERMINATE:
             fprintf(stderr, "Encountered OTree object labeled with an "
-                            "indeterminate type");
+                            "indeterminate type\n");
             exit(-1);
         default:
-            fprintf(stderr, "disp_otree_recursive unhandled case");
+            fprintf(stderr, "disp_otree_recursive unhandled case\n");
             exit(-1);
     }
 
@@ -447,6 +447,7 @@ void disp_otree_recursive(const OTree *otree, DLL *const repr_dll, size_t indent
 OTree *ast_2_otree(const mpc_ast_t *const ast, int *status) {
     OTree *otree = make_empty_otree();
     otree->label = get_tree_label_enum(ast->tag);
+    otree->type = otree_classify_val(otree);
 
     switch (otree->label) {
         case LM_INT:
