@@ -7,7 +7,7 @@
 #include "ht.h"
 
 
-inline size_t hash_str_djb2(HT_KEY_TYPE str) {
+size_t hash_str_djb2(HT_KEY_TYPE str) {
     const unsigned char* str_ptr_cpy = (const unsigned char*)str;
     size_t hash = 5381;
     int c;
@@ -43,6 +43,7 @@ int HT_get(const HashTable *const ht, HT_KEY_TYPE key, size_t *const value) {
     DLL_Node *slot_node = HT_slot_contains(slot, key);
     if (!slot_node) return 1;
     *value = *(size_t *)slot_node->val;
+    return 0;
 }
 
 
@@ -76,10 +77,7 @@ DLL_Node * HT_slot_contains(const DLL *slot, const unsigned char *key) {
 
 
 void HT_clean(HashTable *const ht) {
-    for (int i = 0; i < ht->n_slots; i++) {
-        DLL_FREE(ht->slots[i]);
-    }
-    free(ht->slots);
-    free(ht);
+    for (int i = 0; i < ht->n_slots; i++)
+        DLL_clean(ht->slots[i]);
 }
 

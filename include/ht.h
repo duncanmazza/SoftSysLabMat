@@ -14,15 +14,6 @@
 extern "C" {
 #endif
 
-#define HT_MOD_HASH(key, n_slots) ((key) % (n_slots))
-#define HT_KEY_TYPE const unsigned char *const
-#define HT_KEY_EQUAL(k1, k2)                                                   \
-    (strncmp((const char* const)(k1), (const char* const)(k2),                 \
-    strlen((const char* const)(k2))) == 0)
-#define HT_ACQUIRE_SLOT(ht, key)                                               \
-    (ht)->slots[HT_MOD_HASH(hash_str_djb2(key), (ht)->n_slots)]
-#define HT_FREE(ht) ({free((ht)->slots); free(ht);})
-
 
 typedef struct {
     size_t n_slots;
@@ -40,7 +31,7 @@ HashTable *HT_create(size_t n_slots);
  * @param str String to hash
  * @return Hash
  */
-inline unsigned long hash_str_djb2(const unsigned char *str);
+unsigned long hash_str_djb2(const unsigned char *str);
 
 /** Insert a value into the hash table
  *
@@ -75,6 +66,34 @@ DLL_Node * HT_slot_contains(const DLL* slot, const unsigned char *key);
  * @return 0 if the key is present and 1 otherwise
  */
 int HT_get(const HashTable * ht, const unsigned char * key, size_t *value);
+
+
+/** Runs DLL_clean on all of the slots
+ *
+ * @param ht Hash table to clean
+ */
+void HT_clean(HashTable *ht);
+
+
+#define HT_MOD_HASH(key, n_slots) ((key) % (n_slots))
+
+#define HT_KEY_TYPE const unsigned char *const
+
+#define HT_KEY_EQUAL(k1, k2)                                                   \
+    (strncmp((const char* const)(k1), (const char* const)(k2),                 \
+    strlen((const char* const)(k2))) == 0)
+
+#define HT_ACQUIRE_SLOT(ht, key)                                               \
+    (ht)->slots[HT_MOD_HASH(hash_str_djb2(key), (ht)->n_slots)]
+
+#define HT_FREE(ht) ({                                                         \
+    for (int i = 0; i < (ht)->n_slots; i++) {                                  \
+        DLL_clean((ht)->slots[i]);                                             \
+        DLL_FREE((ht)->slots[i]);                                              \
+    }                                                                          \
+    free((ht)->slots);                                                         \
+    free(ht);                                                                  \
+})
 
 
 #ifdef __cplusplus
