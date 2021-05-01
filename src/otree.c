@@ -225,7 +225,8 @@ int _otree_construct_matrix(const mpc_ast_t *const ast, OTree *const otree) {
                 return 1;
             }
             columns = columns_check;
-            columns_check = 1;
+            if (strncmp(ast->children[i + 2]->contents, "]", 1) != 0)
+                columns_check = 1;
         } else if (label == LM_CHAR) {
             if (strncmp(ast->children[i]->contents, "]", 1) == 0) {
                 if (columns != 1 && columns_check != columns) {
@@ -233,9 +234,8 @@ int _otree_construct_matrix(const mpc_ast_t *const ast, OTree *const otree) {
                                     "matrix literal\n");
                     return 1;
                 }
-
-                if (!(ast_label_record[i - 1] == LM_MATRIX_COMMA_DELIMITER ||
-                    ast_label_record[i - 1] == LM_MATRIX_SEMICOLON_DELIMITER)) {
+                if (!(ast_label_record[i - 2] == LM_MATRIX_COMMA_DELIMITER ||
+                    ast_label_record[i - 2] == LM_MATRIX_SEMICOLON_DELIMITER)) {
                     rows++;
                 }
                 break;
