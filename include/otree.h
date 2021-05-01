@@ -62,18 +62,20 @@ extern const char *const otree_rule_strs[];
 
 
 typedef enum {
-    OTREE_SHOULD_NOT_EXIST,
+    OTREE_VAL_INDETERMINATE,
     OTREE_VAL_STR,
     OTREE_VAL_LONG,
     OTREE_VAL_DOUBLE,
-    OTREE_VAL_DLL,
+    OTREE_VAL_PARENT,
     OTREE_VAL_MAT,
-    OTREE_VAL_OP_ENUM,
+    OTREE_VAL_BINOP_ENUM,
     OTREE_DELIM,
 } OTreeValType;
 
+
 typedef struct {
     OTreeLabel label;
+    OTreeValType type;
     void *val;
     DLL *children;
 } OTree;
@@ -81,24 +83,24 @@ typedef struct {
 #pragma clang diagnostic push
 #pragma ide diagnostic ignored "OCUnusedGlobalDeclarationInspection"
 typedef enum {
-    OP_ARITHMETIC_ADD,
-    OP_ARITHMETIC_SUB,
-    OP_ARITHMETIC_MULT,
-    OP_ARITHMETIC_DIV,
-    OP_ARITHMETIC_MOD,
+    BINOP_ARITH_ADD,
+    BINOP_ARITH_SUB,
+    BINOP_ARITH_MULT,
+    BINOP_ARITH_DIV,
+    BINOP_ARITH_MOD,
 
-    OP_BIT_AND,
-    OP_BIT_XOR,
-    OP_BIT_OR,
+    BINOP_BIT_AND,
+    BINOP_BIT_XOR,
+    BINOP_BIT_OR,
 
-    OP_LOG_AND,
-    OP_LOG_OR,
+    BINOP_LOG_AND,
+    BINOP_LOG_OR,
 
-    OP_ASSIGNMENT,
+    BINOP_ASSMT,
 } OP_Enum;
 #pragma clang diagnostic pop
-extern const char *const op_enum_strs[];
-#define NUM_OPS (OP_ASSIGNMENT + 1)
+extern const char *const binop_enum_strs[];
+#define NUM_OPS (BINOP_ASSMT + 1)
 
 
 #define INDENT_SZ 2

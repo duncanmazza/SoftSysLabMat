@@ -6,9 +6,8 @@
 
 #include "../include/otree.h"
 
-/* This must correspond exactly to the order as prescribed in the OP_Enum
- * enum */
-const char *const op_enum_strs[] = {
+// This must correspond exactly to the order as prescribed in OP_Enum
+const char *const binop_enum_strs[] = {
         "+", "-", "*", "/", "%",
         "&", "^", "|",
         "&&", "||",
@@ -21,8 +20,7 @@ const char *const get_tree_label_enum_ignore_arr[4] = {"char", "regex",
 const size_t get_tree_label_enum_ignore_arr_strlen[4] = {4, 5, 6, 1};
 
 
-/* This must correspond exactly to the order as prescribed in the OTreeLabel
- * enum */
+// This must correspond exactly to the order as prescribed in OTreeLabel
 const char *const otree_label_strs[] = {
         "LM_NO_LABEL",
         "LM_CHAR",
@@ -195,7 +193,7 @@ int otree_atomic_parse_float(const char *contents, OTree *otree) {
 int otree_atomic_parse_op(const char *symb, OTree *otree) {
     size_t symb_strlen = strlen(symb);
     for (int i = 0; i < NUM_OPS; i++) {
-        if (strncmp(op_enum_strs[i], symb, symb_strlen) != 0) continue;
+        if (strncmp(binop_enum_strs[i], symb, symb_strlen) != 0) continue;
         OP_Enum *op_alloc = malloc(sizeof(OP_Enum));
         *op_alloc = (OP_Enum) i;
         otree->val = op_alloc;
@@ -313,6 +311,7 @@ OTree *make_empty_otree() {
     OTree *otree = malloc(sizeof(OTree));
     otree->val = NULL;
     otree->label = LM_NO_LABEL;
+    otree->type = OTREE_VAL_INDETERMINATE;
     otree->children = NULL;
 }
 
@@ -323,16 +322,16 @@ OTreeValType otree_classify_val(const OTree *const otree) {
         case LM_CHAR:
         case LM_ANY_NUMBER:
         case LM_ALL_CHARACTERS:
-            return OTREE_SHOULD_NOT_EXIST;
+            return OTREE_VAL_INDETERMINATE;
+        case LM_LAB_MAT:
         case LM_STATEMENT:
         case LM_STATEMENT_ASSIGNMENT:
+        case LM_FUNCTION_CALL_EXPRESSION:
         case LM_ANY_EXPRESSION:
         case LM_EXPRESSION:
-        case LM_FUNCTION_CALL_EXPRESSION:
         case LM_SIMPLE_EXPRESSION:
         case LM_ARGUMENT_LIST:
-        case LM_LAB_MAT:
-            return OTREE_VAL_DLL;
+            return OTREE_VAL_PARENT;
         case LM_STRING_LITERAL:
         case LM_TOKEN_NAME:
             return OTREE_VAL_STR;
@@ -340,7 +339,7 @@ OTreeValType otree_classify_val(const OTree *const otree) {
         case LM_LOGICAL_OP:
         case LM_BIT_OP:
         case LM_MATH_OP:
-            return OTREE_VAL_OP_ENUM;
+            return OTREE_VAL_BINOP_ENUM;
         case LM_MATRIX_LITERAL:
             return OTREE_VAL_MAT;
         case LM_MATRIX_COMMA_DELIMITER:
@@ -420,17 +419,16 @@ void disp_otree_recursive(const OTree *otree, DLL *const repr_dll, size_t indent
             value_disp = format_msg("Matrix: \n%s", CTYPE_STR, 0, 1, mat_repr);
             free(mat_repr);
             break;
-        case OTREE_VAL_OP_ENUM:
-            value_disp = QUICK_MSG(op_enum_strs[*(OP_Enum *) otree->val]);
+        case OTREE_VAL_BINOP_ENUM:
+            value_disp = QUICK_MSG(binop_enum_strs[*(OP_Enum *) otree->val]);
             break;
-        case OTREE_VAL_DLL:
-            fprintf(stderr,
-                    "Contradiction: OTree object classified as containing "
-                    "a DLL but was found to a null children field");
+        case OTREE_VAL_PARENT:
+            fprintf(stderr, "Contradiction: OTree object classified as being a "
+                    "parent but was found to a null children field");
             exit(-1);
-        case OTREE_SHOULD_NOT_EXIST:
-            fprintf(stderr,
-                    "Encountered OTree object that should not have been created");
+        case OTREE_VAL_INDETERMINATE:
+            fprintf(stderr, "Encountered OTree object labeled with an "
+                            "indeterminate type");
             exit(-1);
         default:
             fprintf(stderr, "disp_otree_recursive unhandled case");

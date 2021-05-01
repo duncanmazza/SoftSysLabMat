@@ -8,5 +8,6 @@
 #define SOFTSYSSOFTSYSLABMAT_EVALUATE_H
 
 #include "otree.h"
+#include "binop_funcs.h"
 
 #endif //SOFTSYSSOFTSYSLABMAT_EVALUATE_H
