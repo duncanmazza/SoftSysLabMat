@@ -19,6 +19,7 @@ extern "C" {
 int main(int argc, char **argv) {
     mpc_parser_t *parser;
     int num_parsers = mpc_setup(&parser);
+    vars_mapping = HT_create(VARS_MAPPING_N_SLOTS);
 
     // Loop for testing command line input
     while (1) {

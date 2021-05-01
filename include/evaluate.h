@@ -12,6 +12,10 @@
 #include "binop_funcs.h"
 
 
+extern HashTable *vars_mapping;
+#define VARS_MAPPING_N_SLOTS 2001
+
+
 int eval_func_call_expr(OTree *otree);
 
 int eval_assmt_stmt(OTree *otree);

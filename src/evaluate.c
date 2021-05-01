@@ -7,6 +7,8 @@
 #include "evaluate.h"
 
 
+HashTable *vars_mapping;
+
 
 int eval_func_call_expr(OTree *otree) {
     if (otree->label != LM_FUNCTION_CALL_EXPRESSION) {
@@ -30,9 +32,37 @@ int eval_assmt_stmt(OTree *otree) {
         exit(-1);
     }
 
-    fprintf(stderr, "Assignment statement evaluation has not yet been "
-                    "implemented\n");
-    return 1;
+    DLL_Node *first_child_dll_node = otree->children->s->next;
+    DLL_Node *second_child_dll_node = first_child_dll_node->next;
+    DLL_Node *third_child_dll_node = second_child_dll_node->next;
+
+    OTree *first_child = (OTree *)first_child_dll_node->val;
+    OTree *second_child = (OTree *)second_child_dll_node->val;
+    OTree *third_child = (OTree *)third_child_dll_node->val;
+
+    HT_KEY_TYPE var_name = (HT_KEY_TYPE)first_child->val;
+    void **var_address;
+    if (HT_get(vars_mapping, var_name, var_address)) {
+        var_address = malloc(sizeof(void *));
+        HT_insert(vars_mapping, var_name, var_address);
+    }
+
+    OP_Enum operator = *(OP_Enum *)second_child->val;
+
+    switch (operator) {
+        case BINOP_ASSMT_EQUAL:
+            break;
+        default:
+            fprintf(stderr, "Operator %s not supported for assignment",
+                    binop_enum_strs[operator]);
+            exit(-1);
+    }
+
+    // This point is only reached if the operator is "="
+
+    evaluate(third_child);
+    *var_address = third_child->val;
+    return 0;
 }
 
 
@@ -55,7 +85,7 @@ int evaluate(OTree *otree) {
     // This point is only reached if otree->type = OTREE_VAL_PARENT
 
     DLL_Node *child;
-    int recurse_ret;
+    int recurse_ret = 0;
     switch(otree->label) {
         case LM_LAB_MAT:
             child = otree->children->s->next;
