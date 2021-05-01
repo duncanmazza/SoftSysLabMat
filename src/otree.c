@@ -332,7 +332,7 @@ OTreeValType otree_classify_val(const OTree *const otree) {
         case LM_SIMPLE_EXPRESSION:
         case LM_ARGUMENT_LIST:
         case LM_LAB_MAT:
-            return OTREE_VAL_SLL;
+            return OTREE_VAL_DLL;
         case LM_STRING_LITERAL:
         case LM_TOKEN_NAME:
             return OTREE_VAL_STR;
@@ -379,7 +379,7 @@ void disp_otree_recursive(const OTree *otree, DLL *const repr_dll, size_t indent
 
     if (otree->children) {
         size_t new_indent = indent + INDENT_SZ;
-        SLL_Node *node = otree->children->head;
+        DLL_Node *node = otree->children->s->next;
 
         const char *disp = otree_label_strs[otree->label];
         char *concatenated = malloc(strlen(disp) + strlen(indent_str) + 1);
@@ -387,7 +387,7 @@ void disp_otree_recursive(const OTree *otree, DLL *const repr_dll, size_t indent
         strcat(concatenated, disp);
         DLL_append(repr_dll, concatenated);
 
-        while (node) {
+        while (node != otree->children->s) {
             disp_otree_recursive((OTree *) node->val, repr_dll, new_indent);
             node = node->next;
         }
@@ -423,10 +423,10 @@ void disp_otree_recursive(const OTree *otree, DLL *const repr_dll, size_t indent
         case OTREE_VAL_OP_ENUM:
             value_disp = QUICK_MSG(op_enum_strs[*(OP_Enum *) otree->val]);
             break;
-        case OTREE_VAL_SLL:
+        case OTREE_VAL_DLL:
             fprintf(stderr,
                     "Contradiction: OTree object classified as containing "
-                    "a SLL but was found to a null children field");
+                    "a DLL but was found to a null children field");
             exit(-1);
         case OTREE_SHOULD_NOT_EXIST:
             fprintf(stderr,
@@ -478,8 +478,7 @@ OTree *ast_2_otree(const mpc_ast_t *const ast, int *status) {
             break;
     }
 
-    otree->children = SLL_create();
-    SLL_Node *prev = otree->children->head;
+    otree->children = DLL_create();
     for (int i = 0; i < ast->children_num; i++) {
         if ((strcmp(ast->children[i]->contents, "(") == 0) ||
             (strcmp(ast->children[i]->contents, ")") == 0) ||
@@ -487,9 +486,7 @@ OTree *ast_2_otree(const mpc_ast_t *const ast, int *status) {
             (strcmp(ast->children[i]->tag, "string") == 0) ||
             (strcmp(ast->children[i]->tag, "regex") == 0))
             continue;
-        prev = SLL_insert_after(otree->children,
-                                ast_2_otree(ast->children[i], status),
-                                prev);
+        DLL_append(otree->children,  ast_2_otree(ast->children[i], status));
     }
     return otree;
 }

@@ -66,7 +66,7 @@ typedef enum {
     OTREE_VAL_STR,
     OTREE_VAL_LONG,
     OTREE_VAL_DOUBLE,
-    OTREE_VAL_SLL,
+    OTREE_VAL_DLL,
     OTREE_VAL_MAT,
     OTREE_VAL_OP_ENUM,
     OTREE_DELIM,
@@ -75,7 +75,7 @@ typedef enum {
 typedef struct {
     OTreeLabel label;
     void *val;
-    SLL *children;
+    DLL *children;
 } OTree;
 
 #pragma clang diagnostic push
