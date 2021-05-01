@@ -19,22 +19,31 @@ namespace HT_Gtests {
 
     TEST(HT_Tests, HT_Insert_Get) {
         HashTable *ht = HT_create(NUM_SLOTS);
-        HT_insert(ht, (HT_KEY_TYPE) "key1", 1);
-        HT_insert(ht, (HT_KEY_TYPE) "key2", 2);
-        HT_insert(ht, (HT_KEY_TYPE) "key3", 3);
+        int one = 1;
+        int two = 2;
+        int three = 3;
+        int four = 4;
+        HT_insert(ht, (HT_KEY_TYPE) "key1", &one);
+        HT_insert(ht, (HT_KEY_TYPE) "key2", &two);
+        HT_insert(ht, (HT_KEY_TYPE) "key3", &three);
 
-        size_t got;
+        void *got;
         HT_get(ht, (HT_KEY_TYPE) "key1", &got);
-        ASSERT_EQ(got, 1);
+        ASSERT_EQ(got, &one);
+        ASSERT_EQ(*(int *)got, one);
         HT_get(ht, (HT_KEY_TYPE) "key2", &got);
-        ASSERT_EQ(got, 2);
+        ASSERT_EQ(got, &two);
+        ASSERT_EQ(*(int *)got, two);
         HT_get(ht, (HT_KEY_TYPE) "key3", &got);
-        ASSERT_EQ(got, 3);
+        ASSERT_EQ(got, &three);
+        ASSERT_EQ(*(int *)got, three);
+
 
         // Test overriding an existing key
-        HT_insert(ht, (HT_KEY_TYPE) "key3", 4);
+        HT_insert(ht, (HT_KEY_TYPE) "key3", &four);
         HT_get(ht, (HT_KEY_TYPE) "key3", &got);
-        ASSERT_EQ(got, 4);
+        ASSERT_EQ(got, &four);
+        ASSERT_EQ(*(int *)got, four);
 
         HT_clean(ht);
         HT_FREE(ht);
@@ -42,17 +51,23 @@ namespace HT_Gtests {
 
     TEST(HT_Tests, HT_Insert_Get_Remove) {
         HashTable *ht = HT_create(NUM_SLOTS);
-        HT_insert(ht, (HT_KEY_TYPE) "key1", 1);
-        HT_insert(ht, (HT_KEY_TYPE) "key2", 2);
-        HT_insert(ht, (HT_KEY_TYPE) "key3", 3);
+        int one = 1;
+        int two = 2;
+        int three = 3;
+        HT_insert(ht, (HT_KEY_TYPE) "key1", &one);
+        HT_insert(ht, (HT_KEY_TYPE) "key2", &two);
+        HT_insert(ht, (HT_KEY_TYPE) "key3", &three);
 
-        size_t got;
+        void *got;
         HT_get(ht, (HT_KEY_TYPE) "key1", &got);
-        ASSERT_EQ(got, 1);
+        ASSERT_EQ(got, &one);
+        ASSERT_EQ(*(int *)got, one);
         HT_get(ht, (HT_KEY_TYPE) "key2", &got);
-        ASSERT_EQ(got, 2);
+        ASSERT_EQ(got, &two);
+        ASSERT_EQ(*(int *)got, two);
         HT_get(ht, (HT_KEY_TYPE) "key3", &got);
-        ASSERT_EQ(got, 3);
+        ASSERT_EQ(got, &three);
+        ASSERT_EQ(*(int *)got, three);
 
         int ret_val;
         ret_val = HT_remove(ht, (HT_KEY_TYPE) "key1");

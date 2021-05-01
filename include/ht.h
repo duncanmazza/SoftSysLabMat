@@ -22,7 +22,7 @@ typedef struct {
 
 typedef struct {
     size_t key;
-    size_t value;
+    void *value;
 } HashTableKVP;  // Key value pair
 
 
@@ -52,7 +52,7 @@ unsigned long hash_str_djb2(const unsigned char *str);
  * @param value Value to insert
  * @return Zero successful, 1 otherwise
  */
-int HT_insert(HashTable *ht, const unsigned char *key, size_t value);
+int HT_insert(HashTable *ht, const unsigned char *key, void *value);
 
 /** Checks whether a slot contains a node with the specified key.
  *
@@ -70,7 +70,7 @@ DLL_Node * HT_slot_contains(const DLL* slot, size_t key);
  *              in the hash table
  * @return 0 if the key is present and 1 otherwise
  */
-int HT_get(const HashTable * ht, const unsigned char * key, size_t *value);
+int HT_get(const HashTable * ht, const unsigned char * key, void **value);
 
 
 /** Removes the specified key-value pair from the hash table (including freeing

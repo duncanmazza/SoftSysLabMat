@@ -38,7 +38,7 @@ HashTable *HT_create(size_t n_slots) {
 }
 
 
-int HT_get(const HashTable *const ht, HT_KEY_TYPE key, size_t *const value) {
+int HT_get(const HashTable *ht, const unsigned char *key, void **value) {
     DLL* slot = HT_ACQUIRE_SLOT(ht, key);
     size_t key_hash = HT_MOD_HASH(hash_str_djb2(key), ht->n_slots);
     DLL_Node *slot_node = HT_slot_contains(slot, key_hash);
@@ -48,7 +48,7 @@ int HT_get(const HashTable *const ht, HT_KEY_TYPE key, size_t *const value) {
 }
 
 
-int HT_insert(HashTable *ht, const unsigned char *key, size_t value) {
+int HT_insert(HashTable *ht, const unsigned char *key, void *value) {
     HashTableKVP *kvp = malloc(sizeof(HashTableKVP));
     if (!kvp) return 1;
 
