@@ -138,14 +138,14 @@ int otree_parse_atomic(const char *const contents, OTree *const otree) {
             return _otree_atomic_parse_op(contents, otree);
         case LM_TOKEN_NAME:
         case LM_ALL_CHARACTERS:
-            otree->val = format_msg("%s", CTYPE_STR, NULL, 1, contents);
+            otree->val = format_msg("%s", CTYPE_STR, 0, 1, contents);
             return 0;
         case LM_ARGUMENT_LIST_DELIMITER:
         case LM_MATRIX_COMMA_DELIMITER:
-            otree->val = format_msg("%s", CTYPE_STR, NULL, 1, ",");
+            otree->val = format_msg("%s", CTYPE_STR, 0, 1, ",");
             return 0;
         case LM_MATRIX_SEMICOLON_DELIMITER:
-            otree->val = format_msg("%s", CTYPE_STR, NULL, 1, ";");
+            otree->val = format_msg("%s", CTYPE_STR, 0, 1, ";");
             return 0;
         default:
             fprintf(stderr, "otree_parse_atomic invoked with non-atomic "
