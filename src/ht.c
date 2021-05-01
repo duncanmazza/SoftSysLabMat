@@ -40,35 +40,38 @@ HashTable *HT_create(size_t n_slots) {
 
 int HT_get(const HashTable *const ht, HT_KEY_TYPE key, size_t *const value) {
     DLL* slot = HT_ACQUIRE_SLOT(ht, key);
-    DLL_Node *slot_node = HT_slot_contains(slot, key);
+    size_t key_hash = HT_MOD_HASH(hash_str_djb2(key), ht->n_slots);
+    DLL_Node *slot_node = HT_slot_contains(slot, key_hash);
     if (!slot_node) return 1;
-    *value = *(size_t *)slot_node->val;
+    *value = (*(HashTableKVP *)slot_node->val).value;
     return 0;
 }
 
 
 int HT_insert(HashTable *ht, const unsigned char *key, size_t value) {
-    size_t *heap_value = malloc(sizeof(size_t));
-    if (!heap_value) return 1;
+    HashTableKVP *kvp = malloc(sizeof(HashTableKVP));
+    if (!kvp) return 1;
 
-    DLL* slot = HT_ACQUIRE_SLOT(ht, key);
+    size_t key_hash = HT_MOD_HASH(hash_str_djb2(key), ht->n_slots);
+    DLL* slot = ht->slots[key_hash];
 
-    DLL_Node *slot_node = HT_slot_contains(slot, key);
+    DLL_Node *slot_node = HT_slot_contains(slot, key_hash);
     if (slot_node) {
         DLL_remove(slot, slot_node);
         DLL_NODE_FREE(slot_node);
     }
-    
-    *heap_value = value;
-    if (!DLL_append(slot, heap_value)) return 1;
+
+    kvp->value = value;
+    kvp->key = key_hash;
+    if (!DLL_append(slot, kvp)) return 1;
     return 0;
 }
 
 
-DLL_Node * HT_slot_contains(const DLL *slot, const unsigned char *key) {
+DLL_Node * HT_slot_contains(const DLL *slot, size_t key) {
     DLL_Node *node = slot->s->next;
     while (node != slot->s) {
-        if (HT_KEY_EQUAL(key, (HT_KEY_TYPE)node->val))
+        if (key == (*(HashTableKVP *)node->val).key)
             return node;
         node = node->next;
     }

@@ -20,6 +20,11 @@ typedef struct {
     DLL **slots;
 } HashTable;
 
+typedef struct {
+    size_t key;
+    size_t value;
+} HashTableKVP;  // Key value pair
+
 
 HashTable *HT_create(size_t n_slots);
 
@@ -55,7 +60,7 @@ int HT_insert(HashTable *ht, const unsigned char *key, size_t value);
  * @param key Key to search for
  * @return Pointer to the node if it is contained, NULL otherwise.
  */
-DLL_Node * HT_slot_contains(const DLL* slot, const unsigned char *key);
+DLL_Node * HT_slot_contains(const DLL* slot, size_t key);
 
 /** Gets the value associated with the provided key.
  *
