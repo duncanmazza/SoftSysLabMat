@@ -35,8 +35,9 @@ int main(int argc, char **argv) {
             if (status != 0) {
                 fprintf(stderr, "Cannot evaluate due to static parsing error\n");
                 usleep(50000);
+            } else {
+                disp_otree(otree);
             }
-            disp_otree(otree);
 
             /* print the AST */
 //            mpc_ast_print(r.output);
