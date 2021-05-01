@@ -20,26 +20,16 @@
 
 #include "../lib/mpc/mpc.h"
 
+#include "evaluate.h"
 #include "dll.h"
 #include "grammar.h"
 #include "cl_input.h"
 #include "otree.h"
 
-
 #ifdef __cplusplus
 extern "C" {
 #endif
 
-#include "../lib/mpc/mpc.h"
-
-#include "dll.h"
-#include "grammar.h"
-#include "cl_input.h"
-
-
-#ifdef __cplusplus
-extern "C" {
-#endif
 
 #ifdef __cplusplus
 }

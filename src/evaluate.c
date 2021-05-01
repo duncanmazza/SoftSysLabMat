@@ -6,11 +6,13 @@
 
 #include "evaluate.h"
 
+
+
 int eval_func_call_expr(OTree *otree) {
     if (otree->label != LM_FUNCTION_CALL_EXPRESSION) {
         fprintf(stderr, "Attempted to evaluate an otree object as a function "
                         "call expression but it was labeled in stead as %s",
-                        otree_label_strs[otree->label]);
+                otree_label_strs[otree->label]);
         exit(-1);
     }
 
@@ -24,7 +26,7 @@ int eval_assmt_stmt(OTree *otree) {
     if (otree->label != LM_STATEMENT_ASSIGNMENT) {
         fprintf(stderr, "Attempted to evaluate an otree object as an "
                         "assignment statement but it was labeled in stead as %s",
-                        otree_label_strs[otree->label]);
+                otree_label_strs[otree->label]);
         exit(-1);
     }
 
@@ -34,7 +36,7 @@ int eval_assmt_stmt(OTree *otree) {
 }
 
 
-int evaluate(OTree* otree) {
+int evaluate(OTree *otree) {
     switch (otree->type) {
         case OTREE_VAL_PARENT:
             break;
@@ -76,8 +78,8 @@ int evaluate(OTree* otree) {
         case LM_ANY_EXPRESSION:
             fprintf(stderr, "evaluate function cannot handle evaluating an otree "
                             "object with a %s or %s label",
-                            otree_label_strs[LM_ARGUMENT_LIST],
-                            otree_label_strs[LM_ANY_EXPRESSION]);
+                    otree_label_strs[LM_ARGUMENT_LIST],
+                    otree_label_strs[LM_ANY_EXPRESSION]);
             return 1;
         default:
             fprintf(stderr, "otree object was classified as being a parent but "
@@ -94,7 +96,7 @@ int evaluate(OTree* otree) {
     }
 
     // Evaluate expression from right to left; each trio of children should
-    // have a middle child that is an operator surrounded by two valid
+    // have a middle child that is an operator
     DLL_Node *child_right;
     DLL_Node *child_middle;
     DLL_Node *child_left;
