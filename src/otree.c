@@ -401,6 +401,7 @@ void _disp_otree(const OTree *const otree, DLL *const repr_dll, size_t indent) {
     }
 
     char *value_disp;
+    char *mat_repr;
     OTreeValType classification = otree_classify_val(otree);
     switch (classification) {
         case OTREE_DELIM:
@@ -416,7 +417,9 @@ void _disp_otree(const OTree *const otree, DLL *const repr_dll, size_t indent) {
                                     CTYPE_DOUBLE, 0, 1, *(long *) otree->val);
             break;
         case OTREE_VAL_MAT:
-            value_disp = QUICK_MSG(matrix_str_repr((matrix *)otree->val));
+            mat_repr = matrix_str_repr((matrix *)otree->val);
+            value_disp = format_msg("Matrix: \n%s", CTYPE_STR, 0, 1, mat_repr);
+            free(mat_repr);
             break;
         case OTREE_VAL_OP_ENUM:
             value_disp = QUICK_MSG(op_enum_strs[*(OP_Enum *) otree->val]);
