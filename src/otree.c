@@ -278,8 +278,8 @@ int _otree_construct_matrix(const mpc_ast_t *const ast, OTree *const otree) {
         }
     }
 
-    matrix* mat = make_matrix(rows, columns);
-    if (complete_matrix(mat, input, rows, columns) == 0) return 1;
+    matrix* mat = make_matrix((int)rows, (int)columns);
+    if (complete_matrix(mat, input, (int)rows, (int)columns) == 0) return 1;
     otree->val = mat;
     return 0;
 }
@@ -297,7 +297,7 @@ int otree_parse_literal(const mpc_ast_t *const ast, OTree *const otree) {
         case LM_STRING_LITERAL:
             // Format msg takes care of allocation of memory to copy the
             // contents string into a new memory chunk.
-            otree->val = format_msg("%s", CTYPE_STR, NULL, 1,
+            otree->val = format_msg("%s", CTYPE_STR, 0, 1,
                                     ast->children[1]->contents);
             return 0;
         case LM_MATRIX_LITERAL:
