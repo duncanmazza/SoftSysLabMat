@@ -96,11 +96,11 @@ typedef enum {
     BINOP_LOG_AND,
     BINOP_LOG_OR,
 
-    BINOP_ASSMT,
+    BINOP_ASSMT_EQUAL,
 } OP_Enum;
 #pragma clang diagnostic pop
 extern const char *const binop_enum_strs[];
-#define NUM_OPS (BINOP_ASSMT + 1)
+#define NUM_OPS (BINOP_ASSMT_EQUAL + 1)
 
 
 #define INDENT_SZ 2

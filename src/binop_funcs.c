@@ -17,7 +17,7 @@ int (*binop_func_ptrs[])(OTree *, OTree*) = {
         binop_bit_or,
         binop_log_and,
         binop_log_or,
-        binop_assmt,
+        binop_assmt_equal,
 };
 
 
@@ -75,7 +75,7 @@ int binop_log_or(OTree *left, OTree *right) {
 }
 
 
-int binop_assmt(OTree *left, OTree *right) {
+int binop_assmt_equal(OTree *left, OTree *right) {
     fprintf(stderr, "Un-implemented operator evaluation: =");
     return 1;
 }

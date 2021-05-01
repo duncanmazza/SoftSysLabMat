@@ -34,7 +34,7 @@ int binop_log_and(OTree *left, OTree *right);
 
 int binop_log_or(OTree *left, OTree *right);
 
-int binop_assmt(OTree *left, OTree *right);
+int binop_assmt_equal(OTree *left, OTree *right);
 
 #ifdef __cplusplus
 }
