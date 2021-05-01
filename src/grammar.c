@@ -43,8 +43,7 @@ SLL *mpc_rules_match(const char *const to_match) {
     regmatch_t rx_match;
     while (rule_def_node) {
         if (regexec(&rx, (char *) rule_def_node->val, 1, &rx_match, 0)) {
-            fprintf(stderr,
-                    "No matches found when looking for a mpc rule name");
+            fprintf(stderr, "No matches found when looking for a mpc rule name");
             exit(-1);
         }
         size_t rule_name_len = rx_match.rm_eo - rx_match.rm_so - 1;
@@ -87,9 +86,9 @@ int mpc_setup(mpc_parser_t **parser) {
             "num     : <float> | <int> ;"  // [order matters] Any number
             "str_lit : '\"'<allchar>'\"' ;"  // String literal
             "mat_lit : '['/\s*/((<num>(<matcdlm> | <matsdlm>))+ <num>?)/\s*/']' ;"  // Matrix literal
-            "smpexpr : (<num>|<name>) ((<math_op>|<log_op>|<bit_op>) (<anyexpr>|<name>|<num>))* "  // Simple expression
-            "        | <str_lit> "
-            "        | <mat_lit> ;"
+            "smpexpr : (<num>|<name>|<str_lit>|<mat_lit>) "
+            "          ((<math_op>|<log_op>|<bit_op>) "
+            "          (<anyexpr>|<name>|<num>|<str_lit>|<mat_lit>))* ;"  // Simple expression
             "arglist : ((<anyexpr><al_dlm>)+<anyexpr> | <anyexpr>) ;"
 
             "fexpr   : <name>'('/\s*/<arglist>?/\s*/')' ;"  // Expression: function call

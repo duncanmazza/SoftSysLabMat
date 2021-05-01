@@ -18,7 +18,7 @@ extern "C" {
 
 int mpc_setup(mpc_parser_t **parser);
 
-SLL *mpc_rules_match(const char *const to_match);
+SLL *mpc_rules_match(const char *to_match);
 
 #ifdef __cplusplus
 }
