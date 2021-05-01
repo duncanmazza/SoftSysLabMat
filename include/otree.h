@@ -8,6 +8,7 @@
 #define SOFTSYSSOFTSYSLABMAT_OTREE_H
 
 #include "sll.h"
+#include "dll.h"
 #include "str_utils.h"
 #include "matrix.h"
 #include "../lib/mpc/mpc.h"
@@ -55,7 +56,7 @@ typedef enum {
     LM_ARGUMENT_LIST,
     LM_LAB_MAT,
 } OTreeLabel;
-#define NUM_OTREE_LABELS LM_LAB_MAT + 1
+#define NUM_OTREE_LABELS (LM_LAB_MAT + 1)
 extern const char *const otree_label_strs[];
 extern const char *const otree_rule_strs[];
 
@@ -77,7 +78,8 @@ typedef struct {
     SLL *children;
 } OTree;
 
-
+#pragma clang diagnostic push
+#pragma ide diagnostic ignored "OCUnusedGlobalDeclarationInspection"
 typedef enum {
     OP_ARITHMETIC_ADD,
     OP_ARITHMETIC_SUB,
@@ -94,16 +96,17 @@ typedef enum {
 
     OP_ASSIGNMENT,
 } OP_Enum;
+#pragma clang diagnostic pop
 extern const char *const op_enum_strs[];
-#define NUM_OPS OP_ASSIGNMENT + 1
+#define NUM_OPS (OP_ASSIGNMENT + 1)
 
 
 #define INDENT_SZ 2
 
 
-OTree *ast_2_otree(const mpc_ast_t *const ast, int *status);
+OTree *ast_2_otree(const mpc_ast_t *ast, int *status);
 
-OTreeLabel get_tree_label_enum(const char *const label);
+OTreeLabel get_tree_label_enum(const char *label);
 
 /** Parse mpc abstract syntax tree node label string by extracting the last
  * label.
@@ -123,27 +126,27 @@ OTreeLabel get_tree_label_enum(const char *const label);
  * @return Length of the label pointed to by *end_label
  */
 size_t
-_get_mpc_end_label_ignore(const char *const *ignore, const size_t ignore_len,
-                          const size_t *ignore_str_len,
-                          const char **end_label);
+get_mpc_end_label_ignore(const char *const *ignore, size_t ignore_len,
+                         const size_t *ignore_str_len,
+                         const char **end_label);
 
-int _otree_atomic_parse_float(const char *const contents, OTree *const otree);
+int otree_atomic_parse_float(const char *contents, OTree *otree);
 
-int otree_parse_atomic(const char *const contents, OTree *const otree);
+int otree_parse_atomic(const char *contents, OTree *otree);
 
-int _otree_atomic_parse_int(const char *const contents, OTree *const otree);
+int otree_atomic_parse_int(const char *contents, OTree *otree);
 
 OTree *make_empty_otree();
 
-int _otree_construct_matrix(const mpc_ast_t *const ast, OTree *const otree);
+int otree_construct_matrix(const mpc_ast_t *ast, OTree *otree);
 
-int otree_parse_literal(const mpc_ast_t *const ast, OTree *const otree);
+int otree_parse_literal(const mpc_ast_t *ast, OTree *otree);
 
-int _otree_atomic_parse_op(const char *const symb, OTree *const otree);
+int otree_atomic_parse_op(const char *symb, OTree *otree);
 
-void _disp_otree(const OTree *const otree, DLL *const repr_dll, size_t indent);
+void disp_otree_recursive(const OTree *otree, DLL *repr_dll, size_t indent);
 
-void disp_otree(const OTree *const otree);
+void disp_otree(const OTree *otree);
 
 
 #ifdef __cplusplus

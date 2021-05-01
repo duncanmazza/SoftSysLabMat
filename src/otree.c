@@ -4,7 +4,6 @@
  *
  */
 
-#include <dll.h>
 #include "../include/otree.h"
 
 /* This must correspond exactly to the order as prescribed in the OP_Enum
@@ -82,9 +81,9 @@ const char *const otree_rule_strs[] = {
 };
 
 size_t
-_get_mpc_end_label_ignore(const char *const *ignore, const size_t ignore_len,
-                          const size_t *ignore_str_len,
-                          const char **end_label) {
+get_mpc_end_label_ignore(const char *const *ignore, size_t ignore_len,
+                         const size_t *ignore_str_len,
+                         const char **end_label) {
     size_t end_label_len = strlen(*end_label);
     const char *seek = *end_label;
     while (*seek) {
@@ -113,9 +112,9 @@ _get_mpc_end_label_ignore(const char *const *ignore, const size_t ignore_len,
 OTreeLabel get_tree_label_enum(const char *const label) {
     const char *end_label = label;
     size_t end_label_len = \
-        _get_mpc_end_label_ignore(get_tree_label_enum_ignore_arr, 4,
-                                  get_tree_label_enum_ignore_arr_strlen,
-                                  &end_label);
+        get_mpc_end_label_ignore(get_tree_label_enum_ignore_arr, 4,
+                                 get_tree_label_enum_ignore_arr_strlen,
+                                 &end_label);
 
     for (int i = 0; i < NUM_OTREE_LABELS; i++) {
         if (strncmp(end_label, otree_rule_strs[i], end_label_len) == 0)
@@ -128,14 +127,14 @@ OTreeLabel get_tree_label_enum(const char *const label) {
 int otree_parse_atomic(const char *const contents, OTree *const otree) {
     switch (otree->label) {
         case LM_INT:
-            return _otree_atomic_parse_int(contents, otree);
+            return otree_atomic_parse_int(contents, otree);
         case LM_FLOAT:
-            return _otree_atomic_parse_float(contents, otree);
+            return otree_atomic_parse_float(contents, otree);
         case LM_ASSIGNMENT_OP:
         case LM_MATH_OP:
         case LM_BIT_OP:
         case LM_LOGICAL_OP:
-            return _otree_atomic_parse_op(contents, otree);
+            return otree_atomic_parse_op(contents, otree);
         case LM_TOKEN_NAME:
         case LM_ALL_CHARACTERS:
             otree->val = format_msg("%s", CTYPE_STR, 0, 1, contents);
@@ -155,7 +154,7 @@ int otree_parse_atomic(const char *const contents, OTree *const otree) {
 }
 
 
-int _otree_atomic_parse_int(const char *const contents, OTree *const otree) {
+int otree_atomic_parse_int(const char *contents, OTree *otree) {
     char *endptr;
     long str_as_l = strtol(contents, &endptr, 10);
     if (errno == ERANGE) {
@@ -174,7 +173,7 @@ int _otree_atomic_parse_int(const char *const contents, OTree *const otree) {
 }
 
 
-int _otree_atomic_parse_float(const char *const contents, OTree *const otree) {
+int otree_atomic_parse_float(const char *contents, OTree *otree) {
     char *endptr;
     double str_as_d = strtod(contents, &endptr);
     if (errno == ERANGE) {
@@ -193,7 +192,7 @@ int _otree_atomic_parse_float(const char *const contents, OTree *const otree) {
 }
 
 
-int _otree_atomic_parse_op(const char *const symb, OTree *const otree) {
+int otree_atomic_parse_op(const char *symb, OTree *otree) {
     size_t symb_strlen = strlen(symb);
     for (int i = 0; i < NUM_OPS; i++) {
         if (strncmp(op_enum_strs[i], symb, symb_strlen) != 0) continue;
@@ -207,7 +206,7 @@ int _otree_atomic_parse_op(const char *const symb, OTree *const otree) {
 }
 
 
-int _otree_construct_matrix(const mpc_ast_t *const ast, OTree *const otree) {
+int otree_construct_matrix(const mpc_ast_t *ast, OTree *otree) {
     size_t rows = 0;
     size_t columns_check = 1;
     size_t columns = 1;
@@ -289,10 +288,10 @@ int otree_parse_literal(const mpc_ast_t *const ast, OTree *const otree) {
         case LM_ANY_NUMBER:
             if (strstr(ast->contents, ".")) {
                 otree->label = LM_FLOAT;
-                return _otree_atomic_parse_float(ast->contents, otree);
+                return otree_atomic_parse_float(ast->contents, otree);
             } else {
                 otree->label = LM_INT;
-                return _otree_atomic_parse_int(ast->contents, otree);
+                return otree_atomic_parse_int(ast->contents, otree);
             }
         case LM_STRING_LITERAL:
             // Format msg takes care of allocation of memory to copy the
@@ -301,7 +300,7 @@ int otree_parse_literal(const mpc_ast_t *const ast, OTree *const otree) {
                                     ast->children[1]->contents);
             return 0;
         case LM_MATRIX_LITERAL:
-            return _otree_construct_matrix(ast, otree);
+            return otree_construct_matrix(ast, otree);
         default:
             fprintf(stderr, "otree_parse_atomic invoked with non-atomic "
                             "label\n");
@@ -360,7 +359,7 @@ OTreeValType otree_classify_val(const OTree *const otree) {
 
 void disp_otree(const OTree *const otree) {
     DLL *disp_dll = DLL_create();
-    _disp_otree(otree, disp_dll, 0);
+    disp_otree_recursive(otree, disp_dll, 0);
     SLL *disp_sll = DLL_to_SLL(disp_dll);
     char *disp_str = sll_strs_to_str(disp_sll, "\n", "\n");
     printf("%s", disp_str);
@@ -370,7 +369,7 @@ void disp_otree(const OTree *const otree) {
 }
 
 
-void _disp_otree(const OTree *const otree, DLL *const repr_dll, size_t indent) {
+void disp_otree_recursive(const OTree *otree, DLL *const repr_dll, size_t indent) {
     size_t this_indent_sz = indent;
     char *indent_str = malloc(this_indent_sz + 3);
     memset(indent_str, ' ', this_indent_sz);
@@ -389,7 +388,7 @@ void _disp_otree(const OTree *const otree, DLL *const repr_dll, size_t indent) {
         DLL_append(repr_dll, concatenated);
 
         while (node) {
-            _disp_otree((OTree *) node->val, repr_dll, new_indent);
+            disp_otree_recursive((OTree *) node->val, repr_dll, new_indent);
             node = node->next;
         }
 
@@ -434,7 +433,7 @@ void _disp_otree(const OTree *const otree, DLL *const repr_dll, size_t indent) {
                     "Encountered OTree object that should not have been created");
             exit(-1);
         default:
-            fprintf(stderr, "_disp_otree unhandled case");
+            fprintf(stderr, "disp_otree_recursive unhandled case");
             exit(-1);
     }
 
