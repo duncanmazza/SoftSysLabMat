@@ -7,9 +7,10 @@
  *
  */
 
-#ifndef SOFTSYSSOFTSYSLABMAT_FORMAT_MSG_H
-#define SOFTSYSSOFTSYSLABMAT_FORMAT_MSG_H
+#ifndef SOFTSYSSOFTSYSLABMAT_STR_UTILS_H
+#define SOFTSYSSOFTSYSLABMAT_STR_UTILS_H
 
+#include <sll.h>
 #include <stdlib.h>
 #include <string.h>
 #include <stdio.h>
@@ -27,13 +28,16 @@ typedef enum {
 extern const char *const ctype_str_formatting[];
 
 
-#define QUICK_MSG(msg) format_msg("%s", CTYPE_STR, 1, (msg))
-#define QUICK_MSG_ENDL(msg) format_msg("%s\n", CTYPE_STR, 1, (msg))
+#define QUICK_MSG(msg) format_msg("%s", CTYPE_STR, 0, 1, (msg))
+#define QUICK_MSG_ENDL(msg) format_msg("%s\n", CTYPE_STR, 0, 1, (msg))
 
-char *format_msg(const char *templ, CType type, size_t nargs, ...);
-
+char *format_msg(const char *templ, CType type,
+                 int skip_check, size_t nargs, ...);
 
 int check_str_formatting(const char *templ, size_t num_occurrences,
                          CType type);
 
-#endif //SOFTSYSSOFTSYSLABMAT_FORMAT_MSG_H
+char *sll_strs_to_str(const SLL *const sll, const char *const join_str,
+                      const char *const term_str);
+
+#endif //SOFTSYSSOFTSYSLABMAT_STR_UTILS_H

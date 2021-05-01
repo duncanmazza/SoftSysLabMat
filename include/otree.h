@@ -8,20 +8,21 @@
 #define SOFTSYSSOFTSYSLABMAT_OTREE_H
 
 #include "sll.h"
+#include "str_utils.h"
+#include "matrix.h"
 #include "../lib/mpc/mpc.h"
 #include <string.h>
-#include "format_msg.h"
 
 #ifdef __cplusplus
 extern "C" {
 #endif
 
-#define ERR_MSG_STATIC(msg) format_msg("STATIC_PARSING_ERR: %s", CTYPE_STR, 1, \
+#define ERR_MSG_STATIC(msg) format_msg("STATIC_PARSING_ERR: %s", CTYPE_STR, 0, 1, \
     (msg))
 #define ERR_MSG_FLOAT_OVERUNDERFLOW(culprit) format_msg("Could not parse %s "  \
-    "as an double due to over/underflow", CTYPE_STR, 1, (culprit))
+    "as an double due to over/underflow", CTYPE_STR, 0, 1, (culprit))
 #define ERR_MSG_INT_OVERUNDERFLOW(culprit) format_msg("Could not parse %s as " \
-    "a long due to over/underflow", CTYPE_STR, 1, (culprit))
+    "a long due to over/underflow", CTYPE_STR, 0, 1, (culprit))
 
 
 extern const char *const get_tree_label_enum_ignore_arr[];

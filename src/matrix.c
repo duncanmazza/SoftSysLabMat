@@ -20,20 +20,39 @@ matrix *make_matrix(int row, int col) {
 }
 
 
-void print_matrix(matrix *mat) {
+char *matrix_str_repr(const matrix *const mat) {
+    SLL *sll = SLL_create();
+    SLL_Node *node = sll->head;
+
     for (int x = 0; x < mat->rows; x++) {
-        printf("%c", x == 0 ? '[' : ' ');
+        node = SLL_insert_after(sll, format_msg("%c", CTYPE_CHAR, 0, 1,
+                                         x == 0 ? '[' : ' '), node);
         for (int y = 0; y < mat->column; y++) {
-            printf("%g", mat->data[x][y]);
+            node = SLL_insert_after(sll, format_msg("%g", CTYPE_CHAR, 1, 1,
+                                             mat->data[x][y]), node);
             if (y != mat->column - 1) {
-                printf(" ");
+                node = SLL_insert_after(sll, format_msg("%c", CTYPE_CHAR, 0, 1,
+                                                 ' '), node);
             } else {
                 if (x != mat->rows - 1)
-                    printf("\n");
+                    node = SLL_insert_after(sll, format_msg("%c", CTYPE_CHAR, 0, 1,
+                                                     '\n'), node);
             }
         }
     }
-    printf("]\n");
+    SLL_insert_after(sll, format_msg("%s", CTYPE_STR, 0, 1,
+                                     "]\n"), node);
+
+    char *mat_repr = sll_strs_to_str(sll, "", "");
+    SLL_clean(sll);
+    return mat_repr;
+}
+
+
+void print_matrix(const matrix *const mat) {
+    char *mat_repr = matrix_str_repr(mat);
+    printf("%s", mat_repr);
+    free(mat_repr);
 }
 
 
@@ -46,7 +65,7 @@ int complete_matrix(matrix *mat, const float *input, int row, int col) {
     int i, j;
     for (i = 0; i < row; i++) {
         for (j = 0; j < col; j++) {
-            mat->data[i][j] = input[col*i+j];
+            mat->data[i][j] = input[col * i + j];
         }
     }
     return 1;

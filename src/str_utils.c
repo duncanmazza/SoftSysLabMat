@@ -7,7 +7,7 @@
  *
  */
 
-#include "format_msg.h"
+#include "str_utils.h"
 
 /* Important note: the strings in this array must correspond exactly to the
 * CType enum */
@@ -20,13 +20,52 @@ const char *const ctype_str_formatting[] = {
         "%s",
 };
 
+char *sll_strs_to_str(const SLL *const sll, const char *const join_str,
+                      const char *const term_str) {
+    size_t join_str_len = strlen(join_str);
+    size_t term_str_len = strlen(term_str);
+    size_t strlen_record[sll->len];
+    size_t total_strlen = 0;
+    SLL_Node *node = sll->head;
+    size_t counter = 0;
+    while (node != NULL) {
+        strlen_record[counter] = strlen((char *) node->val);
+        total_strlen += strlen_record[counter] + join_str_len;
+        node = node->next;
+        counter++;
+    }
 
-char *format_msg(const char *templ, CType type, size_t nargs, ...) {
-    if (!check_str_formatting(templ, nargs, type)) {
-        fprintf(stderr, "Message template did not contain the appropriate "
-                        "number of %s substrings to support string "
-                        "formatting", ctype_str_formatting[type]);
-        exit(1);
+    // Size will be total_strlen with another character for '\0' with the last
+    // join_str_len counted for in the above while loop replaced by term_str_len
+    char *str_repr = malloc(total_strlen + 1 + term_str_len - join_str_len);
+    str_repr[total_strlen] = '\0';
+    char *const str_repr_copy = str_repr;
+    node = sll->head;
+    counter = 0;
+    while (node != NULL) {
+        strcpy(str_repr, (char *) node->val);
+        str_repr += strlen_record[counter++];
+        node = node->next;
+        if (node != NULL) {
+            strcpy(str_repr, join_str);
+            str_repr += join_str_len;
+        } else {
+            strcpy(str_repr, term_str);
+        }
+    }
+    return str_repr_copy;
+}
+
+
+char *format_msg(const char *templ, CType type,
+                 const int skip_check, size_t nargs, ...) {
+    if (!skip_check) {
+        if (!check_str_formatting(templ, nargs, type)) {
+            fprintf(stderr, "Message template did not contain the appropriate "
+                            "number of %s substrings to support string "
+                            "formatting", ctype_str_formatting[type]);
+            exit(-1);
+        }
     }
 
     va_list ap;

@@ -7,6 +7,8 @@
 #ifndef SOFTSYSSOFTSYSLABMAT_MATRIX_H
 #define SOFTSYSSOFTSYSLABMAT_MATRIX_H
 
+#include "sll.h"
+#include "str_utils.h"
 #include <stdio.h>
 #include <stdlib.h>
 
@@ -22,7 +24,7 @@ typedef struct matrix {
 
 matrix *make_matrix(int row, int col);
 
-void print_matrix(matrix *mat);
+void print_matrix(const matrix *const mat);
 
 /** Fills out the values of a matrix
  *
@@ -37,6 +39,8 @@ int complete_matrix(matrix *mat, const float *input, int row, int col);
 matrix *add_int(matrix *mat, float k);
 
 matrix *add_matrix(matrix *mat1, matrix *mat2);
+
+char *matrix_str_repr(const matrix *const mat);
 
 #ifdef __cplusplus
 }

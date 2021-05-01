@@ -56,7 +56,7 @@ const char *const otree_label_strs[] = {
  * enum */
 const char *const otree_rule_strs[] = {
         "",  // LM_NO_LABEL
-        "",  // LM_CHAR
+        "char",
         "stmt",
         "a_stmt",
         "anyexpr",
@@ -138,14 +138,14 @@ int otree_parse_atomic(const char *const contents, OTree *const otree) {
             return _otree_atomic_parse_op(contents, otree);
         case LM_TOKEN_NAME:
         case LM_ALL_CHARACTERS:
-            otree->val = format_msg("%s", CTYPE_STR, 1, contents);
+            otree->val = format_msg("%s", CTYPE_STR, NULL, 1, contents);
             return 0;
         case LM_ARGUMENT_LIST_DELIMITER:
         case LM_MATRIX_COMMA_DELIMITER:
-            otree->val = format_msg("%s", CTYPE_STR, 1, ",");
+            otree->val = format_msg("%s", CTYPE_STR, NULL, 1, ",");
             return 0;
         case LM_MATRIX_SEMICOLON_DELIMITER:
-            otree->val = format_msg("%s", CTYPE_STR, 1, ";");
+            otree->val = format_msg("%s", CTYPE_STR, NULL, 1, ";");
             return 0;
         default:
             fprintf(stderr, "otree_parse_atomic invoked with non-atomic "
@@ -208,14 +208,79 @@ int _otree_atomic_parse_op(const char *const symb, OTree *const otree) {
 
 
 int _otree_construct_matrix(const mpc_ast_t *const ast, OTree *const otree) {
-    // TODO: replace with actual matrix construction; current code is just a
-    //  placeholder
-//    int rows, columns = -1;
-//    for (int i = 0; i < ast->children_num; i++) {
-//
-//    }
+    size_t rows = 0;
+    size_t columns_check = 1;
+    size_t columns = 1;
+    OTreeLabel ast_label_record[ast->children_num];
+    for (int i = 0; i < ast->children_num; i++) {
+        OTreeLabel label = get_tree_label_enum(ast->children[i]->tag);
+        ast_label_record[i] = label;
+        if (label == LM_MATRIX_COMMA_DELIMITER) {
+            columns_check++;
+        } else if (label == LM_MATRIX_SEMICOLON_DELIMITER) {
+            rows++;
+            if (columns != 1 && columns_check != columns) {
+                fprintf(stderr, "Inconsistent columns given in the "
+                                "matrix literal");
+                return 1;
+            }
+            columns = columns_check;
+            columns_check = 1;
+        } else if (label == LM_CHAR) {
+            if (strncmp(ast->children[i]->contents, "]", 1) == 0) {
+                if (columns != 1 && columns_check != columns) {
+                    fprintf(stderr, "Inconsistent columns given in the "
+                                    "matrix literal\n");
+                    return 1;
+                }
 
-    otree->val = NULL;
+                if (!(ast_label_record[i - 1] == LM_MATRIX_COMMA_DELIMITER ||
+                    ast_label_record[i - 1] == LM_MATRIX_SEMICOLON_DELIMITER)) {
+                    rows++;
+                }
+                break;
+            }
+        }
+    }
+    columns = columns_check;
+
+    float input[rows * columns];
+    size_t input_counter = 0;
+    for (int i = 0; i < ast->children_num; i++) {
+        OTreeLabel label = ast_label_record[i];
+        char *endptr;
+        if (label == LM_FLOAT) {
+            double str_as_d = strtod(ast->children[i]->contents, &endptr);
+            if (errno == ERANGE) {
+                char *err_msg_template = ERR_MSG_FLOAT_OVERUNDERFLOW(
+                        ast->children[i]->contents);
+                char *err_msg = ERR_MSG_STATIC(err_msg_template);
+                fprintf(stderr, "%s\n", err_msg);
+                free(err_msg_template);
+                free(err_msg);
+                return 1;
+            }
+            input[input_counter++] = (float) str_as_d;
+        } else if (label == LM_INT) {
+            long str_as_l = strtol(ast->children[i]->contents, &endptr, 10);
+            if (errno == ERANGE) {
+                char *err_msg_template = ERR_MSG_INT_OVERUNDERFLOW(
+                        ast->children[i]->contents);
+                char *err_msg = ERR_MSG_STATIC(err_msg_template);
+                fprintf(stderr, "%s\n", err_msg);
+                free(err_msg_template);
+                free(err_msg);
+                return 1;
+            }
+            input[input_counter++] = (float) str_as_l;
+        } else {
+            continue;
+        }
+    }
+
+    matrix* mat = make_matrix(rows, columns);
+    if (complete_matrix(mat, input, rows, columns) == 0) return 1;
+    otree->val = mat;
     return 0;
 }
 
@@ -232,7 +297,7 @@ int otree_parse_literal(const mpc_ast_t *const ast, OTree *const otree) {
         case LM_STRING_LITERAL:
             // Format msg takes care of allocation of memory to copy the
             // contents string into a new memory chunk.
-            otree->val = format_msg("%s", CTYPE_STR, 1,
+            otree->val = format_msg("%s", CTYPE_STR, NULL, 1,
                                     ast->children[1]->contents);
             return 0;
         case LM_MATRIX_LITERAL:
@@ -292,37 +357,16 @@ OTreeValType otree_classify_val(const OTree *const otree) {
     }
 }
 
+
 void disp_otree(const OTree *const otree) {
     DLL *disp_dll = DLL_create();
     _disp_otree(otree, disp_dll, 0);
-
-    size_t strlen_record[disp_dll->len];
-    size_t total_strlen = 0;
-    DLL_Node *node = disp_dll->s->next;
-    size_t counter = 0;
-    while (node != disp_dll->s) {
-        strlen_record[counter] = strlen((char *) node->val);
-        total_strlen += strlen_record[counter] + 1;
-        node = node->next;
-        counter++;
-    }
-
-    char *display = malloc(total_strlen + 1);
-    memset(display, '-', total_strlen);
-    display[total_strlen] = '\0';
-    char *const display_copy = display;
-    node = node->next;  // Resets to first node
-    counter = 0;
-    while (node != disp_dll->s) {
-        strcpy(display, (char *) node->val);
-        display += strlen_record[counter++];
-        display[0] = '\n';
-        display++;
-        node = node->next;
-    }
-
-    printf("%s", display_copy);
-    free(display_copy);
+    SLL *disp_sll = DLL_to_SLL(disp_dll);
+    char *disp_str = sll_strs_to_str(disp_sll, "\n", "\n");
+    printf("%s", disp_str);
+    SLL_clean(disp_sll);
+    free(disp_dll);  // disp_sll is a shallow copy so this is sufficient
+    free(disp_str);
 }
 
 
@@ -365,14 +409,14 @@ void _disp_otree(const OTree *const otree, DLL *const repr_dll, size_t indent) {
             break;
         case OTREE_VAL_LONG:
             value_disp = format_msg(ctype_str_formatting[CTYPE_LONG],
-                                    CTYPE_LONG, 1, *(long *) otree->val);
+                                    CTYPE_LONG, 0, 1, *(long *) otree->val);
             break;
         case OTREE_VAL_DOUBLE:
             value_disp = format_msg(ctype_str_formatting[CTYPE_DOUBLE],
-                                    CTYPE_DOUBLE, 1, *(long *) otree->val);
+                                    CTYPE_DOUBLE, 0, 1, *(long *) otree->val);
             break;
         case OTREE_VAL_MAT:
-            value_disp = QUICK_MSG("MATRIX");
+            value_disp = QUICK_MSG(matrix_str_repr((matrix *)otree->val));
             break;
         case OTREE_VAL_OP_ENUM:
             value_disp = QUICK_MSG(op_enum_strs[*(OP_Enum *) otree->val]);

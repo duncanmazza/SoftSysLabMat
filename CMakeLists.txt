@@ -19,7 +19,7 @@ add_library(
         ${LIB_SRC_DIR_NAME}/sll.c
         ${LIB_SRC_DIR_NAME}/grammar.c
         ${LIB_SRC_DIR_NAME}/otree.c
-        ${LIB_SRC_DIR_NAME}/format_msg.c
+        ${LIB_SRC_DIR_NAME}/str_utils.c
         ${LIB_SRC_DIR_NAME}/matrix.c
 )
 
