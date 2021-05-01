@@ -10,6 +10,7 @@
 #ifndef MINI_LISP_DLL_H
 #define MINI_LISP_DLL_H
 
+#include "sll.h"
 #include <stdio.h>
 #include <malloc.h>
 
@@ -134,6 +135,16 @@ DLL_insert_after(DLL *dll, void *val, DLL_Node *node);
  * @param node Node to remove from the DLL
  */
 void DLL_remove(DLL *dll, const DLL_Node *node);
+
+
+/** \brief Shallow-copies a dll to a sll (prev pointers are ignored)
+ *
+ * It is the programmer's responsibility to free the allocated memory.
+ *
+ * @param dll
+ * @return Newly allocated SLL
+ */
+SLL *DLL_to_SLL(DLL *dll);
 
 
 #ifdef __cplusplus

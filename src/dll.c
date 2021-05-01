@@ -102,6 +102,21 @@ void DLL_clean(DLL *const dll) {
     dll->len = 0;
 }
 
+
+SLL *DLL_to_SLL(DLL *dll) {
+    SLL *sll = SLL_create();
+    if (sll == NULL) return sll;
+
+    DLL_Node *dll_node = dll->s->next;
+    SLL_Node *sll_node = sll->head;
+    while (dll_node != dll->s) {
+        sll_node = SLL_insert_after(sll, dll_node->val, sll_node);
+        dll_node = dll_node->next;
+    }
+    return sll;
+}
+
+
 #ifdef __cplusplus
 }
 #endif
