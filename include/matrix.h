@@ -24,7 +24,7 @@ typedef struct matrix {
 
 matrix *make_matrix(int row, int col);
 
-void print_matrix(const matrix *const mat);
+void print_matrix(const matrix *mat);
 
 /** Fills out the values of a matrix
  *
@@ -40,7 +40,7 @@ matrix *add_int(matrix *mat, float k);
 
 matrix *add_matrix(matrix *mat1, matrix *mat2);
 
-char *matrix_str_repr(const matrix *const mat);
+char *matrix_str_repr(const matrix *mat);
 
 matrix *multiply_matrix(matrix *mat1, matrix *mat2);
 
