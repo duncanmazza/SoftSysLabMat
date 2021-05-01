@@ -41,7 +41,7 @@ char *matrix_str_repr(const matrix *const mat) {
         }
     }
     SLL_insert_after(sll, format_msg("%s", CTYPE_STR, 0, 1,
-                                     "]\n"), node);
+                                     "]"), node);
 
     char *mat_repr = sll_strs_to_str(sll, "", "");
     SLL_clean(sll);
@@ -51,7 +51,7 @@ char *matrix_str_repr(const matrix *const mat) {
 
 void print_matrix(const matrix *const mat) {
     char *mat_repr = matrix_str_repr(mat);
-    printf("%s", mat_repr);
+    printf("%s\n", mat_repr);
     free(mat_repr);
 }
 
