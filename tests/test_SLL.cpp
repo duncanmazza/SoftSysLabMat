@@ -11,6 +11,7 @@
 #pragma clang diagnostic ignored "-Wunknown-pragmas"
 #pragma ide diagnostic ignored "cert-err58-cpp"
 
+
 #include "../include/sll.h"
 #include "test_all.hpp"
 
@@ -114,6 +115,7 @@ namespace SLL_Gtests {
         ASSERT_EQ(3, sll->len);
 
         SLL_clean(sll);
+        free(sll);
     }
 
     TEST(SLL_Tests, SLL_Insert) {
@@ -157,8 +159,8 @@ namespace SLL_Gtests {
                 idx--;
             }
             SLL_clean(sll);
+            free(sll);
         }
-        free(sll);
     }
 
     TEST(SLL_Tests, SLL_Clean) {
@@ -167,15 +169,15 @@ namespace SLL_Gtests {
         // Test cleaning an empty SLL
         SLL_clean(sll);
         ASSERT_EMPTY_SLL(sll);
+        free(sll);
 
         for (auto &num_vec : num_vecs) {
             sll = SLL_create();
             POPULATE_LL(sll, num_vec, &SLL_insert);
             SLL_clean(sll);
             ASSERT_EMPTY_SLL(sll);
+            free(sll);
         }
-
-        free(sll);
     }
 } // namespace SLL_Gtests
 

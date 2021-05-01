@@ -60,6 +60,7 @@ SLL *mpc_rules_match(const char *const to_match) {
     regfree(&rx);
     free(to_match_copy_copy);
     SLL_clean(rule_definitions);
+    free(rule_definitions);
     return rule_names;
 }
 

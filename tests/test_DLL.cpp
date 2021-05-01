@@ -61,8 +61,8 @@ namespace DLL_Gtests {
                 idx--;
             }
             DLL_clean(dll);
+            DLL_FREE(dll);
         }
-        DLL_FREE(dll);
     }
 
     TEST(DLL_Tests, DLL_Insert) {
@@ -94,8 +94,8 @@ namespace DLL_Gtests {
                 idx--;
             }
             DLL_clean(dll);
+            DLL_FREE(dll);
         }
-        DLL_FREE(dll);
     }
 
     TEST(DLL_Tests, DLL_Delete) {
@@ -123,8 +123,8 @@ namespace DLL_Gtests {
         ASSERT_EQ(to_remove->prev, dll->s);
 
         DLL_clean(dll);
-        DLL_FREE(dll);
         DLL_NODE_FREE(to_remove);
+        DLL_FREE(dll);
     }
 
     TEST(DLL_Tests, DLL_Clean) {

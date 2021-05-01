@@ -363,6 +363,7 @@ void disp_otree(const OTree *const otree) {
     char *disp_str = sll_strs_to_str(disp_sll, "\n", "\n");
     printf("%s", disp_str);
     SLL_clean(disp_sll);
+    free(disp_sll);
     free(disp_dll);  // disp_sll is a shallow copy so this is sufficient
     free(disp_str);
 }

@@ -45,6 +45,7 @@ char *matrix_str_repr(const matrix *const mat) {
 
     char *mat_repr = sll_strs_to_str(sll, "", "");
     SLL_clean(sll);
+    free(sll);
     return mat_repr;
 }
 
