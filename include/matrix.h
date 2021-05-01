@@ -42,6 +42,8 @@ matrix *add_matrix(matrix *mat1, matrix *mat2);
 
 char *matrix_str_repr(const matrix *const mat);
 
+matrix *multiply_matrix(matrix *mat1, matrix *mat2);
+
 #ifdef __cplusplus
 }
 #endif
