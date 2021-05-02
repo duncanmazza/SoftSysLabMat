@@ -54,7 +54,7 @@ namespace MATRIX_Gtests {
       matrix* mat = make_matrix(i,j);
       float test[] = {1,2,3,4,5,6};
       complete_matrix(mat, test, i, j);
-      matrix *sum = add_int(mat, 3);
+      matrix *sum = matrix_add_scalar(mat, 3);
       ASSERT_EQ(sum->data[0][0], 4);
       ASSERT_EQ(sum->data[0][1], 5);
       ASSERT_EQ(sum->data[0][2], 6);
@@ -75,7 +75,7 @@ namespace MATRIX_Gtests {
       matrix* mat2 = make_matrix(i,j);
       complete_matrix(mat1, test, i, j);
       complete_matrix(mat2, test, i, j);
-      matrix *sum = add_matrix(mat1, mat2);
+      matrix *sum = matrix_add(mat1, mat2);
       ASSERT_EQ(sum->data[0][0], 2);
       ASSERT_EQ(sum->data[0][1], 4);
       ASSERT_EQ(sum->data[0][2], 6);

@@ -32,22 +32,22 @@ int eval_assmt_stmt(OTree *otree) {
         exit(-1);
     }
 
-    DLL_Node *first_child_dll_node = otree->children->s->next;
-    DLL_Node *second_child_dll_node = first_child_dll_node->next;
-    DLL_Node *third_child_dll_node = second_child_dll_node->next;
+    DLL_Node *child_left = otree->children->s->next;
+    DLL_Node *child_middle = child_left->next;
+    DLL_Node *child_right = child_middle->next;
 
-    OTree *first_child = (OTree *)first_child_dll_node->val;
-    OTree *second_child = (OTree *)second_child_dll_node->val;
-    OTree *third_child = (OTree *)third_child_dll_node->val;
+    OTree *otree_left = (OTree *)child_left->val;
+    OTree *otree_middle = (OTree *)child_middle->val;
+    OTree *otree_right = (OTree *)child_right->val;
 
-    HT_KEY_TYPE var_name = (HT_KEY_TYPE)first_child->val;
-    void **var_address;
-    if (HT_get(vars_mapping, var_name, var_address)) {
-        var_address = malloc(sizeof(void *));
+    HT_KEY_TYPE var_name = (HT_KEY_TYPE)otree_left->val;
+    OTree *var_address;
+    if (HT_get(vars_mapping, var_name, (void *)&var_address)) {
+        var_address = make_empty_otree();
         HT_insert(vars_mapping, var_name, var_address);
     }
 
-    OP_Enum operator = *(OP_Enum *)second_child->val;
+    OPEnum operator = *(OPEnum *)otree_middle->val;
 
     switch (operator) {
         case BINOP_ASSMT_EQUAL:
@@ -60,8 +60,10 @@ int eval_assmt_stmt(OTree *otree) {
 
     // This point is only reached if the operator is "="
 
-    evaluate(third_child);
-    *var_address = third_child->val;
+    evaluate(otree_right);
+    var_address->val = otree_right->val;
+    var_address->label = otree_right->label;
+    var_address->type = otree_right->type;
     return 0;
 }
 
@@ -75,7 +77,7 @@ int evaluate(OTree *otree) {
         case OTREE_VAL_DOUBLE:
         case OTREE_VAL_MAT:
         case OTREE_VAL_BINOP_ENUM:
-        case OTREE_DELIM:
+        case OTREE_VAL_DELIM:
             return 0;
         case OTREE_VAL_INDETERMINATE:
             fprintf(stderr, "Encountered undetermined otree value type");
@@ -134,7 +136,7 @@ int evaluate(OTree *otree) {
     OTree *otree_right;
     OTree *otree_left;
     OTree *otree_middle;
-    OP_Enum operator;
+    OPEnum operator;
     child_right = otree->children->s->prev;
 
     do {
@@ -153,9 +155,10 @@ int evaluate(OTree *otree) {
         recurse_ret |= evaluate(otree_left);
         if (recurse_ret) return recurse_ret;
 
-        operator = *(OP_Enum *)otree_middle->val;
+        operator = *(OPEnum *)otree_middle->val;
         (*(binop_func_ptrs[operator]))(otree_left, otree_right);
 
+        free(otree_right->val);
         DLL_remove(otree->children, child_right);
         DLL_NODE_FREE(child_right);
         DLL_remove(otree->children, child_middle);

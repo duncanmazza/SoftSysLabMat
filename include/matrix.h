@@ -36,9 +36,9 @@ void print_matrix(const matrix *mat);
  */
 int complete_matrix(matrix *mat, const float *input, int row, int col);
 
-matrix *add_int(matrix *mat, float k);
+matrix *matrix_add_scalar(matrix *mat, float k);
 
-matrix *add_matrix(matrix *mat1, matrix *mat2);
+matrix *matrix_add(matrix *mat1, matrix *mat2);
 
 char *matrix_str_repr(const matrix *mat);
 

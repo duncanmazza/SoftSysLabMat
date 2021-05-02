@@ -15,6 +15,17 @@ const char *const binop_enum_strs[] = {
 };
 
 
+// Length is reflected in the BINOP_ADD_MULT_SUB_COMPAT_LEN macro
+const OTreeValTypeTrio binop_add_mult_sub_eval_to[] = {
+        {OTREE_VAL_LONG, OTREE_VAL_LONG, OTREE_VAL_LONG},
+        {OTREE_VAL_DOUBLE, OTREE_VAL_LONG, OTREE_VAL_DOUBLE},
+        {OTREE_VAL_DOUBLE, OTREE_VAL_DOUBLE, OTREE_VAL_DOUBLE},
+        {OTREE_VAL_MAT, OTREE_VAL_MAT, OTREE_VAL_MAT},
+        {OTREE_VAL_MAT, OTREE_VAL_DOUBLE, OTREE_VAL_MAT},
+        {OTREE_VAL_MAT, OTREE_VAL_LONG, OTREE_VAL_MAT},
+};
+
+
 const char *const get_tree_label_enum_ignore_arr[4] = {"char", "regex",
                                                        "string", ">"};
 const size_t get_tree_label_enum_ignore_arr_strlen[4] = {4, 5, 6, 1};
@@ -194,8 +205,8 @@ int otree_atomic_parse_op(const char *symb, OTree *otree) {
     size_t symb_strlen = strlen(symb);
     for (int i = 0; i < NUM_OPS; i++) {
         if (strncmp(binop_enum_strs[i], symb, symb_strlen) != 0) continue;
-        OP_Enum *op_alloc = malloc(sizeof(OP_Enum));
-        *op_alloc = (OP_Enum) i;
+        OPEnum *op_alloc = malloc(sizeof(OPEnum));
+        *op_alloc = (OPEnum) i;
         otree->val = op_alloc;
         return 0;
     }
@@ -344,7 +355,7 @@ OTreeValType otree_classify_val(const OTree *const otree) {
             return OTREE_VAL_MAT;
         case LM_MATRIX_COMMA_DELIMITER:
         case LM_ARGUMENT_LIST_DELIMITER:
-            return OTREE_DELIM;
+            return OTREE_VAL_DELIM;
         case LM_FLOAT:
             return OTREE_VAL_DOUBLE;
         case LM_INT:
@@ -403,7 +414,7 @@ void disp_otree_recursive(const OTree *otree, DLL *const repr_dll, size_t indent
     char *mat_repr;
     OTreeValType classification = otree_classify_val(otree);
     switch (classification) {
-        case OTREE_DELIM:
+        case OTREE_VAL_DELIM:
         case OTREE_VAL_STR:
             value_disp = QUICK_MSG((char *) otree->val);
             break;
@@ -421,7 +432,7 @@ void disp_otree_recursive(const OTree *otree, DLL *const repr_dll, size_t indent
             free(mat_repr);
             break;
         case OTREE_VAL_BINOP_ENUM:
-            value_disp = QUICK_MSG(binop_enum_strs[*(OP_Enum *) otree->val]);
+            value_disp = QUICK_MSG(binop_enum_strs[*(OPEnum *) otree->val]);
             break;
         case OTREE_VAL_PARENT:
             fprintf(stderr, "Contradiction: OTree object classified as being a "

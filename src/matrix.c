@@ -73,7 +73,7 @@ int complete_matrix(matrix *mat, const float *input, int row, int col) {
 }
 
 
-matrix *add_int(matrix *mat, float k) {
+matrix *matrix_add_scalar(matrix *mat, float k) {
     matrix *total = make_matrix(mat->rows, mat->column);
     for (int x = 0; x < mat->rows; x++) {
         for (int y = 0; y < mat->column; y++) {
@@ -84,7 +84,7 @@ matrix *add_int(matrix *mat, float k) {
 }
 
 
-matrix *add_matrix(matrix *mat1, matrix *mat2) {
+matrix *matrix_add(matrix *mat1, matrix *mat2) {
     if (mat1->rows != mat2->rows && mat1->column != mat2->column) {
         return 0;
     }

@@ -8,12 +8,17 @@
 #define SOFTSYSSOFTSYSLABMAT_BINOP_FUNCS_H
 
 #include "otree.h"
+#include "matrix.h"
 
 #ifdef __cplusplus
 extern "C" {
 #endif
 
 extern int (*binop_func_ptrs[])(OTree *, OTree*);
+
+#define EVALUATE_OP(op, left_and_eval_type, right_type, left, right)           \
+    *(left_and_eval_type)(left) = (*(left_and_eval_type)(left)) (op)           \
+    (*(right_type)(right));
 
 
 int binop_arith_add(OTree *left, OTree *right);

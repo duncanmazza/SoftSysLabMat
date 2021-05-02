@@ -69,8 +69,14 @@ typedef enum {
     OTREE_VAL_PARENT,
     OTREE_VAL_MAT,
     OTREE_VAL_BINOP_ENUM,
-    OTREE_DELIM,
+    OTREE_VAL_DELIM,
 } OTreeValType;
+
+typedef struct {
+    OTreeValType arg1;
+    OTreeValType arg2;
+    OTreeValType ret_val;
+} OTreeValTypeTrio;
 
 
 typedef struct {
@@ -97,10 +103,13 @@ typedef enum {
     BINOP_LOG_OR,
 
     BINOP_ASSMT_EQUAL,
-} OP_Enum;
+} OPEnum;
 #pragma clang diagnostic pop
 extern const char *const binop_enum_strs[];
 #define NUM_OPS (BINOP_ASSMT_EQUAL + 1)
+
+extern const OTreeValTypeTrio binop_add_mult_sub_eval_to[];
+#define BINOP_ADD_MULT_SUB_EVAL_TO_LEN 6
 
 
 #define INDENT_SZ 2
