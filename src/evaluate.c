@@ -134,8 +134,8 @@ int evaluate(OTree *otree) {
     DLL_Node *child_left;
 
     OTree *otree_right;
-    OTree *otree_left;
     OTree *otree_middle;
+    OTree *otree_left;
     OPEnum operator;
     child_right = otree->children->s->prev;
 
@@ -158,12 +158,19 @@ int evaluate(OTree *otree) {
         operator = *(OPEnum *)otree_middle->val;
         (*(binop_func_ptrs[operator]))(otree_left, otree_right);
 
-        free(otree_right->val);
         DLL_remove(otree->children, child_right);
         DLL_NODE_FREE(child_right);
+
         DLL_remove(otree->children, child_middle);
         DLL_NODE_FREE(child_middle);
         child_right = child_left;
     } while (child_right->prev != otree->children->s);
+
+    otree->val = otree_left->val;
+    otree->label = otree_left->label;
+    otree->type = otree_left->type;
+    free(child_left);
+    DLL_FREE(otree->children);
+    otree->children = NULL;
     return 0;
 }
