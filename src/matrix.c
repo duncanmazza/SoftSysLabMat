@@ -112,6 +112,16 @@ matrix *multiply_matrix(matrix *mat1, matrix *mat2) {
     return product;
 }
 
+matrix *matrix_multiply_scalar(matrix *mat, float k) {
+    matrix *total = make_matrix(mat->rows, mat->column);
+    for (int x = 0; x < mat->rows; x++) {
+        for (int y = 0; y < mat->column; y++) {
+            total->data[x][y] = mat->data[x][y] * k;
+        }
+    }
+    return total;
+}
+
 /*
 int main() {
     int i = 3;
