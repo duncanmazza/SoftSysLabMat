@@ -36,16 +36,18 @@ int main(int argc, char **argv) {
             if (status != 0) {
                 fprintf(stderr, "Cannot evaluate due to static parsing error\n");
                 usleep(50000);
-            } else {
-                disp_otree(otree);
+                continue;
             }
 
+            printf("Before evaluation:\n");
+            disp_otree(otree);
             evaluate(otree);
+            printf("\nAfter evaluation:\n");
             disp_otree(otree);
 
-            /* print the AST */
-//            mpc_ast_print(r.output);
-            mpc_ast_delete(r.output);
+            // Test variable acquisition:
+            // OTree *node;
+            // HT_get(vars_mapping, (HT_KEY_TYPE)"m", (void **) &node);
         } else {
             /* Otherwise Print the Error */
             mpc_err_print(r.error);
