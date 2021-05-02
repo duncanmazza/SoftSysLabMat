@@ -71,7 +71,8 @@ int binop_arith_add(OTree *left, OTree *right) {
         fprintf(stderr, "Unhandled case in binop_arith_add");
         exit(-1);
     }
-    if (swap) left->val = new_l_val;
+
+    left->val = new_l_val;
     left->type = eval_to;
     return 0;
 }
