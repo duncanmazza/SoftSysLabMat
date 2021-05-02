@@ -60,10 +60,18 @@ int eval_assmt_stmt(OTree *otree) {
 
     // This point is only reached if the operator is "="
 
-    evaluate(otree_right);
+    int recurse_ret = evaluate(otree_right);
+    if (recurse_ret) return recurse_ret;
+
     var_address->val = otree_right->val;
     var_address->label = otree_right->label;
     var_address->type = otree_right->type;
+
+    free(otree_left->val);
+    free(otree_middle->val);
+    DLL_NODE_FREE(child_left);
+    DLL_NODE_FREE(child_middle);
+    child_replace_current(child_right, otree);
     return 0;
 }
 
@@ -99,7 +107,10 @@ int evaluate(OTree *otree) {
             return 0;
         case LM_STATEMENT:
             child = otree->children->s->next;
-            return evaluate((OTree *)child->val);
+            recurse_ret = evaluate((OTree *)child->val);
+            if (recurse_ret) return recurse_ret;
+            child_replace_current(child, otree);
+            return 0;
         case LM_STATEMENT_ASSIGNMENT:
             return eval_assmt_stmt(otree);
         case LM_FUNCTION_CALL_EXPRESSION:
@@ -166,11 +177,17 @@ int evaluate(OTree *otree) {
         child_right = child_left;
     } while (child_right->prev != otree->children->s);
 
-    otree->val = otree_left->val;
-    otree->label = otree_left->label;
-    otree->type = otree_left->type;
-    free(child_left);
-    DLL_FREE(otree->children);
-    otree->children = NULL;
+    child_replace_current(child_left, otree);
     return 0;
+}
+
+
+void child_replace_current(DLL_Node *const child, OTree *const current) {
+    OTree *child_otree = (OTree *)child->val;
+    current->val = child_otree->val;
+    current->label = child_otree->label;
+    current->type = child_otree->type;
+
+    DLL_NODE_FREE(child);  // Also frees otree_child
+    current->children = NULL;
 }

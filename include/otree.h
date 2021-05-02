@@ -159,6 +159,8 @@ void disp_otree_recursive(const OTree *otree, DLL *repr_dll, size_t indent);
 
 void disp_otree(const OTree *otree);
 
+void child_replace_current(DLL_Node *const child, OTree *const current);
+
 
 #ifdef __cplusplus
 }
