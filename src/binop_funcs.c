@@ -78,8 +78,41 @@ int binop_arith_add(OTree *left, OTree *right) {
 
 
 int binop_arith_mult(OTree *left, OTree *right) {
-    fprintf(stderr, "Un-implemented operator evaluation: *");
-    return 1;
+    int swap;
+    OTreeValType eval_to = check_binop_compatibility(
+            binop_add_mult_sub_eval_to, BINOP_ADD_MULT_SUB_EVAL_TO_LEN,
+            left->type, right->type, &swap);
+    if (eval_to == OTREE_VAL_INDETERMINATE) {
+        fprintf(stderr, "Incompatible types for * operator");
+        return 1;
+    }
+    void *new_l_val = swap ? right->val : left->val;
+    OTreeValType new_l_type = swap ? right->type : left->type;
+    void *new_r_val = swap ? left->val : right->val;
+    OTreeValType new_r_type = swap ? left->type : right->type;
+
+    if (new_l_type == OTREE_VAL_LONG && new_r_type == OTREE_VAL_LONG) {
+        *(long *)new_l_val = *(long *)new_l_val * *(long *)new_r_val;
+    } else if (new_l_type == OTREE_VAL_DOUBLE &&
+               (new_r_type == OTREE_VAL_LONG ||
+                new_r_type == OTREE_VAL_DOUBLE)) {
+        *(double *) new_l_val = *(double *) new_l_val * *(double *) new_r_val;
+    } else if (new_l_type == OTREE_VAL_MAT && new_r_type == OTREE_VAL_MAT) {
+        new_l_val = (void *) matrix_multiply((matrix *) new_l_val,
+                                        (matrix *) new_r_val);
+    } else if (new_l_type == OTREE_VAL_MAT &&
+               (new_r_type == OTREE_VAL_LONG ||
+                new_r_type == OTREE_VAL_DOUBLE)) {
+        new_l_val = (void *) matrix_multiply_scalar((matrix *) new_l_val,
+                                               (float) *(double *) new_r_val);
+    } else {
+        fprintf(stderr, "Unhandled case in binop_arith_mult");
+        exit(-1);
+    }
+    if (swap) left->val = new_l_val;
+    left->type = eval_to;
+    return 0;
+
 }
 
 

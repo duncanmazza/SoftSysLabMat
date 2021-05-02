@@ -111,6 +111,23 @@ namespace MATRIX_Gtests {
       free(product);
     }
 
+    TEST(MAT_Tests, MAT_multiply_scalar) {
+      int i = 3;
+      int j = 1;
+      matrix* mat1 = make_matrix(i,j);
+      float test1[] = {1,1,1};
+      complete_matrix(mat1, test1, i, j);
+      float scal = 3;
+      matrix *product = matrix_multiply_scalar(mat1, scal);
+      ASSERT_EQ(product->data[0][0], 3);
+      ASSERT_EQ(product->data[1][0], 3);
+      ASSERT_EQ(product->data[2][0], 3);
+      ASSERT_EQ(product->rows, i);
+      ASSERT_EQ(product->column, j);
+      free(mat1);
+      free(product);
+    }
+
 } // namespace SLL_Gtests
 
 #pragma clang diagnostic pop

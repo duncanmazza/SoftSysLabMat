@@ -44,6 +44,8 @@ char *matrix_str_repr(const matrix *mat);
 
 matrix *multiply_matrix(matrix *mat1, matrix *mat2);
 
+matrix *matrix_multiply_scalar(matrix *mat, float k);
+
 #ifdef __cplusplus
 }
 #endif
