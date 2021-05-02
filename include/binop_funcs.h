@@ -16,6 +16,14 @@ extern "C" {
 
 extern int (*binop_func_ptrs[])(OTree *, OTree*);
 
+#define RESOLVE_VAL_SWAP(new_l_val, new_l_type, new_r_val, new_r_type, right,  \
+left, swap) ({                                                                 \
+    (new_l_val) = (swap) ? (right)->val : (left)->val;                         \
+    (new_l_type) = (swap) ? (right)->type : (left)->type;                      \
+    (new_r_val) = (swap) ? (left)->val : (right)->val;                         \
+    (new_r_type) = (swap) ? (left)->type : (right)->type;                      \
+})
+
 
 int binop_arith_add(OTree *left, OTree *right);
 

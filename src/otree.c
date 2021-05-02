@@ -175,7 +175,7 @@ int otree_atomic_parse_int(const char *contents, OTree *otree) {
         return 1;
     }
 
-    long *val_ptr = malloc(sizeof(double));
+    long *val_ptr = malloc(sizeof(long));
     *val_ptr = str_as_l;
     otree->val = (void *) val_ptr;
     return 0;
@@ -412,8 +412,7 @@ void disp_otree_recursive(const OTree *otree, DLL *const repr_dll, size_t indent
 
     char *value_disp;
     char *mat_repr;
-    OTreeValType classification = otree_classify_val(otree);
-    switch (classification) {
+    switch (otree->type) {
         case OTREE_VAL_DELIM:
         case OTREE_VAL_STR:
             value_disp = QUICK_MSG((char *) otree->val);

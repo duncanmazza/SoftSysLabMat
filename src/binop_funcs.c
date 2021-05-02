@@ -48,28 +48,31 @@ int binop_arith_add(OTree *left, OTree *right) {
         return 1;
     }
 
-    void *new_l_val = swap ? right->val : left->val;
-    OTreeValType new_l_type = swap ? right->type : left->type;
-    void *new_r_val = swap ? left->val : right->val;
-    OTreeValType new_r_type = swap ? left->type : right->type;
+    void *new_l_val;
+    void *new_r_val;
+    OTreeValType new_l_type;
+    OTreeValType new_r_type;
+    RESOLVE_VAL_SWAP(new_l_val, new_l_type, new_r_val, new_r_type, right, left,
+                     swap);
 
     if (new_l_type == OTREE_VAL_LONG && new_r_type == OTREE_VAL_LONG) {
-        *(long *)new_l_val = *(long *)new_l_val + *(long *)new_r_val;
-    } else if (new_l_type == OTREE_VAL_DOUBLE &&
-               (new_r_type == OTREE_VAL_LONG ||
-                new_r_type == OTREE_VAL_DOUBLE)) {
-        *(double *) new_l_val = *(double *) new_l_val + *(double *) new_r_val;
+        *(long *) new_l_val = *(long *) new_l_val + *(long *) new_r_val;
+    } else if (new_l_type == OTREE_VAL_DOUBLE) {
+        *(double *) new_l_val = *(double *) new_l_val +
+                                (new_r_type == OTREE_VAL_LONG ?
+                                 ((double) *(long *) new_r_val) :
+                                 (*(double *) new_r_val));
     } else if (new_l_type == OTREE_VAL_MAT && new_r_type == OTREE_VAL_MAT) {
         new_l_val = (void *) matrix_add((matrix *) new_l_val,
                                         (matrix *) new_r_val);
-    } else if (new_l_type == OTREE_VAL_MAT &&
-               (new_r_type == OTREE_VAL_LONG ||
-                new_r_type == OTREE_VAL_DOUBLE)) {
-        new_l_val = (void *) matrix_add_scalar((matrix *) new_l_val,
-                                               (float) *(double *) new_r_val);
     } else {
-        fprintf(stderr, "Unhandled case in binop_arith_add");
-        exit(-1);
+        new_l_val = (void *) matrix_add_scalar(
+                (matrix *) new_l_val, (float) (
+                        new_r_type == OTREE_VAL_LONG ?
+                        ((double) *(long *) new_r_val) :
+                        (*(double *) new_r_val)
+                )
+        );
     }
 
     left->val = new_l_val;
@@ -87,13 +90,18 @@ int binop_arith_mult(OTree *left, OTree *right) {
         fprintf(stderr, "Incompatible types for * operator");
         return 1;
     }
-    void *new_l_val = swap ? right->val : left->val;
-    OTreeValType new_l_type = swap ? right->type : left->type;
-    void *new_r_val = swap ? left->val : right->val;
-    OTreeValType new_r_type = swap ? left->type : right->type;
+
+    void *new_l_val;
+    void *new_r_val;
+    OTreeValType new_l_type;
+    OTreeValType new_r_type;
+    RESOLVE_VAL_SWAP(new_l_val, new_l_type, new_r_val, new_r_type, right, left,
+                     swap);
+
+    // TODO: fix type casting (see binop_arith_add function for reference)
 
     if (new_l_type == OTREE_VAL_LONG && new_r_type == OTREE_VAL_LONG) {
-        *(long *)new_l_val = *(long *)new_l_val * *(long *)new_r_val;
+        *(long *) new_l_val = *(long *) new_l_val * *(long *) new_r_val;
     } else if (new_l_type == OTREE_VAL_DOUBLE &&
                (new_r_type == OTREE_VAL_LONG ||
                 new_r_type == OTREE_VAL_DOUBLE)) {
@@ -105,7 +113,7 @@ int binop_arith_mult(OTree *left, OTree *right) {
                (new_r_type == OTREE_VAL_LONG ||
                 new_r_type == OTREE_VAL_DOUBLE)) {
         new_l_val = (void *) matrix_multiply_scalar((matrix *) new_l_val,
-                                               (float) *(double *) new_r_val);
+                                                    (float) *(double *) new_r_val);
     } else {
         fprintf(stderr, "Unhandled case in binop_arith_mult");
         exit(-1);
