@@ -424,7 +424,7 @@ void disp_otree_recursive(const OTree *otree, DLL *const repr_dll, size_t indent
             break;
         case OTREE_VAL_DOUBLE:
             value_disp = format_msg(ctype_str_formatting[CTYPE_DOUBLE],
-                                    CTYPE_DOUBLE, 0, 1, *(long *) otree->val);
+                                    CTYPE_DOUBLE, 0, 1, *(double *) otree->val);
             break;
         case OTREE_VAL_MAT:
             mat_repr = matrix_str_repr((matrix *)otree->val);
