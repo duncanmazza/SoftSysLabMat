@@ -97,7 +97,7 @@ matrix *matrix_add(matrix *mat1, matrix *mat2) {
     return total;
 }
 
-matrix *multiply_matrix(matrix *mat1, matrix *mat2) {
+matrix *matrix_multiply(matrix *mat1, matrix *mat2) {
     if (mat1->column != mat2->rows) {
       return 0;
     }

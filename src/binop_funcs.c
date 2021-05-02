@@ -99,7 +99,7 @@ int binop_arith_mult(OTree *left, OTree *right) {
         *(double *) new_l_val = *(double *) new_l_val * *(double *) new_r_val;
     } else if (new_l_type == OTREE_VAL_MAT && new_r_type == OTREE_VAL_MAT) {
         new_l_val = (void *) matrix_multiply((matrix *) new_l_val,
-                                        (matrix *) new_r_val);
+                                             (matrix *) new_r_val);
     } else if (new_l_type == OTREE_VAL_MAT &&
                (new_r_type == OTREE_VAL_LONG ||
                 new_r_type == OTREE_VAL_DOUBLE)) {
@@ -112,7 +112,6 @@ int binop_arith_mult(OTree *left, OTree *right) {
     if (swap) left->val = new_l_val;
     left->type = eval_to;
     return 0;
-
 }
 
 

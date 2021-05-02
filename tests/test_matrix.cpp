@@ -100,7 +100,7 @@ namespace MATRIX_Gtests {
       float test2[] = {1,1,1};
       complete_matrix(mat1, test1, i, j);
       complete_matrix(mat2, test2, a, b);
-      matrix *product = multiply_matrix(mat1, mat2);
+      matrix *product = matrix_multiply(mat1, mat2);
       ASSERT_EQ(product->data[0][0], 3);
       ASSERT_EQ(product->data[1][0], 3);
       ASSERT_EQ(product->data[2][0], 3);
