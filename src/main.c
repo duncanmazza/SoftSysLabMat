@@ -41,6 +41,7 @@ int main(int argc, char **argv) {
             }
 
             evaluate(otree);
+            disp_otree(otree);
 
             /* print the AST */
 //            mpc_ast_print(r.output);
