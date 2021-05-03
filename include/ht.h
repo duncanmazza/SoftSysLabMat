@@ -57,10 +57,10 @@ int HT_insert(HashTable *ht, const unsigned char *key, void *value);
 /** Checks whether a slot contains a node with the specified key.
  *
  * @param slot Hash table slot
- * @param key Key to search for
+ * @param str_hash Key to search for
  * @return Pointer to the node if it is contained, NULL otherwise.
  */
-DLL_Node * HT_slot_contains(const DLL* slot, size_t key);
+DLL_Node * HT_slot_contains(const DLL* slot, size_t str_hash);
 
 /** Gets the value associated with the provided key.
  *
@@ -93,13 +93,6 @@ void HT_clean(HashTable *ht);
 #define HT_MOD_HASH(key, n_slots) ((key) % (n_slots))
 
 #define HT_KEY_TYPE const unsigned char *const
-
-#define HT_KEY_EQUAL(k1, k2)                                                   \
-    (strncmp((const char* const)(k1), (const char* const)(k2),                 \
-    strlen((const char* const)(k2))) == 0)
-
-#define HT_ACQUIRE_SLOT(ht, key)                                               \
-    (ht)->slots[HT_MOD_HASH(hash_str_djb2(key), (ht)->n_slots)]
 
 #define HT_FREE(ht) ({                                                         \
     for (int i = 0; i < (ht)->n_slots; i++) {                                  \

@@ -39,9 +39,9 @@ HashTable *HT_create(size_t n_slots) {
 
 
 int HT_get(const HashTable *ht, const unsigned char *key, void **value) {
-    DLL* slot = HT_ACQUIRE_SLOT(ht, key);
-    size_t key_hash = HT_MOD_HASH(hash_str_djb2(key), ht->n_slots);
-    DLL_Node *slot_node = HT_slot_contains(slot, key_hash);
+    size_t str_hash = hash_str_djb2(key);
+    DLL* slot = ht->slots[HT_MOD_HASH(str_hash, ht->n_slots)];
+    DLL_Node *slot_node = HT_slot_contains(slot, str_hash);
     if (!slot_node) return 1;
     *value = (*(HashTableKVP *)slot_node->val).value;
     return 0;
@@ -52,27 +52,28 @@ int HT_insert(HashTable *ht, const unsigned char *key, void *value) {
     HashTableKVP *kvp = malloc(sizeof(HashTableKVP));
     if (!kvp) return 1;
 
-    size_t key_hash = HT_MOD_HASH(hash_str_djb2(key), ht->n_slots);
+    size_t str_hash = hash_str_djb2(key);
+    size_t key_hash = HT_MOD_HASH(str_hash, ht->n_slots);
     DLL* slot = ht->slots[key_hash];
 
-    DLL_Node *slot_node = HT_slot_contains(slot, key_hash);
+    DLL_Node *slot_node = HT_slot_contains(slot, str_hash);
     if (slot_node) {
         DLL_remove(slot, slot_node);
         DLL_NODE_FREE(slot_node);
     }
 
     kvp->value = value;
-    kvp->key = key_hash;
+    kvp->key = str_hash;
     if (!DLL_append(slot, kvp)) return 1;
     return 0;
 }
 
 
 int HT_remove(HashTable *ht, const unsigned char *key) {
-    size_t key_hash = HT_MOD_HASH(hash_str_djb2(key), ht->n_slots);
-    DLL* slot = ht->slots[key_hash];
+    size_t str_hash = hash_str_djb2(key);
+    DLL* slot = ht->slots[HT_MOD_HASH(str_hash, ht->n_slots)];
 
-    DLL_Node *slot_node = HT_slot_contains(slot, key_hash);
+    DLL_Node *slot_node = HT_slot_contains(slot, str_hash);
     if (slot_node) {
         DLL_remove(slot, slot_node);
         DLL_NODE_FREE(slot_node);
@@ -82,10 +83,10 @@ int HT_remove(HashTable *ht, const unsigned char *key) {
 }
 
 
-DLL_Node * HT_slot_contains(const DLL *slot, size_t key) {
+DLL_Node * HT_slot_contains(const DLL *slot, size_t str_hash) {
     DLL_Node *node = slot->s->next;
     while (node != slot->s) {
-        if (key == (*(HashTableKVP *)node->val).key)
+        if (str_hash == (*(HashTableKVP *)node->val).key)
             return node;
         node = node->next;
     }
