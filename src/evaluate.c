@@ -239,7 +239,7 @@ void child_replace_current(DLL_Node *const child, OTree *const current) {
 
 
 void print_workspace() {
-    printf("Workspace:\n");
+    printf("\nWorkspace:\n----------\n");
     for (int i = 0; i < workspace->n_slots; i++) {
         DLL *slot = workspace->slots[i];
         DLL_Node *slot_node = slot->s->next;
@@ -254,7 +254,7 @@ void print_workspace() {
             void *var_name;
             HT_get_by_str_hash(var_name_to_str_hash, kvp->key, &var_name);
 
-            printf("%s (%s): %s\n", (char *) var_name,
+            printf("> %s (%s): %s\n", (char *) var_name,
                    otree_val_type_enum_strs[kvp_otree->type],
                    disp_str + 2);
 

@@ -30,6 +30,8 @@
 extern "C" {
 #endif
 
+extern const char* const help_msg;
+
 
 #ifdef __cplusplus
 }
