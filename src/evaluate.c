@@ -139,9 +139,11 @@ int evaluate(OTree *otree) {
             break;
         case LM_ARGUMENT_LIST:
         case LM_ANY_EXPRESSION:
+            if (otree->children) { if (otree->children->len == 1) break; }
             fprintf(stderr,
                     "evaluate function cannot handle evaluating an otree "
-                    "object with a %s or %s label",
+                    "object with a %s label or a %s label where there is some "
+                    "number of children other than 1",
                     otree_label_strs[LM_ARGUMENT_LIST],
                     otree_label_strs[LM_ANY_EXPRESSION]);
             return 1;
@@ -152,13 +154,10 @@ int evaluate(OTree *otree) {
             return 1;
     }
 
-    // This point is only reached if otree->label = LM_SIMPLE_EXPRESSION
-
-    if (otree->children->len < 3) {
-        fprintf(stderr, "simple expression was encountered that did not have "
-                        "the minimum of 3 children");
-        exit(-1);
-    }
+    // This point is only reached if otree->label = LM_SIMPLE_EXPRESSION (or if
+    // there is a simple expression that only has one child node and is
+    // therefore ambiguously labeled as "LM_ANY_EXPRESSION" based on how mpc
+    // rolls tree levels with one child into one hierarchical level)
 
     // Evaluate expression from right to left; each trio of children should
     // have a middle child that is an operator
@@ -175,6 +174,14 @@ int evaluate(OTree *otree) {
     OPEnum operator;
 
     child_right = otree->children->s->prev;
+    if (child_right->prev == otree->children->s) {
+        otree_right = (OTree *)child_right->val;
+        recurse_ret |= evaluate(otree_right);
+        if (recurse_ret) return recurse_ret;
+        child_replace_current(child_right, otree);
+        return 0;
+    }
+
     do {
         child_middle = child_right->prev;
         child_left = child_middle->prev;

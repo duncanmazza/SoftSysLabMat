@@ -39,18 +39,7 @@ int main(int argc, char **argv) {
                 usleep(50000);
                 continue;
             }
-
-            evaluate(otree);
             print_workspace(workspace);
-
-            // printf("Before evaluation:\n");
-            // print_otree(otree);
-            // printf("\nAfter evaluation:\n");
-            // print_otree(otree);
-
-            // Test variable acquisition:
-            // OTree *node;
-            // HT_get(vars_mapping, (HT_KEY_TYPE)"m", (void **) &node);
         } else {
             /* Otherwise Print the Error */
             mpc_err_print(r.error);
