@@ -27,6 +27,8 @@ left, swap) ({                                                                 \
 
 int binop_arith_add(OTree *left, OTree *right, OTree *ret);
 
+int binop_arith_sub(OTree *left, OTree *right, OTree *ret);
+
 int binop_arith_mult(OTree *left, OTree *right, OTree *ret);
 
 int binop_arith_div(OTree *left, OTree *right, OTree *ret);

@@ -40,6 +40,8 @@ matrix *matrix_add_scalar(matrix *mat, float k);
 
 matrix *matrix_add(matrix *mat1, matrix *mat2);
 
+matrix *matrix_sub(matrix *mat1, matrix *mat2);
+
 char *matrix_str_repr(const matrix *mat);
 
 matrix *matrix_multiply(matrix *mat1, matrix *mat2);

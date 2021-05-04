@@ -86,7 +86,7 @@ matrix *matrix_add_scalar(matrix *mat, float k) {
 
 matrix *matrix_add(matrix *mat1, matrix *mat2) {
     if (mat1->rows != mat2->rows && mat1->column != mat2->column) {
-        return 0;
+        return NULL;
     }
     matrix *total = make_matrix(mat1->rows, mat1->column);
     for (int x = 0; x < total->rows; x++) {
@@ -96,6 +96,21 @@ matrix *matrix_add(matrix *mat1, matrix *mat2) {
     }
     return total;
 }
+
+
+matrix *matrix_sub(matrix *mat1, matrix *mat2) {
+    if (mat1->rows != mat2->rows && mat1->column != mat2->column) {
+        return NULL;
+    }
+    matrix *total = make_matrix(mat1->rows, mat1->column);
+    for (int x = 0; x < total->rows; x++) {
+        for (int y = 0; y < total->column; y++) {
+            total->data[x][y] = mat1->data[x][y] - mat2->data[x][y];
+        }
+    }
+    return total;
+}
+
 
 matrix *matrix_multiply(matrix *mat1, matrix *mat2) {
     if (mat1->column != mat2->rows) {
@@ -111,6 +126,7 @@ matrix *matrix_multiply(matrix *mat1, matrix *mat2) {
     }
     return product;
 }
+
 
 matrix *matrix_multiply_scalar(matrix *mat, float k) {
     matrix *total = make_matrix(mat->rows, mat->column);
