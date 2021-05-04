@@ -7,7 +7,7 @@
 #include "../include/binop_funcs.h"
 
 // This must correspond exactly to the order as prescribed in OP_Enum
-int (*binop_func_ptrs[])(OTree *, OTree *) = {
+int (*binop_func_ptrs[])(OTree *, OTree *, OTree *) = {
         binop_arith_add,
         binop_arith_mult,
         binop_arith_div,
@@ -38,7 +38,7 @@ OTreeValType check_binop_compatibility(
 }
 
 
-int binop_arith_add(OTree *left, OTree *right) {
+int binop_arith_add(OTree *left, OTree *right, OTree *ret) {
     int swap;
     OTreeValType eval_to = check_binop_compatibility(
             binop_add_mult_sub_eval_to, BINOP_ADD_MULT_SUB_EVAL_TO_LEN,
@@ -48,6 +48,8 @@ int binop_arith_add(OTree *left, OTree *right) {
         return 1;
     }
 
+    ret->val = malloc(sizeof(void *));
+
     void *new_l_val;
     void *new_r_val;
     OTreeValType new_l_type;
@@ -56,17 +58,17 @@ int binop_arith_add(OTree *left, OTree *right) {
                      swap);
 
     if (new_l_type == OTREE_VAL_LONG && new_r_type == OTREE_VAL_LONG) {
-        *(long *) new_l_val = *(long *) new_l_val + *(long *) new_r_val;
+        *(long *)ret->val = *(long *) new_l_val + *(long *) new_r_val;
     } else if (new_l_type == OTREE_VAL_DOUBLE) {
-        *(double *) new_l_val = *(double *) new_l_val +
+        *(double *)ret->val = *(double *) new_l_val +
                                 (new_r_type == OTREE_VAL_LONG ?
                                  ((double) *(long *) new_r_val) :
                                  (*(double *) new_r_val));
     } else if (new_l_type == OTREE_VAL_MAT && new_r_type == OTREE_VAL_MAT) {
-        new_l_val = (void *) matrix_add((matrix *) new_l_val,
+        ret->val = (void *) matrix_add((matrix *) new_l_val,
                                         (matrix *) new_r_val);
     } else {
-        new_l_val = (void *) matrix_add_scalar(
+        ret->val = (void *) matrix_add_scalar(
                 (matrix *) new_l_val, (float) (
                         new_r_type == OTREE_VAL_LONG ?
                         ((double) *(long *) new_r_val) :
@@ -75,13 +77,12 @@ int binop_arith_add(OTree *left, OTree *right) {
         );
     }
 
-    left->val = new_l_val;
-    left->type = eval_to;
+    ret->type = eval_to;
     return 0;
 }
 
 
-int binop_arith_mult(OTree *left, OTree *right) {
+int binop_arith_mult(OTree *left, OTree *right, OTree *ret) {
     int swap;
     OTreeValType eval_to = check_binop_compatibility(
             binop_add_mult_sub_eval_to, BINOP_ADD_MULT_SUB_EVAL_TO_LEN,
@@ -118,55 +119,56 @@ int binop_arith_mult(OTree *left, OTree *right) {
         fprintf(stderr, "Unhandled case in binop_arith_mult");
         exit(-1);
     }
-    if (swap) left->val = new_l_val;
-    left->type = eval_to;
+
+    ret->val = new_l_val;
+    ret->type = eval_to;
     return 0;
 }
 
 
-int binop_arith_div(OTree *left, OTree *right) {
+int binop_arith_div(OTree *left, OTree *right, OTree *ret) {
     fprintf(stderr, "Un-implemented operator evaluation: /");
     return 1;
 }
 
 
-int binop_arith_mod(OTree *left, OTree *right) {
+int binop_arith_mod(OTree *left, OTree *right, OTree *ret) {
     fprintf(stderr, "Un-implemented operator evaluation: %%");
     return 1;
 }
 
 
-int binop_bit_and(OTree *left, OTree *right) {
+int binop_bit_and(OTree *left, OTree *right, OTree *ret) {
     fprintf(stderr, "Un-implemented operator evaluation: &");
     return 1;
 }
 
 
-int binop_bit_xor(OTree *left, OTree *right) {
+int binop_bit_xor(OTree *left, OTree *right, OTree *ret) {
     fprintf(stderr, "Un-implemented operator evaluation: ^");
     return 1;
 }
 
 
-int binop_bit_or(OTree *left, OTree *right) {
+int binop_bit_or(OTree *left, OTree *right, OTree *ret) {
     fprintf(stderr, "Un-implemented operator evaluation: |");
     return 1;
 }
 
 
-int binop_log_and(OTree *left, OTree *right) {
+int binop_log_and(OTree *left, OTree *right, OTree *ret) {
     fprintf(stderr, "Un-implemented operator evaluation: &&");
     return 1;
 }
 
 
-int binop_log_or(OTree *left, OTree *right) {
+int binop_log_or(OTree *left, OTree *right, OTree *ret) {
     fprintf(stderr, "Un-implemented operator evaluation: ||");
     return 1;
 }
 
 
-int binop_assmt_equal(OTree *left, OTree *right) {
+int binop_assmt_equal(OTree *left, OTree *right, OTree *ret) {
     fprintf(stderr, "Un-implemented operator evaluation: =");
     return 1;
 }

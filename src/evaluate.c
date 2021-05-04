@@ -10,6 +10,7 @@
 HashTable *workspace;
 HashTable *var_name_to_str_hash;
 
+
 int eval_func_call_expr(OTree *otree) {
     if (otree->label != LM_FUNCTION_CALL_EXPRESSION) {
         fprintf(stderr, "Attempted to evaluate an otree object as a function "
@@ -78,17 +79,34 @@ int eval_assmt_stmt(OTree *otree) {
 }
 
 
+int replace_var_name_with_var(OTree *otree) {
+    OTree *to_replace_with;
+    int not_a_var = HT_get(workspace, (HT_KEY_TYPE)otree->val,
+                           (void **)&to_replace_with);
+    if (not_a_var) {
+        fprintf(stderr, "%s does not exist in the workspace", (char *)otree->val);
+        return not_a_var;
+    }
+    otree->label = to_replace_with->label;
+    otree->type = to_replace_with->type;
+    otree->val = to_replace_with->val;
+    return 0;
+}
+
+
 int evaluate(OTree *otree) {
     switch (otree->type) {
         case OTREE_VAL_PARENT:
             break;
-        case OTREE_VAL_STR:
         case OTREE_VAL_LONG:
         case OTREE_VAL_DOUBLE:
         case OTREE_VAL_MAT:
         case OTREE_VAL_BINOP_ENUM:
         case OTREE_VAL_DELIM:
             return 0;
+        case OTREE_VAL_STR:
+            if (otree->label == LM_STRING_LITERAL) return 0;
+            else return replace_var_name_with_var(otree);
         case OTREE_VAL_INDETERMINATE:
             fprintf(stderr, "Encountered undetermined otree value type");
             return 1;
@@ -151,15 +169,23 @@ int evaluate(OTree *otree) {
     OTree *otree_right;
     OTree *otree_middle;
     OTree *otree_left;
-    OPEnum operator;
-    child_right = otree->children->s->prev;
 
+    int otree_right_is_rvalue;
+    int otree_left_is_rvalue;
+    OPEnum operator;
+
+    child_right = otree->children->s->prev;
     do {
         child_middle = child_right->prev;
         child_left = child_middle->prev;
+
         otree_right = (OTree *) child_right->val;
         otree_middle = (OTree *) child_middle->val;
         otree_left = (OTree *) child_left->val;
+
+        otree_right_is_rvalue = otree_right->label != LM_TOKEN_NAME;
+        otree_left_is_rvalue = otree_left->label != LM_TOKEN_NAME;
+
         if (otree_middle->type != OTREE_VAL_BINOP_ENUM) {
             fprintf(stderr, "Encountered a middle otree node in an expression "
                             "that was not an operator");
@@ -171,13 +197,21 @@ int evaluate(OTree *otree) {
         if (recurse_ret) return recurse_ret;
 
         operator = *(OPEnum *) otree_middle->val;
-        (*(binop_func_ptrs[operator]))(otree_left, otree_right);
+        OTree *ret = make_empty_otree();
+        (*(binop_func_ptrs[operator]))(otree_left, otree_right, ret);
 
         DLL_remove(otree->children, child_right);
-        DLL_NODE_FREE(child_right);
-
         DLL_remove(otree->children, child_middle);
+        DLL_remove(otree->children, child_left);
+
+        if (otree_right_is_rvalue) free(otree_right->val);
+        if (otree_left_is_rvalue) free(otree_left->val);
+        free(otree_middle->val);
+
+        DLL_NODE_FREE(child_right);
         DLL_NODE_FREE(child_middle);
+
+        child_left->val = ret;
         child_right = child_left;
     } while (child_right->prev != otree->children->s);
 
