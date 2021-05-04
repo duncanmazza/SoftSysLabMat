@@ -6,6 +6,18 @@
 
 #include "../include/otree.h"
 
+// This must correspond exactly to the order as prescribed in OTreeValType
+const char* const otree_val_type_enum_strs[] = {
+        "<indeterminate>",
+        "str",
+        "long",
+        "double",
+        "<parent>",
+        "matrix",
+        "<binary operator>",
+        "<delimiter>",
+};
+
 // This must correspond exactly to the order as prescribed in OP_Enum
 const char *const binop_enum_strs[] = {
         "+", "-", "*", "/", "%",
@@ -17,12 +29,12 @@ const char *const binop_enum_strs[] = {
 
 // Length is reflected in the BINOP_ADD_MULT_SUB_COMPAT_LEN macro
 const OTreeValTypeTrio binop_add_mult_sub_eval_to[] = {
-        {OTREE_VAL_LONG, OTREE_VAL_LONG, OTREE_VAL_LONG},
-        {OTREE_VAL_DOUBLE, OTREE_VAL_LONG, OTREE_VAL_DOUBLE},
+        {OTREE_VAL_LONG,   OTREE_VAL_LONG,   OTREE_VAL_LONG},
+        {OTREE_VAL_DOUBLE, OTREE_VAL_LONG,   OTREE_VAL_DOUBLE},
         {OTREE_VAL_DOUBLE, OTREE_VAL_DOUBLE, OTREE_VAL_DOUBLE},
-        {OTREE_VAL_MAT, OTREE_VAL_MAT, OTREE_VAL_MAT},
-        {OTREE_VAL_MAT, OTREE_VAL_DOUBLE, OTREE_VAL_MAT},
-        {OTREE_VAL_MAT, OTREE_VAL_LONG, OTREE_VAL_MAT},
+        {OTREE_VAL_MAT,    OTREE_VAL_MAT,    OTREE_VAL_MAT},
+        {OTREE_VAL_MAT,    OTREE_VAL_DOUBLE, OTREE_VAL_MAT},
+        {OTREE_VAL_MAT,    OTREE_VAL_LONG,   OTREE_VAL_MAT},
 };
 
 
@@ -243,7 +255,8 @@ int otree_construct_matrix(const mpc_ast_t *ast, OTree *otree) {
                     return 1;
                 }
                 if (!(ast_label_record[i - 2] == LM_MATRIX_COMMA_DELIMITER ||
-                    ast_label_record[i - 2] == LM_MATRIX_SEMICOLON_DELIMITER)) {
+                      ast_label_record[i - 2] ==
+                      LM_MATRIX_SEMICOLON_DELIMITER)) {
                     rows++;
                 }
                 break;
@@ -286,8 +299,8 @@ int otree_construct_matrix(const mpc_ast_t *ast, OTree *otree) {
         }
     }
 
-    matrix* mat = make_matrix((int)rows, (int)columns);
-    if (complete_matrix(mat, input, (int)rows, (int)columns) == 0) return 1;
+    matrix *mat = make_matrix((int) rows, (int) columns);
+    if (complete_matrix(mat, input, (int) rows, (int) columns) == 0) return 1;
     otree->val = mat;
     return 0;
 }
@@ -367,7 +380,7 @@ OTreeValType otree_classify_val(const OTree *const otree) {
 }
 
 
-void disp_otree(const OTree *const otree) {
+void print_otree(const OTree *const otree) {
     DLL *disp_dll = DLL_create();
     disp_otree_recursive(otree, disp_dll, 0);
     SLL *disp_sll = DLL_to_SLL(disp_dll);
@@ -380,7 +393,8 @@ void disp_otree(const OTree *const otree) {
 }
 
 
-void disp_otree_recursive(const OTree *otree, DLL *const repr_dll, size_t indent) {
+void
+disp_otree_recursive(const OTree *otree, DLL *const repr_dll, size_t indent) {
     size_t this_indent_sz = indent;
     char *indent_str = malloc(this_indent_sz + 3);
     memset(indent_str, ' ', this_indent_sz);
@@ -426,8 +440,8 @@ void disp_otree_recursive(const OTree *otree, DLL *const repr_dll, size_t indent
                                     CTYPE_DOUBLE, 0, 1, *(double *) otree->val);
             break;
         case OTREE_VAL_MAT:
-            mat_repr = matrix_str_repr((matrix *)otree->val);
-            value_disp = format_msg("Matrix: \n%s", CTYPE_STR, 0, 1, mat_repr);
+            mat_repr = matrix_str_repr((matrix *) otree->val);
+            value_disp = format_msg("\n%s", CTYPE_STR, 0, 1, mat_repr);
             free(mat_repr);
             break;
         case OTREE_VAL_BINOP_ENUM:
@@ -435,7 +449,7 @@ void disp_otree_recursive(const OTree *otree, DLL *const repr_dll, size_t indent
             break;
         case OTREE_VAL_PARENT:
             fprintf(stderr, "Contradiction: OTree object classified as being a "
-                    "parent but was found to a null children field\n");
+                            "parent but was found to a null children field\n");
             exit(-1);
         case OTREE_VAL_INDETERMINATE:
             fprintf(stderr, "Encountered OTree object labeled with an "
@@ -496,7 +510,7 @@ OTree *ast_2_otree(const mpc_ast_t *const ast, int *status) {
             (strcmp(ast->children[i]->tag, "string") == 0) ||
             (strcmp(ast->children[i]->tag, "regex") == 0))
             continue;
-        DLL_append(otree->children,  ast_2_otree(ast->children[i], status));
+        DLL_append(otree->children, ast_2_otree(ast->children[i], status));
     }
     return otree;
 }

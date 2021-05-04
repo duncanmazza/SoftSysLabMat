@@ -40,13 +40,17 @@ HashTable *HT_create(size_t n_slots) {
 
 int HT_get(const HashTable *ht, const unsigned char *key, void **value) {
     size_t str_hash = hash_str_djb2(key);
+    return HT_get_by_str_hash(ht, str_hash, value);
+}
+
+
+int HT_get_by_str_hash(const HashTable *ht, size_t str_hash, void **value) {
     DLL* slot = ht->slots[HT_MOD_HASH(str_hash, ht->n_slots)];
     DLL_Node *slot_node = HT_slot_contains(slot, str_hash);
     if (!slot_node) return 1;
     *value = (*(HashTableKVP *)slot_node->val).value;
     return 0;
 }
-
 
 int HT_insert(HashTable *ht, const unsigned char *key, void *value) {
     HashTableKVP *kvp = malloc(sizeof(HashTableKVP));

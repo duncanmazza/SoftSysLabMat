@@ -7,8 +7,8 @@
 #include "evaluate.h"
 
 
-HashTable *vars_mapping;
-
+HashTable *workspace;
+HashTable *var_name_to_str_hash;
 
 int eval_func_call_expr(OTree *otree) {
     if (otree->label != LM_FUNCTION_CALL_EXPRESSION) {
@@ -36,18 +36,20 @@ int eval_assmt_stmt(OTree *otree) {
     DLL_Node *child_middle = child_left->next;
     DLL_Node *child_right = child_middle->next;
 
-    OTree *otree_left = (OTree *)child_left->val;
-    OTree *otree_middle = (OTree *)child_middle->val;
-    OTree *otree_right = (OTree *)child_right->val;
+    OTree *otree_left = (OTree *) child_left->val;
+    OTree *otree_middle = (OTree *) child_middle->val;
+    OTree *otree_right = (OTree *) child_right->val;
 
-    HT_KEY_TYPE var_name = (HT_KEY_TYPE)otree_left->val;
+    HT_KEY_TYPE var_name = (HT_KEY_TYPE) otree_left->val;
     OTree *var_address;
-    if (HT_get(vars_mapping, var_name, (void *)&var_address)) {
+    if (HT_get(workspace, var_name, (void *) &var_address)) {
         var_address = make_empty_otree();
-        HT_insert(vars_mapping, var_name, var_address);
+        HT_insert(workspace, var_name, var_address);
+        HT_insert(var_name_to_str_hash, var_name,
+                  format_msg("%s", CTYPE_STR, 1, 1, otree_left->val));
     }
 
-    OPEnum operator = *(OPEnum *)otree_middle->val;
+    OPEnum operator = *(OPEnum *) otree_middle->val;
 
     switch (operator) {
         case BINOP_ASSMT_EQUAL:
@@ -96,18 +98,18 @@ int evaluate(OTree *otree) {
 
     DLL_Node *child;
     int recurse_ret = 0;
-    switch(otree->label) {
+    switch (otree->label) {
         case LM_LAB_MAT:
             child = otree->children->s->next;
             while (child != otree->children->s) {
-                recurse_ret = evaluate((OTree *)child->val);
+                recurse_ret = evaluate((OTree *) child->val);
                 if (recurse_ret) return recurse_ret;
                 child = child->next;
             }
             return 0;
         case LM_STATEMENT:
             child = otree->children->s->next;
-            recurse_ret = evaluate((OTree *)child->val);
+            recurse_ret = evaluate((OTree *) child->val);
             if (recurse_ret) return recurse_ret;
             child_replace_current(child, otree);
             return 0;
@@ -119,14 +121,16 @@ int evaluate(OTree *otree) {
             break;
         case LM_ARGUMENT_LIST:
         case LM_ANY_EXPRESSION:
-            fprintf(stderr, "evaluate function cannot handle evaluating an otree "
-                            "object with a %s or %s label",
+            fprintf(stderr,
+                    "evaluate function cannot handle evaluating an otree "
+                    "object with a %s or %s label",
                     otree_label_strs[LM_ARGUMENT_LIST],
                     otree_label_strs[LM_ANY_EXPRESSION]);
             return 1;
         default:
             fprintf(stderr, "otree object was classified as being a parent but "
-                            "its label of %s does not match", otree_label_strs[otree->label]);
+                            "its label of %s does not match",
+                    otree_label_strs[otree->label]);
             return 1;
     }
 
@@ -155,7 +159,7 @@ int evaluate(OTree *otree) {
         child_left = child_middle->prev;
         otree_right = (OTree *) child_right->val;
         otree_middle = (OTree *) child_middle->val;
-        otree_left = (OTree *)child_left->val;
+        otree_left = (OTree *) child_left->val;
         if (otree_middle->type != OTREE_VAL_BINOP_ENUM) {
             fprintf(stderr, "Encountered a middle otree node in an expression "
                             "that was not an operator");
@@ -166,7 +170,7 @@ int evaluate(OTree *otree) {
         recurse_ret |= evaluate(otree_left);
         if (recurse_ret) return recurse_ret;
 
-        operator = *(OPEnum *)otree_middle->val;
+        operator = *(OPEnum *) otree_middle->val;
         (*(binop_func_ptrs[operator]))(otree_left, otree_right);
 
         DLL_remove(otree->children, child_right);
@@ -183,11 +187,53 @@ int evaluate(OTree *otree) {
 
 
 void child_replace_current(DLL_Node *const child, OTree *const current) {
-    OTree *child_otree = (OTree *)child->val;
+    OTree *child_otree = (OTree *) child->val;
     current->val = child_otree->val;
     current->label = child_otree->label;
     current->type = child_otree->type;
 
     DLL_NODE_FREE(child);  // Also frees otree_child
     current->children = NULL;
+}
+
+
+void print_workspace() {
+    printf("Workspace:\n");
+    for (int i = 0; i < workspace->n_slots; i++) {
+        DLL *slot = workspace->slots[i];
+        DLL_Node *slot_node = slot->s->next;
+        while (slot_node != slot->s) {
+            DLL *disp_dll = DLL_create();
+            HashTableKVP *kvp = (HashTableKVP *) slot_node->val;
+            OTree *kvp_otree = (OTree *) kvp->value;
+            disp_otree_recursive(kvp_otree, disp_dll, 0);
+            SLL *disp_sll = DLL_to_SLL(disp_dll);
+            char *disp_str = sll_strs_to_str(disp_sll, "", "");
+
+            void *var_name;
+            HT_get_by_str_hash(var_name_to_str_hash, kvp->key, &var_name);
+
+            printf("%s (%s): %s\n", (char *) var_name,
+                   otree_val_type_enum_strs[kvp_otree->type],
+                   disp_str + 2);
+
+            free(disp_str);
+            DLL_clean(disp_dll);
+            DLL_FREE(disp_dll);
+
+            // Manually free each sll node because disp_sll is a shallow copy of
+            // disp_dll and SLL_clean would result in a double free.
+            SLL_Node *sll_node = disp_sll->head;
+            SLL_Node *tmp;
+            while (sll_node) {
+                tmp = sll_node->next;
+                free(sll_node);
+                sll_node = tmp;
+            }
+
+            free(disp_sll);
+            slot_node = slot_node->next;
+        }
+    }
+    printf("\n");
 }

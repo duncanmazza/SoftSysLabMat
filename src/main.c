@@ -19,7 +19,8 @@ extern "C" {
 int main(int argc, char **argv) {
     mpc_parser_t *parser;
     int num_parsers = mpc_setup(&parser);
-    vars_mapping = HT_create(VARS_MAPPING_N_SLOTS);
+    workspace = HT_create(WORKSPACE_N_SLOTS);
+    var_name_to_str_hash = HT_create(VAR_NAME_TO_STR_HASH_N_SLOTS);
 
     // Loop for testing command line input
     while (1) {
@@ -39,11 +40,13 @@ int main(int argc, char **argv) {
                 continue;
             }
 
-            printf("Before evaluation:\n");
-            disp_otree(otree);
             evaluate(otree);
-            printf("\nAfter evaluation:\n");
-            disp_otree(otree);
+            print_workspace(workspace);
+
+            // printf("Before evaluation:\n");
+            // print_otree(otree);
+            // printf("\nAfter evaluation:\n");
+            // print_otree(otree);
 
             // Test variable acquisition:
             // OTree *node;

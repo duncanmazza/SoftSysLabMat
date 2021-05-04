@@ -71,6 +71,7 @@ typedef enum {
     OTREE_VAL_BINOP_ENUM,
     OTREE_VAL_DELIM,
 } OTreeValType;
+extern const char* const otree_val_type_enum_strs[];
 
 typedef struct {
     OTreeValType arg1;
@@ -157,9 +158,9 @@ int otree_atomic_parse_op(const char *symb, OTree *otree);
 
 void disp_otree_recursive(const OTree *otree, DLL *repr_dll, size_t indent);
 
-void disp_otree(const OTree *otree);
+void print_otree(const OTree *otree);
 
-void child_replace_current(DLL_Node *const child, OTree *const current);
+void child_replace_current(DLL_Node *child, OTree *current);
 
 
 #ifdef __cplusplus

@@ -12,8 +12,10 @@
 #include "binop_funcs.h"
 
 
-extern HashTable *vars_mapping;
-#define VARS_MAPPING_N_SLOTS 2001
+extern HashTable *workspace;
+#define WORKSPACE_N_SLOTS 10001
+extern HashTable *var_name_to_str_hash;
+#define VAR_NAME_TO_STR_HASH_N_SLOTS 10001
 
 
 int eval_func_call_expr(OTree *otree);
@@ -21,5 +23,7 @@ int eval_func_call_expr(OTree *otree);
 int eval_assmt_stmt(OTree *otree);
 
 int evaluate(OTree* otree);
+
+void print_workspace();
 
 #endif //SOFTSYSSOFTSYSLABMAT_EVALUATE_H
