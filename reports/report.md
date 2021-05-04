@@ -38,6 +38,14 @@ In Duncan's first project, variables could be definied with numerical values lik
 
 ### Syntax of LabMat
 
+Our LabMat syntax allows the variable definition like the following:
+```
+m = 1 + 2;
+```
+For each variable definition, a height 2 tree is constructed. The parent of the tree will be the operation that needs to happen, and the children of the parent would be the numbers or matrices involved in the operation. For instance, in the sample code, the parent would be the addition operation, and the children would be two integers 1 and 2. The code will do operation on those two values (addition in this case) and substitute the parent with the result.
+
+## Reflection
+
 
 ## Resources
 
