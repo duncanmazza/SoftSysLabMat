@@ -46,7 +46,7 @@ For each variable definition, a height 2 tree is constructed. The parent of the 
 
 All lines must end with a semicolon.
 
-### Strings
+#### Strings
 
 Variables can store strings. To define, strings must start and end with double quotation marks (" ").
 
@@ -61,17 +61,29 @@ m = 'Hello World';
 m = `hello world`;
 ```
 
-### Numbers
+#### Numbers
 
 Any numbers can be parsed, bot positive and negative.
-'''
+```
 // all these lines are valid
 a = 2;
 a = -1;
 a = 2.2343;
 
-'''
+```
 
+#### Matrices
+
+Matrix definition follows similarly to MATLAB's syntax, but not exactly as shown below.
+```
+// Any of these are considered valid.
+a = [1, 2;3, 4];
+
+// This is not valid (even though this works in MATLAB).
+a = [1 2;3 4]
+
+```
+There must be comments separating each element in each row. When the matrix.  
 ## Reflection
 
 
