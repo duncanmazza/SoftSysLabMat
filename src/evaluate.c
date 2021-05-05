@@ -25,60 +25,6 @@ int eval_func_call_expr(OTree *otree) {
 }
 
 
-int eval_assmt_stmt(OTree *otree) {
-    if (otree->label != LM_STATEMENT_ASSIGNMENT) {
-        fprintf(stderr, "Attempted to evaluate an otree object as an "
-                        "assignment statement but it was labeled in stead as %s\n",
-                otree_label_strs[otree->label]);
-        exit(-1);
-    }
-
-    DLL_Node *child_left = otree->children->s->next;
-    DLL_Node *child_middle = child_left->next;
-    DLL_Node *child_right = child_middle->next;
-
-    OTree *otree_left = (OTree *) child_left->val;
-    OTree *otree_middle = (OTree *) child_middle->val;
-    OTree *otree_right = (OTree *) child_right->val;
-
-    // Assign new variable in the workspace
-    HT_KEY_TYPE var_name = (HT_KEY_TYPE) otree_left->val;
-    OTree *var_otree;
-    if (HT_get(workspace, var_name, (void *) &var_otree)) {
-        var_otree = make_empty_otree();
-        HT_insert(workspace, var_name, var_otree);
-        HT_insert(var_name_to_str_hash, var_name,
-                  format_msg("%s", CTYPE_STR, 1, 1, otree_left->val));
-    }
-
-    OPEnum operator = *(OPEnum *) otree_middle->val;
-    switch (operator) {
-        case BINOP_ASSMT_EQUAL:
-            break;
-        default:
-            fprintf(stderr, "Operator %s not supported for assignment",
-                    binop_enum_strs[operator]);
-            exit(-1);
-    }
-
-    // This point is only reached if the operator is "="
-
-    int recurse_ret = evaluate(otree_right);
-    if (recurse_ret) return recurse_ret;
-
-    var_otree->val = otree_right->val;
-    var_otree->label = otree_right->label;
-    var_otree->type = otree_right->type;
-
-    free(otree_left->val);
-    free(otree_middle->val);
-    DLL_NODE_FREE(child_left);
-    DLL_NODE_FREE(child_middle);
-    child_replace_current(child_right, otree);
-    return 0;
-}
-
-
 int replace_var_name_with_var(OTree *otree) {
     OTree *to_replace_with;
     int not_a_var = HT_get(workspace, (HT_KEY_TYPE) otree->val,
@@ -132,10 +78,9 @@ int evaluate(OTree *otree) {
             if (recurse_ret) return recurse_ret;
             child_replace_current(child, otree);
             return 0;
-        case LM_STATEMENT_ASSIGNMENT:
-            return eval_assmt_stmt(otree);
         case LM_FUNCTION_CALL_EXPRESSION:
             return eval_func_call_expr(otree);
+        case LM_STATEMENT_ASSIGNMENT:
         case LM_SIMPLE_EXPRESSION:
             break;
         case LM_ARGUMENT_LIST:
@@ -155,10 +100,11 @@ int evaluate(OTree *otree) {
             return 1;
     }
 
-    // This point is only reached if otree->label = LM_SIMPLE_EXPRESSION (or if
-    // there is a simple expression that only has one child node and is
-    // therefore ambiguously labeled as "LM_ANY_EXPRESSION" based on how mpc
-    // rolls tree levels with one child into one hierarchical level)
+    // This point is only reached if otree->label = LM_STATEMENT_ASSIGNMENT or
+    // LM_SIMPLE_EXPRESSION (or if there is a simple expression that only has
+    // one child node and is therefore ambiguously labeled as
+    // "LM_ANY_EXPRESSION" based on how mpc rolls tree levels with one child
+    // into one hierarchical level)
 
     // Evaluate expression from right to left; each trio of children should
     // have a middle child that is an operator
@@ -194,14 +140,9 @@ int evaluate(OTree *otree) {
         otree_right_is_rvalue = otree_right->label != LM_TOKEN_NAME;
         otree_left_is_rvalue = otree_left->label != LM_TOKEN_NAME;
 
-        if (otree_middle->type != OTREE_VAL_BINOP_ENUM) {
-            fprintf(stderr, "Encountered a middle otree node in an expression "
-                            "that was not an operator");
-            exit(-1);
-        }
-
         recurse_ret |= evaluate(otree_right);
-        recurse_ret |= evaluate(otree_left);
+        if (otree->label != LM_STATEMENT_ASSIGNMENT)
+            recurse_ret |= evaluate(otree_left);
         if (recurse_ret) return recurse_ret;
 
         operator = *(OPEnum *) otree_middle->val;

@@ -9,6 +9,8 @@
 
 #include "otree.h"
 #include "matrix.h"
+#include "ht.h"
+#include "evaluate.h"
 
 #ifdef __cplusplus
 extern "C" {

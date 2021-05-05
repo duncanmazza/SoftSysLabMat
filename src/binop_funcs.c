@@ -217,7 +217,7 @@ int binop_arith_div(OTree *left, OTree *right, OTree *ret) {
 }
 
 int binop_arith_mod(OTree *left, OTree *right, OTree *ret) {
-    if (right->type == OTREE_VAL_LONG && *(long *)right->val == 0) {
+    if (right->type == OTREE_VAL_LONG && *(long *) right->val == 0) {
         fprintf(stderr, "Divide by zero error\n");
         return 1;
     }
@@ -251,6 +251,19 @@ int binop_log_or(OTree *left, OTree *right, OTree *ret) {
 
 
 int binop_assmt_equal(OTree *left, OTree *right, OTree *ret) {
-    fprintf(stderr, "Un-implemented operator evaluation: =\n");
-    return 1;
+    // Assign new variable in the workspace
+    HT_KEY_TYPE var_name = (HT_KEY_TYPE) left->val;
+    if (HT_get(workspace, var_name, (void *) &ret)) {
+        ret = make_empty_otree();
+        HT_insert(workspace, var_name, ret);
+        HT_insert(var_name_to_str_hash, var_name,
+                  format_msg("%s", CTYPE_STR, 1, 1, left->val));
+    }
+
+    int recurse_ret = evaluate(right);
+    if (recurse_ret) return recurse_ret;
+
+    ret->val = right->val;
+    ret->label = right->label;
+    ret->type = right->type;
 }
