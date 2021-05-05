@@ -244,9 +244,6 @@ int binop_arith_div(OTree *left, OTree *right, OTree *ret) {
                                   ((double) *(long *) new_r_val) :
                                   (*(double *) new_r_val)) / *(double *) new_l_val 
                                   ;
-       } else if (new_l_type == OTREE_VAL_MAT && new_r_type == OTREE_VAL_MAT) {
-         fprintf(stderr, "Incompatible types for / operator\n");
-         return 1;
        } else {
          fprintf(stderr, "Incompatible types for / operator\n");
          return 1;
