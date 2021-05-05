@@ -78,7 +78,6 @@ int main(int argc, char **argv) {
             OTree *otree = ast_2_otree(r.output, &status);
             if (status != 0) {
                 fprintf(stderr, "Cannot evaluate due to static parsing error\n");
-                usleep(50000);
                 continue;
             }
 
@@ -89,7 +88,6 @@ int main(int argc, char **argv) {
             fprintf(stderr, "Syntax error: ");
             mpc_err_print_to(r.error, stderr);
             mpc_err_delete(r.error);
-            usleep(50000);
         }
     }
     return 0;
