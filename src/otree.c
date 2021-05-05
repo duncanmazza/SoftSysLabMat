@@ -37,6 +37,15 @@ const OTreeValTypeTrio binop_add_mult_sub_eval_to[] = {
         {OTREE_VAL_MAT,    OTREE_VAL_LONG,   OTREE_VAL_MAT},
 };
 
+// Length is reflected in the BINOP_DIV_EVAL_TO_LEN macro
+const OTreeValTypeTrio binop_div_eval_to[] = {
+        {OTREE_VAL_LONG,   OTREE_VAL_LONG,   OTREE_VAL_LONG},
+        {OTREE_VAL_DOUBLE, OTREE_VAL_LONG,   OTREE_VAL_DOUBLE},
+        {OTREE_VAL_DOUBLE, OTREE_VAL_DOUBLE, OTREE_VAL_DOUBLE},
+        {OTREE_VAL_MAT,    OTREE_VAL_DOUBLE, OTREE_VAL_MAT},
+        {OTREE_VAL_MAT,    OTREE_VAL_LONG,   OTREE_VAL_MAT},
+};
+
 
 const char *const get_tree_label_enum_ignore_arr[4] = {"char", "regex",
                                                        "string", ">"};

@@ -41,17 +41,17 @@ int eval_assmt_stmt(OTree *otree) {
     OTree *otree_middle = (OTree *) child_middle->val;
     OTree *otree_right = (OTree *) child_right->val;
 
+    // Assign new variable in the workspace
     HT_KEY_TYPE var_name = (HT_KEY_TYPE) otree_left->val;
-    OTree *var_address;
-    if (HT_get(workspace, var_name, (void *) &var_address)) {
-        var_address = make_empty_otree();
-        HT_insert(workspace, var_name, var_address);
+    OTree *var_otree;
+    if (HT_get(workspace, var_name, (void *) &var_otree)) {
+        var_otree = make_empty_otree();
+        HT_insert(workspace, var_name, var_otree);
         HT_insert(var_name_to_str_hash, var_name,
                   format_msg("%s", CTYPE_STR, 1, 1, otree_left->val));
     }
 
     OPEnum operator = *(OPEnum *) otree_middle->val;
-
     switch (operator) {
         case BINOP_ASSMT_EQUAL:
             break;
@@ -66,9 +66,9 @@ int eval_assmt_stmt(OTree *otree) {
     int recurse_ret = evaluate(otree_right);
     if (recurse_ret) return recurse_ret;
 
-    var_address->val = otree_right->val;
-    var_address->label = otree_right->label;
-    var_address->type = otree_right->type;
+    var_otree->val = otree_right->val;
+    var_otree->label = otree_right->label;
+    var_otree->type = otree_right->type;
 
     free(otree_left->val);
     free(otree_middle->val);
@@ -81,10 +81,11 @@ int eval_assmt_stmt(OTree *otree) {
 
 int replace_var_name_with_var(OTree *otree) {
     OTree *to_replace_with;
-    int not_a_var = HT_get(workspace, (HT_KEY_TYPE)otree->val,
-                           (void **)&to_replace_with);
+    int not_a_var = HT_get(workspace, (HT_KEY_TYPE) otree->val,
+                           (void **) &to_replace_with);
     if (not_a_var) {
-        fprintf(stderr, "%s does not exist in the workspace", (char *)otree->val);
+        fprintf(stderr, "%s does not exist in the workspace",
+                (char *) otree->val);
         return not_a_var;
     }
     otree->label = to_replace_with->label;
@@ -175,7 +176,7 @@ int evaluate(OTree *otree) {
 
     child_right = otree->children->s->prev;
     if (child_right->prev == otree->children->s) {
-        otree_right = (OTree *)child_right->val;
+        otree_right = (OTree *) child_right->val;
         recurse_ret |= evaluate(otree_right);
         if (recurse_ret) return recurse_ret;
         child_replace_current(child_right, otree);
@@ -205,7 +206,9 @@ int evaluate(OTree *otree) {
 
         operator = *(OPEnum *) otree_middle->val;
         OTree *ret = make_empty_otree();
-        (*(binop_func_ptrs[operator]))(otree_left, otree_right, ret);
+        recurse_ret |= (*(binop_func_ptrs[operator]))(otree_left, otree_right,
+                                                      ret);
+        if (recurse_ret) return recurse_ret;
 
         DLL_remove(otree->children, child_right);
         DLL_remove(otree->children, child_middle);

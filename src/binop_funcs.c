@@ -22,9 +22,9 @@ int (*binop_func_ptrs[])(OTree *, OTree *, OTree *) = {
 };
 
 
-OTreeValType check_binop_compatibility(
-        const OTreeValTypeTrio acceptable[], size_t acceptable_len,
-        OTreeValType left, OTreeValType right, int *swap) {
+OTreeValType check_binop_compatibility(const OTreeValTypeTrio acceptable[],
+                                       size_t acceptable_len, OTreeValType left,
+                                       OTreeValType right, int *swap) {
     for (int i = 0; i < acceptable_len; i++) {
         OTreeValTypeTrio trio = acceptable[i];
         if (left == trio.arg1 && right == trio.arg2) {
@@ -41,6 +41,7 @@ OTreeValType check_binop_compatibility(
 
 int binop_arith_add(OTree *left, OTree *right, OTree *ret) {
     int swap;
+    ret->val = malloc(sizeof(void *));
     OTreeValType eval_to = check_binop_compatibility(
             binop_add_mult_sub_eval_to, BINOP_ADD_MULT_SUB_EVAL_TO_LEN,
             left->type, right->type, &swap);
@@ -48,8 +49,6 @@ int binop_arith_add(OTree *left, OTree *right, OTree *ret) {
         fprintf(stderr, "Incompatible types for + operator\n");
         return 1;
     }
-
-    ret->val = malloc(sizeof(void *));
 
     void *new_l_val;
     void *new_r_val;
@@ -73,8 +72,7 @@ int binop_arith_add(OTree *left, OTree *right, OTree *ret) {
                 (matrix *) new_l_val, (float) (
                         new_r_type == OTREE_VAL_LONG ?
                         ((double) *(long *) new_r_val) :
-                        (*(double *) new_r_val)
-                )
+                        (*(double *) new_r_val))
         );
     }
 
@@ -84,6 +82,7 @@ int binop_arith_add(OTree *left, OTree *right, OTree *ret) {
 
 
 int binop_arith_sub(OTree *left, OTree *right, OTree *ret) {
+    ret->val = malloc(sizeof(void *));
     int swap;
     OTreeValType eval_to = check_binop_compatibility(
             binop_add_mult_sub_eval_to, BINOP_ADD_MULT_SUB_EVAL_TO_LEN,
@@ -93,8 +92,6 @@ int binop_arith_sub(OTree *left, OTree *right, OTree *ret) {
         return 1;
     }
 
-    ret->val = malloc(sizeof(void *));
-
     void *new_l_val;
     void *new_r_val;
     OTreeValType new_l_type;
@@ -103,47 +100,26 @@ int binop_arith_sub(OTree *left, OTree *right, OTree *ret) {
                      swap);
 
     // Change negation of left/right values depending on their order
-    if (!swap) {
-        if (new_l_type == OTREE_VAL_LONG && new_r_type == OTREE_VAL_LONG) {
-            *(long *) ret->val = *(long *) new_l_val - *(long *) new_r_val;
-        } else if (new_l_type == OTREE_VAL_DOUBLE) {
-            *(double *) ret->val = *(double *) new_l_val -
-                                   (new_r_type == OTREE_VAL_LONG ?
-                                    ((double) *(long *) new_r_val) :
-                                    (*(double *) new_r_val));
-        } else if (new_l_type == OTREE_VAL_MAT && new_r_type == OTREE_VAL_MAT) {
-            ret->val = (void *) matrix_sub((matrix *) new_l_val,
-                                           (matrix *) new_r_val);
-        } else {
-            ret->val = (void *) matrix_add_scalar(
-                    (matrix *) new_l_val, (float) (
-                            new_r_type == OTREE_VAL_LONG ?
-                            (-(double) *(long *) new_r_val) :
-                            (-*(double *) new_r_val)
-                    )
-            );
-        }
+
+    if (new_l_type == OTREE_VAL_LONG && new_r_type == OTREE_VAL_LONG) {
+        *(long *) ret->val = (!swap ? 1 : -1) * *(long *) new_l_val +
+                             (!swap ? -1 : 1) * *(long *) new_r_val;
+    } else if (new_l_type == OTREE_VAL_DOUBLE) {
+        *(double *) ret->val = (!swap ? 1 : -1) * *(double *) new_l_val +
+                               (!swap ? -1 : 1) * (new_r_type == OTREE_VAL_LONG
+                                                   ? ((double) *(long *) new_r_val)
+                                                   : (*(double *) new_r_val));
+    } else if (new_l_type == OTREE_VAL_MAT && new_r_type == OTREE_VAL_MAT) {
+        ret->val = (void *) matrix_sub((matrix *) new_l_val,
+                                       (matrix *) new_r_val);
     } else {
-        if (new_l_type == OTREE_VAL_LONG && new_r_type == OTREE_VAL_LONG) {
-            *(long *) ret->val = -*(long *) new_l_val + *(long *) new_r_val;
-        } else if (new_l_type == OTREE_VAL_DOUBLE) {
-            *(double *) ret->val = -*(double *) new_l_val +
-                                   (new_r_type == OTREE_VAL_LONG ?
-                                    ((double) *(long *) new_r_val) :
-                                    (*(double *) new_r_val));
-        } else if (new_l_type == OTREE_VAL_MAT && new_r_type == OTREE_VAL_MAT) {
-            ret->val = (void *) matrix_sub((matrix *) new_l_val,
-                                           (matrix *) new_r_val);
-        } else {
-            ret->val = (void *) matrix_add_scalar(
-                    matrix_multiply_scalar((matrix *) new_l_val, -1),
-                    (float) (
-                            new_r_type == OTREE_VAL_LONG ?
-                            ((double) *(long *) new_r_val) :
-                            (*(double *) new_r_val)
-                    )
-            );
-        }
+        ret->val = (void *) matrix_add_scalar(
+                matrix_multiply_scalar((matrix *) new_l_val,
+                                       (!swap ? 1.0f : -1.0f)), (float) (
+                        (!swap ? -1 : 1) * (new_r_type == OTREE_VAL_LONG ?
+                                            (double) *(long *) new_r_val :
+                                            (*(double *) new_r_val)))
+        );
     }
 
     ret->type = eval_to;
@@ -153,6 +129,7 @@ int binop_arith_sub(OTree *left, OTree *right, OTree *ret) {
 
 int binop_arith_mult(OTree *left, OTree *right, OTree *ret) {
     int swap;
+    ret->val = malloc(sizeof(void *));
     OTreeValType eval_to = check_binop_compatibility(
             binop_add_mult_sub_eval_to, BINOP_ADD_MULT_SUB_EVAL_TO_LEN,
             left->type, right->type, &swap);
@@ -160,8 +137,6 @@ int binop_arith_mult(OTree *left, OTree *right, OTree *ret) {
         fprintf(stderr, "Incompatible types for * operator\n");
         return 1;
     }
-
-    ret->val = malloc(sizeof(void *));
 
     void *new_l_val;
     void *new_r_val;
@@ -185,8 +160,7 @@ int binop_arith_mult(OTree *left, OTree *right, OTree *ret) {
                 (matrix *) new_l_val, (float) (
                         new_r_type == OTREE_VAL_LONG ?
                         ((double) *(long *) new_r_val) :
-                        (*(double *) new_r_val)
-                )
+                        (*(double *) new_r_val))
         );
     }
 
@@ -197,15 +171,14 @@ int binop_arith_mult(OTree *left, OTree *right, OTree *ret) {
 
 int binop_arith_div(OTree *left, OTree *right, OTree *ret) {
     int swap;
+    ret->val = malloc(sizeof(void *));
     OTreeValType eval_to = check_binop_compatibility(
-            binop_add_mult_sub_eval_to, BINOP_ADD_MULT_SUB_EVAL_TO_LEN,
+            binop_div_eval_to, BINOP_DIV_EVAL_TO_LEN,
             left->type, right->type, &swap);
     if (eval_to == OTREE_VAL_INDETERMINATE) {
         fprintf(stderr, "Incompatible types for / operator\n");
         return 1;
     }
-
-    ret->val = malloc(sizeof(void *));
 
     void *new_l_val;
     void *new_r_val;
@@ -214,38 +187,29 @@ int binop_arith_div(OTree *left, OTree *right, OTree *ret) {
     RESOLVE_VAL_SWAP(new_l_val, new_l_type, new_r_val, new_r_type, right, left,
                      swap);
 
-    if (!swap) {
-        if (new_l_type == OTREE_VAL_LONG && new_r_type == OTREE_VAL_LONG) {
-            *(long *) ret->val = *(long *) new_l_val / *(long *) new_r_val;
-        } else if (new_l_type == OTREE_VAL_DOUBLE) {
+    if (new_l_type == OTREE_VAL_LONG && new_r_type == OTREE_VAL_LONG) {
+        *(long *) ret->val = *(long *) new_l_val / *(long *) new_r_val;
+    } else if (new_l_type == OTREE_VAL_MAT) {
+        ret->val = (void *) matrix_multiply_scalar(
+                (matrix *) new_l_val,
+                (float) (1.0 / (new_r_type == OTREE_VAL_LONG ?
+                                ((double) *(long *) new_r_val) :
+                                (*(double *) new_r_val))));
+    } else if (new_l_type == OTREE_VAL_DOUBLE) {
+        if (!swap) {
             *(double *) ret->val = *(double *) new_l_val /
                                    (new_r_type == OTREE_VAL_LONG ?
                                     ((double) *(long *) new_r_val) :
                                     (*(double *) new_r_val));
-        } else if (new_l_type == OTREE_VAL_MAT && new_r_type == OTREE_VAL_MAT) {
-            fprintf(stderr, "Incompatible types for / operator\n");
-            return 1;
         } else {
-            ret->val = (void *) matrix_multiply_scalar(
-                    (matrix *) new_l_val,
-                    (float) pow((new_r_type ==
-                                 OTREE_VAL_LONG ?
-                                 ((double) *(long *) new_r_val) :
-                                 (*(double *) new_r_val)), -1)
-            );
-        }
-    } else {
-        if (new_l_type == OTREE_VAL_LONG && new_r_type == OTREE_VAL_LONG) {
-            *(long *) ret->val = *(long *) new_r_val / *(long *) new_l_val;
-        } else if (new_l_type == OTREE_VAL_DOUBLE) {
             *(double *) ret->val = (new_r_type == OTREE_VAL_LONG ?
                                     ((double) *(long *) new_r_val) :
                                     (*(double *) new_r_val)) /
                                    *(double *) new_l_val;
-        } else {
-            fprintf(stderr, "Incompatible types for / operator\n");
-            return 1;
         }
+    } else {
+        fprintf(stderr, "Incompatible types for / operator\n");
+        return 1;
     }
 
     ret->type = eval_to;
@@ -253,38 +217,36 @@ int binop_arith_div(OTree *left, OTree *right, OTree *ret) {
 }
 
 int binop_arith_mod(OTree *left, OTree *right, OTree *ret) {
-    fprintf(stderr, "Un-implemented operator evaluation: %%\n");
-    return 1;
+    if (right->type == OTREE_VAL_LONG && *(long *)right->val == 0) {
+        fprintf(stderr, "Divide by zero error\n");
+        return 1;
+    }
+    LOG_AND_BIT_OP_TEMPLATE(left, right, ret, %, "%");
 }
 
 
 int binop_bit_and(OTree *left, OTree *right, OTree *ret) {
-    fprintf(stderr, "Un-implemented operator evaluation: &\n");
-    return 1;
+    LOG_AND_BIT_OP_TEMPLATE(left, right, ret, &, "&");
 }
 
 
 int binop_bit_xor(OTree *left, OTree *right, OTree *ret) {
-    fprintf(stderr, "Un-implemented operator evaluation: ^\n");
-    return 1;
+    LOG_AND_BIT_OP_TEMPLATE(left, right, ret, ^, "^");
 }
 
 
 int binop_bit_or(OTree *left, OTree *right, OTree *ret) {
-    fprintf(stderr, "Un-implemented operator evaluation: |\n");
-    return 1;
+    LOG_AND_BIT_OP_TEMPLATE(left, right, ret, |, "|");
 }
 
 
 int binop_log_and(OTree *left, OTree *right, OTree *ret) {
-    fprintf(stderr, "Un-implemented operator evaluation: &&\n");
-    return 1;
+    LOG_AND_BIT_OP_TEMPLATE(left, right, ret, &&, "&&");
 }
 
 
 int binop_log_or(OTree *left, OTree *right, OTree *ret) {
-    fprintf(stderr, "Un-implemented operator evaluation: ||\n");
-    return 1;
+    LOG_AND_BIT_OP_TEMPLATE(left, right, ret, ||, "||");
 }
 
 

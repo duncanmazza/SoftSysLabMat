@@ -112,6 +112,9 @@ extern const char *const binop_enum_strs[];
 extern const OTreeValTypeTrio binop_add_mult_sub_eval_to[];
 #define BINOP_ADD_MULT_SUB_EVAL_TO_LEN 6
 
+extern const OTreeValTypeTrio binop_div_eval_to[];
+#define BINOP_DIV_EVAL_TO_LEN 5
+
 
 #define INDENT_SZ 2
 

@@ -25,6 +25,18 @@ left, swap) ({                                                                 \
 })
 
 
+#define LOG_AND_BIT_OP_TEMPLATE(left, right, ret, op, op_str) ({               \
+    (ret)->val = malloc(sizeof(void *));                                       \
+    if ((left)->type == OTREE_VAL_LONG && (right)->type == OTREE_VAL_LONG) {   \
+        *(long *) (ret)->val = (*(long *) (left)->val) op                      \
+                               (*(long *) (right)->val);                       \
+        (ret)->type = OTREE_VAL_LONG;                                          \
+    } else {                                                                   \
+        fprintf(stderr, "Incompatible types for %s operator\n", (op_str));     \
+        return 1;                                                              \
+    }                                                                          \
+    return 0;})
+
 int binop_arith_add(OTree *left, OTree *right, OTree *ret);
 
 int binop_arith_sub(OTree *left, OTree *right, OTree *ret);
