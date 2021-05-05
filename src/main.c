@@ -83,10 +83,13 @@ int main(int argc, char **argv) {
             }
 
             evaluate(otree);
+            mpc_ast_delete(r.output);
         } else {
             /* Otherwise Print the Error */
-            mpc_err_print(r.error);
+            fprintf(stderr, "Syntax error: ");
+            mpc_err_print_to(r.error, stderr);
             mpc_err_delete(r.error);
+            usleep(50000);
         }
     }
     return 0;
