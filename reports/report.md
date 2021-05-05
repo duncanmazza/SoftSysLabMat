@@ -34,7 +34,7 @@ Building off of my first project, I am interested in learning more about how int
 
 ### Matrix Definition
 
-In Duncan's first project, variables could be definied with numerical values like float & constants. However, we wanted to implement 2D matrices in this language. Therefore, we had to create separate functions for defining matrices. In matrix.c & matrix.h, there are functions that define matrices and perform addition and multiplications on them.
+In Duncan's first project, variables could be defined with numerical values like float & constants. However, we wanted to implement 2D matrices in this language. Therefore, we had to create separate functions for defining matrices. In matrix.c & matrix.h, there are functions that define matrices and perform addition and multiplications on them.
 
 ### Syntax of LabMat
 
@@ -43,6 +43,34 @@ Our LabMat syntax allows the variable definition like the following:
 m = 1 + 2;
 ```
 For each variable definition, a height 2 tree is constructed. The parent of the tree will be the operation that needs to happen, and the children of the parent would be the numbers or matrices involved in the operation. For instance, in the sample code, the parent would be the addition operation, and the children would be two integers 1 and 2. The code will do operation on those two values (addition in this case) and substitute the parent with the result.
+
+All lines must end with a semicolon.
+
+### Strings
+
+Variables can store strings. To define, strings must start and end with double quotation marks (" ").
+
+For instance, this is a valid syntax.
+```
+m = "Hello World";
+```
+
+These are not valid.
+```
+m = 'Hello World';
+m = `hello world`;
+```
+
+### Numbers
+
+Any numbers can be parsed, bot positive and negative.
+'''
+// all these lines are valid
+a = 2;
+a = -1;
+a = 2.2343;
+
+'''
 
 ## Reflection
 

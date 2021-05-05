@@ -90,20 +90,19 @@ namespace MATRIX_Gtests {
     }
 
     TEST(MAT_Tests, MAT_multiply_matrix) {
-      int i = 3;
-      int j = 3;
-      int a = 3;
+      int i = 2;
+      int j = 2;
+      int a = 2;
       int b = 1;
       matrix* mat1 = make_matrix(i,j);
-      float test1[] = {1,1,1,1,1,1,1,1,1};
+      float test1[] = {1,1,1,1};
       matrix* mat2 = make_matrix(a,b);
-      float test2[] = {1,1,1};
+      float test2[] = {1,1};
       complete_matrix(mat1, test1, i, j);
       complete_matrix(mat2, test2, a, b);
       matrix *product = matrix_multiply(mat1, mat2);
-      ASSERT_EQ(product->data[0][0], 3);
-      ASSERT_EQ(product->data[1][0], 3);
-      ASSERT_EQ(product->data[2][0], 3);
+      ASSERT_EQ(product->data[0][0], 2);
+      ASSERT_EQ(product->data[1][0], 2);
       ASSERT_EQ(product->rows, i);
       ASSERT_EQ(product->column, b);
       free(mat1);
