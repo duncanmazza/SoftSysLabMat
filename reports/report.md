@@ -78,12 +78,35 @@ Matrix definition follows similarly to MATLAB's syntax, but not exactly as shown
 ```
 // Any of these are considered valid.
 a = [1, 2;3, 4];
+a = [1,2;3,4;];
 
 // This is not valid (even though this works in MATLAB).
 a = [1 2;3 4]
 
 ```
 There must be comments separating each element in each row. When the matrix.  
+
+#### Operations
+
+Basic arithmetics can be done with matrices and numbers.
+* Addition: +
+* Subtraction: -
+* Multiplication: *
+* Division: /
+* Modulo: %
+Note that there are rules that must be followed for matrix operations (ex) restrictions on matrix dimensions, etc.)
+You may write multiple operations in one line as long as they are valid.
+
+```
+// Any of these are considered valid.
+a = 1 + 2;
+b = 2 + [1,1;1,1]; // this will add 2 to all elements.
+c = [1,1;1,1] * [1;1]; // Multiplying 2*2 matrix with 2*1 matrix is valid.
+
+// These are not valid;
+a = [1 2;3 4] / [1;1] // This is impossible
+
+```
 ## Reflection
 
 
