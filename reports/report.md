@@ -360,6 +360,8 @@ Use of `void` pointers provides a benefit in memory usage over `union`s. Because
 
 ### Matrix Representation
 
+Another design decision that was made on the matrix structure was using 2D array instead of 1D array consisted of DLLs. Originally we intended to create matrix  where each element in 1D array consists linked list. However, we decided to use default 2D arrays in C to define our matrices because it was much easier to index the elements than the original DLL idea.  
+
 ## Reflection
 
 We were able to achieve many of our learning goals and all the originally-defined MVP except for signal processing function integration. Though we didn't have the bandwidth to explore our stretch goals, achieving the MVP was plenty challenging with implementation of basic arithmetic operations on both numbers *and* matrices, as well as assigning and making use of variables. Given the infrastructure we built to support the transposition function, we see integration of signal processing functions like convolution and the fast Fourier Transform as a clear next step.
