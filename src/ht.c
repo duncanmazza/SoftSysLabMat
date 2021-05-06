@@ -8,7 +8,7 @@
 
 
 size_t hash_str_djb2(HT_KEY_TYPE str) {
-    const unsigned char* str_ptr_cpy = (const unsigned char*)str;
+    const unsigned char *str_ptr_cpy = (const unsigned char *) str;
     size_t hash = 5381;
     int c;
     while ((c = *str_ptr_cpy++))
@@ -45,10 +45,10 @@ int HT_get(const HashTable *ht, const unsigned char *key, void **value) {
 
 
 int HT_get_by_str_hash(const HashTable *ht, size_t str_hash, void **value) {
-    DLL* slot = ht->slots[HT_MOD_HASH(str_hash, ht->n_slots)];
+    DLL *slot = ht->slots[HT_MOD_HASH(str_hash, ht->n_slots)];
     DLL_Node *slot_node = HT_slot_contains(slot, str_hash);
     if (!slot_node) return 1;
-    *value = (*(HashTableKVP *)slot_node->val).value;
+    *value = (*(HashTableKVP *) slot_node->val).value;
     return 0;
 }
 
@@ -58,7 +58,7 @@ int HT_insert(HashTable *ht, const unsigned char *key, void *value) {
 
     size_t str_hash = hash_str_djb2(key);
     size_t key_hash = HT_MOD_HASH(str_hash, ht->n_slots);
-    DLL* slot = ht->slots[key_hash];
+    DLL *slot = ht->slots[key_hash];
 
     DLL_Node *slot_node = HT_slot_contains(slot, str_hash);
     if (slot_node) {
@@ -75,7 +75,7 @@ int HT_insert(HashTable *ht, const unsigned char *key, void *value) {
 
 int HT_remove(HashTable *ht, const unsigned char *key) {
     size_t str_hash = hash_str_djb2(key);
-    DLL* slot = ht->slots[HT_MOD_HASH(str_hash, ht->n_slots)];
+    DLL *slot = ht->slots[HT_MOD_HASH(str_hash, ht->n_slots)];
 
     DLL_Node *slot_node = HT_slot_contains(slot, str_hash);
     if (slot_node) {
@@ -87,10 +87,10 @@ int HT_remove(HashTable *ht, const unsigned char *key) {
 }
 
 
-DLL_Node * HT_slot_contains(const DLL *slot, size_t str_hash) {
+DLL_Node *HT_slot_contains(const DLL *slot, size_t str_hash) {
     DLL_Node *node = slot->s->next;
     while (node != slot->s) {
-        if (str_hash == (*(HashTableKVP *)node->val).key)
+        if (str_hash == (*(HashTableKVP *) node->val).key)
             return node;
         node = node->next;
     }

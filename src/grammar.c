@@ -43,7 +43,8 @@ SLL *mpc_rules_match(const char *const to_match) {
     regmatch_t rx_match;
     while (rule_def_node) {
         if (regexec(&rx, (char *) rule_def_node->val, 1, &rx_match, 0)) {
-            fprintf(stderr, "No matches found when looking for a mpc rule name");
+            fprintf(stderr,
+                    "No matches found when looking for a mpc rule name");
             exit(-1);
         }
         size_t rule_name_len = rx_match.rm_eo - rx_match.rm_so - 1;
@@ -86,19 +87,21 @@ int mpc_setup(mpc_parser_t **parser) {
             // -- Compound rules --
             "num     : <float> | <int> ;"  // [order matters] Any number
             "str_lit : '\"'<allchar>'\"' ;"  // String literal
-            "mat_lit : '['/\s*/((<num>(<matcdlm> | <matsdlm>))+ <num>?)/\s*/']' ;"  // Matrix literal
+            "mat_lit : '['/\s*/((<num>/\s*/(<matcdlm> | <matsdlm>))+ <num>?)/\s*/']' "
+            "        | '['/\s*/<num>/\s*/<matcdlm>?/\s*/']' ;"  // Matrix literal
             "smpexpr : (<num>|<name>|<str_lit>|<mat_lit>) "
             "          (((<math_op>|<log_op>|<bit_op>) "
             "           (<anyexpr>|<name>|<num>|<str_lit>|<mat_lit>))*)? ;"  // Simple expression
             "arglist : ((<anyexpr><al_dlm>)+<anyexpr> | <anyexpr>) ;"
 
             "fexpr   : <name>'('/\s*/<arglist>?/\s*/')' ;"  // Expression: function call
+            "method  : <name>'.'<fexpr> ;"
             "anyexpr : <fexpr> | '(' <expr>+ ')' | <smpexpr> ;"
             "expr    : <anyexpr> ;"  // This enables mutual recursion with anyexpr
-//            "a_stmt  : <name> <name> <assmt> <expr> "  // Assignment statement
-//            "        | <name> <assmt> <expr> ;"
+            //            "a_stmt  : <name> <name> <assmt> <expr> "  // Assignment statement
+            //            "        | <name> <assmt> <expr> ;"
             "a_stmt  : <name> <assmt> <expr> ;"
-            "stmt    : (<a_stmt> | <fexpr>)';' ;"
+            "stmt    : (<a_stmt> | <fexpr> | <method>)';' ;"
             "lab_mat : /^/ ((<stmt>)/\s*/)+ /$/ ;";
 #pragma clang diagnostic pop
 
@@ -136,9 +139,10 @@ int mpc_setup(mpc_parser_t **parser) {
     mpc_parser_t *p19 = mpc_new(rule_names_arr[19]);
     mpc_parser_t *p20 = mpc_new(rule_names_arr[20]);
     mpc_parser_t *p21 = mpc_new(rule_names_arr[21]);
+    mpc_parser_t *p22 = mpc_new(rule_names_arr[22]);
     mpca_lang(MPCA_LANG_DEFAULT, grammar, p00, p01, p02, p03, p04, p05,
               p06, p07, p08, p09, p10, p11, p12, p13, p14, p15, p16, p17, p18,
-              p19, p20, p21);
-    *parser = p21;
-    return 22;
+              p19, p20, p21, p22);
+    *parser = p22;
+    return 23;
 }

@@ -7,7 +7,7 @@
 #include "../include/otree.h"
 
 // This must correspond exactly to the order as prescribed in OTreeValType
-const char* const otree_val_type_enum_strs[] = {
+const char *const otree_val_type_enum_strs[] = {
         "<indeterminate>",
         "str",
         "long",
@@ -61,6 +61,7 @@ const char *const otree_label_strs[] = {
         "LM_ANY_EXPRESSION",
         "LM_EXPRESSION",
         "LM_FUNCTION_CALL_EXPRESSION",
+        "LM_METHOD",
         "LM_SIMPLE_EXPRESSION",
         "LM_MATRIX_LITERAL",
         "LM_STRING_LITERAL",
@@ -91,6 +92,7 @@ const char *const otree_rule_strs[] = {
         "anyexpr",
         "expr",
         "fexpr",
+        "method",
         "smpexpr",
         "mat_lit",
         "str_lit",
@@ -360,6 +362,7 @@ OTreeValType otree_classify_val(const OTree *const otree) {
         case LM_STATEMENT:
         case LM_STATEMENT_ASSIGNMENT:
         case LM_FUNCTION_CALL_EXPRESSION:
+        case LM_METHOD:
         case LM_ANY_EXPRESSION:
         case LM_EXPRESSION:
         case LM_SIMPLE_EXPRESSION:

@@ -10,6 +10,7 @@
 #include "ht.h"
 #include "otree.h"
 #include "binop_funcs.h"
+#include "builtins.h"
 
 
 extern HashTable *workspace;
@@ -18,11 +19,11 @@ extern HashTable *var_name_to_str_hash;
 #define VAR_NAME_TO_STR_HASH_N_SLOTS 10001
 
 
-int eval_func_call_expr(OTree *otree);
+int eval_func_call(OTree *otree);
 
 int eval_assmt_stmt(OTree *otree);
 
-int evaluate(OTree* otree);
+int evaluate(OTree *otree);
 
 void print_workspace();
 
