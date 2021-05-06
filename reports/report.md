@@ -58,7 +58,7 @@ Building off of my first project, I am interested in learning more about how int
 
 ## Project Outcomes
 
-We have successfully implemented a minimal language interpreter that can assign numbers and matrices to variables and perform basic arithmetic and matrix operations on them. 
+We have successfully implemented a minimal language interpreter that can assign numbers and matrices to variables and perform basic arithmetic and matrix operations on them.
 
 ### Syntax of LabMat
 
@@ -91,7 +91,7 @@ LabMat also supports instance methods for objects. For example, a matrix can be 
 
 Workspace:
 ----------
-> m (matrix): 
+> m (matrix):
 [1 2]
 
 >>> m.transpose();
@@ -99,7 +99,7 @@ Workspace:
 
 Workspace:
 ----------
-> m (matrix): 
+> m (matrix):
 [1
  2]
 
@@ -108,8 +108,8 @@ Workspace:
 
 Workspace:
 ----------
-> m (matrix): 
-[1 2] 
+> m (matrix):
+[1 2]
 ```
 
 When a function is invoked as a method, the object is inserted as the first argument to the function. Because functions are pass-by-reference, `transpose(m)` is functionally identical to `m.transpose`. As implemented, the transpose function returns a copy of the reference to the original object. This enables the following behavior:
@@ -121,9 +121,9 @@ When a function is invoked as a method, the object is inserted as the first argu
 
 Workspace:
 ----------
-> m (matrix): 
+> m (matrix):
 [1 2]
-> n (matrix): 
+> n (matrix):
 [1 2]
 
 >>> n.transpose();
@@ -131,10 +131,10 @@ Workspace:
 
 Workspace:
 ----------
-> m (matrix): 
+> m (matrix):
 [1
  2]
-> n (matrix): 
+> n (matrix):
 [1
  2]
 ```
@@ -149,7 +149,7 @@ a = 1 + 2;
 b = 2 + [1,1;1,1];     // this will add 2 to all elements.
 c = [1,1;1,1] * [1;1]; // Multiply 2*2 matrix with 2*1 matrix
 d = [1,1;1,1] / a;     // This will divide all elements by 3.
-e = 5 - 1 + 2; 
+e = 5 - 1 + 2;
 
 // These are not valid;
 a = [1 2;3 4] / [1;1]  // This is impossible. You can't divide matrices.
@@ -171,36 +171,36 @@ For every input, the `mpc` library creates an abstract syntax tree where each no
 
 ```
 >>> m = transpose([1, 2]);
-> 
-  regex 
-  stmt|> 
-    a_stmt|> 
+>
+  regex
+  stmt|>
+    a_stmt|>
       name|regex:1:1 'm'
       regex:1:2 ' '
       assmt|char:1:3 '='
       regex:1:4 ' '
-      expr|anyexpr|fexpr|> 
+      expr|anyexpr|fexpr|>
         name|regex:1:5 'transpose'
         char:1:14 '('
-        regex 
-        arglist|anyexpr|smpexpr|> 
-          mat_lit|> 
+        regex
+        arglist|anyexpr|smpexpr|>
+          mat_lit|>
             char:1:15 '['
             num|int|regex:1:16 '1'
             matcdlm|char:1:17 ','
             regex:1:18 ' '
             num|int|regex:1:19 '2'
-            regex 
+            regex
             char:1:20 ']'
-          regex 
-        regex 
+          regex
+        regex
         char:1:21 ')'
-    regex 
+    regex
     char:1:22 ';'
   regex:1:23 '
 '
-  regex 
->>> 
+  regex
+>>>
 ```
 
 This abstract syntax tree is then parsed into an object tree:
@@ -215,7 +215,7 @@ This abstract syntax tree is then parsed into an object tree:
       > LM_FUNCTION_CALL_EXPRESSION
         > transpose
         > LM_SIMPLE_EXPRESSION
-          > 
+          >
 [1 2]
 ```
 
@@ -309,7 +309,7 @@ For this project, we implemented a 2D matrix data structure that is a first-clas
 
 #### Matrix Structure
 
-In matrix.c & matrix.h, there are functions that define matrices and perform addition and multiplications on them. When we made these matrices, we were 
+In matrix.c & matrix.h, there are functions that define matrices and perform addition and multiplications on them. When we made these matrices, we were
 
 ```c
 // matrix.h
@@ -354,7 +354,7 @@ We were able to achieve many of our our learning goals and all of the originally
 
 ### Duncan Learning Goals Reflection
 
-I was able to achieve some of my learning goals through this project. Namely, my understanding of language interpreters grew substantially, due to both realizing the merits of LabMat's implementation and becoming aware of its downfalls relative to other language interpreters. I also grew my confidence in writing C code, especially through this project's abundant use of pointers to heap-allocated data, `enum`s, and function pointers. 
+I was able to achieve some of my learning goals through this project. Namely, my understanding of language interpreters grew substantially, due to both realizing the merits of LabMat's implementation and becoming aware of its downfalls relative to other language interpreters. I also grew my confidence in writing C code, especially through this project's abundant use of pointers to heap-allocated data, `enum`s, and function pointers.
 
 This project, however, made no use of any synchronization, so I did not achieve my learning goal of learning more about threading. I had also hoped that this project would improve my knowledge of mathematical theory relevant to signal processing, but that was not achieved within the bounds of the MVP. Having seen a peer in a different class dive into the implementation of the cross-correlation function to find that, under the hood, it can be implemented in better-than-quadratic time (as would be achieved with a naive implementation) using a theorem invoking the Fourier Transform, I realized this was the kind of learning I was hoping this project would provide.
 
@@ -362,7 +362,7 @@ Though not all of my learning goals were achieved, I sufficiently challenged mys
 
 ### Junwon Learning Goals Reflection
 
-We are happy that we got to the point where we could perform basic arithmetics on both numbers and matrices. We learned how to define matrices and make syntax design choices for LabMat. We also learned how interpreted languages are operated with tree structures.
+I am happy that we got to the point where we could perform basic arithmetics on both numbers and matrices. I learned how to define matrices and make syntax design choices for LabMat. I also learned how interpreted languages are operated with tree structures thanks to Duncan. One personal realization I had was that learning the concept behind interpreted languages in depth is just as important as writing C code. I thought I wasn't "learning" anything because I wasn't writing any extensive code, but I realize how much I learned about operation of language interpreters just from reading documents and code. I did not get to implement my signal processing functions in LabMat due to the lack of time, but I am personally happy with progress Duncan and I made so far in this project.  
 
 ## Resources
 
@@ -377,5 +377,3 @@ https://www.gnu.org/software/octave/index \[Octave is an open-source IDE + progr
 * **Lee, Kent D. ..author. Foundations of Programming Languages. 2014. EBSCOhost, search.ebscohost.com/login.aspx?direct=true&db=edshlc&AN=edshlc.014293420.8&site=eds-live.**
 * Cache/Memory efficiency in matrix operation https://people.eecs.berkeley.edu/~demmel/cs267_Spr99/Lectures/Lect_02_1999b.pdf
 * https://cs.brown.edu/courses/cs033/lecture/18cacheX.pdf
-
-
