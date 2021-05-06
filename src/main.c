@@ -86,7 +86,7 @@ int main(int argc, char **argv) {
                 continue;
             }
 
-            print_otree(otree);
+            // print_otree(otree);
             evaluate(otree);
             mpc_ast_delete(r.output);
         } else {
