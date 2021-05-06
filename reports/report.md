@@ -20,7 +20,7 @@ mat = randn([3, 1]).transpose()
 ```
 This combination of characteristics has inspired us to create a new programming language that combines some of the best (in our opinion) features of MATLAB and traditional programming languages. Additionally, between both of us, our first SoftSys projects included a language interpreter and a signal processing library. The combination of both of these projects provides a natural jumping-off point for this project.
 
-Our goal is to create a programming language based on C so that we could define matrices and constants and run operations with these like basic arithmetic. Our stretch goal was to implement multi-threading for matrix operations and add extra math operations like complex numbers and trig/exponetial functions.
+Our goal is to create a programming language based on C so that we could define matrices and constants and run operations with these like basic arithmetic. We also wanted to implement at least 1 function from the signal processing library by adapting it to work with matrix data structures.  Our stretch goal was to implement multi-threading for matrix operations and add extra math operations like complex numbers and trig/exponetial functions.
 
 ## Learning Goals
 
@@ -35,7 +35,50 @@ Building off of my first project, I am interested in learning more about how int
 ### Matrix Definition
 
 In Duncan's first project, variables could be defined with numerical values like float & constants. However, we wanted to implement 2D matrices in this language. Therefore, we had to create separate functions for defining matrices. In matrix.c & matrix.h, there are functions that define matrices and perform addition and multiplications on them.
+```
+// make_matrix, matrix_add, and matrix_multiply functions.
 
+matrix *make_matrix(int row, int col) {
+    struct matrix *mat = malloc(sizeof(matrix));
+    mat->rows = row;
+    mat->column = col;
+    mat->data = (float **) malloc(sizeof(float *) * row);
+    int k;
+    for (k = 0; k < row; k++) {
+        mat->data[k] = (float *) malloc(sizeof(float *) * col);
+    }
+    return mat;
+}
+
+matrix *matrix_add(matrix *mat1, matrix *mat2) {
+    if (mat1->rows != mat2->rows && mat1->column != mat2->column) {
+        return NULL;
+    }
+    matrix *total = make_matrix(mat1->rows, mat1->column);
+    for (int x = 0; x < total->rows; x++) {
+        for (int y = 0; y < total->column; y++) {
+            total->data[x][y] = mat1->data[x][y] + mat2->data[x][y];
+        }
+    }
+    return total;
+}
+
+matrix *matrix_multiply(matrix *mat1, matrix *mat2) {
+    if (mat1->column != mat2->rows) {
+      return 0;
+    }
+    matrix *product = make_matrix(mat1->rows, mat2->column);
+    for (int x = 0; x < product->rows; x++) {
+        for (int y = 0; y < product->column; y++) {
+          for (int z = 0; z < mat1 ->column; z++) {
+              product->data[x][y] += mat1->data[x][z] * mat2->data[z][y];
+          }
+        }
+    }
+    return product;
+}
+
+```
 ### Syntax of LabMat
 
 Our LabMat syntax allows the variable definition like the following:
@@ -102,13 +145,18 @@ You may write multiple operations in one line as long as they are valid.
 a = 1 + 2;
 b = 2 + [1,1;1,1]; // this will add 2 to all elements.
 c = [1,1;1,1] * [1;1]; // Multiplying 2*2 matrix with 2*1 matrix is valid.
+d = [1,1;1,1] / 2; // This will divide all elements by 2.
 
 // These are not valid;
-a = [1 2;3 4] / [1;1] // This is impossible
+a = [1 2;3 4] / [1;1] // This is impossible. You can't divide matrices.
+b = 2 / [1,1;1,1]; // This is impossible
 
 ```
 ## Reflection
 
+We were able to achieve some of our original learning goals. We are happy that we got to the point where we could perform basic arithmetics on both numbers and matrices. We learned how to define matrices and make syntax design choices for LabMat. We also learned how interpreted languages are operated with tree structures.
+
+However, we didn't get to define signal processing functions with our LabMat. We spent too much time making basic functions for matrices and implementing arithmetic functions in LabMat that we didn't get to create syntax for signal processing functions like convolution and Fourier Transform. We know that if we had more time then we could've defined functions in LabMat that perform signal processing functions.  
 
 ## Resources
 
