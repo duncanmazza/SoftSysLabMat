@@ -8,7 +8,7 @@ Taking inspiration from MATLAB’s admirable qualities and peculiar idiosyncrasi
 
 ## Goals
 
-We \[Junwon and Duncan\] are both well versed with the MATLAB programming language and, between us, have used it in the contexts of digital signal processing, computer vision algorithm prototyping, solving ODEs, robotics, and more.
+We [Junwon and Duncan] are both well versed with the MATLAB programming language and, between us, have used it in the contexts of digital signal processing, computer vision algorithm prototyping, solving ODEs, robotics, and more.
 Through our experiences with MATLAB we have developed an affinity for some aspects of MATLAB, particularly regarding the first-class nature of the matrix data structure and complex numbers, abundance of matrix operations, and excellent documentation. However, when compared to other programming languages such as Python, it deviates from programming language norms and is missing nice-to-have features. For example, MATLAB matrix indexing is 1-indexed, whereas in nearly every other language, array indexing is 0-indexed. Additionally, r-values of matrix-equivalent data structures in Python (e.g., Numpy arrays) support invocation of their associated methods, whereas MATLAB does not. For example:
 
 ```python
@@ -345,14 +345,20 @@ matrix *matrix_add(matrix *mat1, matrix *mat2) {
 An important feature of LabMat is support for matrix literals. Matrix literals are converted into `matrix` structures in when parsing the abstract syntax tree. We adopted the same matrix literal syntax used in MATLAB which enables efficient inline creation of matrices. Incorrect matrix dimensions are detected as a static semantic error and reported accordingly. Thanks to the `mpc` library's integration of regex, we implemented the grammar such that white space simultaneously serves a column delimiter and can be treated as extraneous when appropriate. For example:
 
 ```
->>> m = [1,2;3,4];           // Valid
->>> m = [1 2; 3       4;];   // Valid
->>> m = [1, 2, 3; 4];        // Invalid dimensions reported
+>>> m = [1,2;3,4];         // Valid
+>>> m = [1 2; 3     4;];   // Valid
+>>> m = [1, 2, 3; 4];      // Invalid dimensions reported
 ```
 
-## Design Decision example
+## Design Decision Examples
 
-TODO
+### Void Pointers in `OTree` Structure
+
+One design decision that was made was using `void` pointers to enable object tree nodes to represent multiple data types as opposed to `union`s. In both cases case, conditional logic would need to be applied to either correctly cast the `void` pointer to an explicit pointer or to access the correct field of the `union`, so one is not necessarily simpler than the other to implement. 
+
+Use of `void` pointers provides a benefit in memory usage over `union`s. Because of the matrix data structure that contains a record its dimensions and a pointer to the data array, use of a `union` would be space inefficient when only storing a `double` or a `long`. Additionally, using a `void` pointer was helpful when writing the object tree evaluation code, as the hash table of variables mapped variable names to `void` pointers. Thus, enabling every variable to be a reference to some underlying data was a matter of updating object tree nodes to point to the same location as recorded in the hash table.
+
+### Matrix Representation
 
 ## Reflection
 
@@ -376,9 +382,9 @@ Following is the initial list of resources we outlined, with the bolded items ha
 
 * Numpy documentation
 * MATLAB documentation
-* Language interpreter resources: https://aosabook.org/en/500L/a-python-interpreter-written-in-python.html \[This and other similar resources on the Python interpreter will be helpful references on interpreter design and implementation\]
-* **http://www.buildyourownlisp.com/ \[from Duncan’s first SoftSys project\]**
-https://www.gnu.org/software/octave/index \[Octave is an open-source IDE + programming language that borrows heavily from MATLAB, so it can be used as a reference for how to implement the MATLAB-like features we are desiring\]
+* Language interpreter resources: https://aosabook.org/en/500L/a-python-interpreter-written-in-python.html [This and other similar resources on the Python interpreter will be helpful references on interpreter design and implementation]
+* **http://www.buildyourownlisp.com/ [from Duncan’s first SoftSys project]**
+https://www.gnu.org/software/octave/index [Octave is an open-source IDE + programming language that borrows heavily from MATLAB, so it can be used as a reference for how to implement the MATLAB-like features we are desiring]
 * **Sestoft, Peter. Programming Language Concepts. Springer London, 2012. EBSCOhost, search.ebscohost.com/login.aspx?direct=true&db=edshlc&AN=edshlc.013282898.7&site=eds-live.**
 * **Lee, Kent D. ..author. Foundations of Programming Languages. 2014. EBSCOhost, search.ebscohost.com/login.aspx?direct=true&db=edshlc&AN=edshlc.014293420.8&site=eds-live.**
 * Cache/Memory efficiency in matrix operation https://people.eecs.berkeley.edu/~demmel/cs267_Spr99/Lectures/Lect_02_1999b.pdf
