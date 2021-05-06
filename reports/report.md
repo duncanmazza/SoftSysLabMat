@@ -58,84 +58,102 @@ Building off of my first project, I am interested in learning more about how int
 
 ## Project Outcomes
 
-We have successfully implemented a minimal language interpreter that can assign numbers and matrices to variables and perform basic arithmetics and matrix operations on them. 
+We have successfully implemented a minimal language interpreter that can assign numbers and matrices to variables and perform basic arithmetic and matrix operations on them. 
 
 ### Syntax of LabMat
 
-Our LabMat syntax allows variable definitions like the following:
-```
-m = 1 + 2;
-```
-For each variable definition, a height n tree is constructed. The height depends on the number of operations involved in the expression. The parent of the tree will be the operation that needs to happen, and the children of the parent would be the numbers or matrices involved in the operation. For instance, in the sample code, the parent would be the addition operation, and the children would be two integers 1 and 2. The code will do operation on those two values (addition in this case) and substitute the parent with the result.
-
-All lines must end with a semicolon.
-
-#### Strings
-
-Variables can store strings. To define, strings must start and end with double quotation marks (" ").
-
-For instance, this is a valid syntax.
-```
-m = "Hello World";
-```
-
-These are not valid.
-```
-m = 'Hello World';
-m = `hello world`;
-```
-
-#### Numbers
-
-Any real numbers can be defined.
-```
-// all these lines are valid
-a = 2;
-a = -1;
-a = 2.2343;
-a = 2/3;
-```
-
-#### Matrices
-
-Matrix definition follows similarly to MATLAB's syntax, but not exactly as shown below.
+LabMat is an imperative language with infix-style syntax that resembles a hybrid of Python and MATLAB. Unlike these languages, it is intentionally whitespace-agnostic (like C) and requires semi-colons to separate statements. Variables are dynamically typed and support re-assignment to different types. While operator precedence is not observed, expressions can be arbitrarily nested to enforce the order of operation:
 
 ```
-// All of these are considered valid.
-a = [1, 2;3, 4];
-a = [1,2;3,4;];
+>>> m = 4.5 / (2 + 3);
+>>> ws
 
-// This is not valid. 
-a = [1,2;3]; // invalid matrix definition. 
-// This is not valid (even though this works in MATLAB).
-a = [1 2;3 4];
+Workspace:
+----------
+> m (double): 0.840000
+
 ```
 
-There must be commas separating elements in each row. Semicolons separate each row.
+*A limitation of the syntax as currently implemented is that a leading expression enclosed in parentheses is interpreted as invalid syntax (e.g., `m = (2 + 3) / 4.5`; with more work on constructing the `mpc` parser, this issue could be overcome.*
 
-#### Arithmetics
+Supported types include:
 
-Basic arithmetics can be done with matrices and numbers.
-* Addition: `+`
-* Subtraction: `-`
-* Multiplication: `*`
-* Division `/` (except between matrices)
-* Modulo: `%`
-  Note that there are rules that must be followed for matrix operations (ex) restrictions on matrix dimensions, etc.)
-  You may write multiple operations in one line as long as they are valid.
+- Integers (`long`)
+- Floating points (`double`)
+- Matrices (`matrix`)
+- Strings as string literals
+
+LabMat also supports instance methods for objects. For example, a matrix can be transposed with the following syntax:
+
+```
+>>> m = [1, 2];
+>>> ws
+
+Workspace:
+----------
+> m (matrix): 
+[1 2]
+
+>>> m.transpose();
+>>> ws
+
+Workspace:
+----------
+> m (matrix): 
+[1
+ 2]
+
+>>> transpose(m);
+>>> ws
+
+Workspace:
+----------
+> m (matrix): 
+[1 2] 
+```
+
+When a function is invoked as a method, the object is inserted as the first argument to the function. Because functions are pass-by-reference, `transpose(m)` is functionally identical to `m.transpose`. As implemented, the transpose function returns a copy of the reference to the original object. This enables the following behavior:
+
+```
+>>> m = transpose([1, 2]);
+>>> n = m.transpose();
+>>> ws
+
+Workspace:
+----------
+> m (matrix): 
+[1 2]
+> n (matrix): 
+[1 2]
+
+>>> n.transpose();
+>>> ws
+
+Workspace:
+----------
+> m (matrix): 
+[1
+ 2]
+> n (matrix): 
+[1
+ 2]
+```
+
+Currently, there is nothing that distinguishes a "method" from a "function"; i.e., the structures in C do not keep track of what functions are associated with a particular data type. This constitutes a next step for improvement if there is further work done on this project.
+
+For a few more examples illustrating LabMat's syntax:
 
 ```
 // Any of these are considered valid.
 a = 1 + 2;
-b = 2 + [1,1;1,1]; // this will add 2 to all elements.
-c = [1,1;1,1] * [1;1]; // Multiplying 2*2 matrix with 2*1 matrix is valid.
-d = [1,1;1,1] / 2; // This will divide all elements by 2.
+b = 2 + [1,1;1,1];     // this will add 2 to all elements.
+c = [1,1;1,1] * [1;1]; // Multiply 2*2 matrix with 2*1 matrix
+d = [1,1;1,1] / a;     // This will divide all elements by 3.
 e = 5 - 1 + 2; 
 
 // These are not valid;
-a = [1 2;3 4] / [1;1] // This is impossible. You can't divide matrices.
-b = 2 / [1,1;1,1]; // This is impossible
-
+a = [1 2;3 4] / [1;1]  // This is impossible. You can't divide matrices.
+b = 2 / [1,1;1,1];     // This is impossible
 ```
 
 #### Transposition
@@ -149,41 +167,141 @@ n = m.transpose();
 
 ### Syntax and Object Tree Creation and Parsing
 
-When an expression is written for these variables, a height 2 tree is constructed. The parent of the tree would represent the expression in the line, and the children would be either another operation or a number/matrix. 
-
-For instance, in an expression: 
-```
-m = 1 + 2;
-```
-
-The following tree would depict the expression above. 
-(insert diagram here)
-
-Another example: 
-```
-a = 5 * 2 + 1;
+For every input, the `mpc` library creates an abstract syntax tree where each node is labeled according to the parsing rules that are defined in [grammar.c](src/grammar.c) and contains the matching string. The following example shows a visual representation of the abstract syntax tree constructed by the `mpc` library.
 
 ```
+>>> m = transpose([1, 2]);
+> 
+  regex 
+  stmt|> 
+    a_stmt|> 
+      name|regex:1:1 'm'
+      regex:1:2 ' '
+      assmt|char:1:3 '='
+      regex:1:4 ' '
+      expr|anyexpr|fexpr|> 
+        name|regex:1:5 'transpose'
+        char:1:14 '('
+        regex 
+        arglist|anyexpr|smpexpr|> 
+          mat_lit|> 
+            char:1:15 '['
+            num|int|regex:1:16 '1'
+            matcdlm|char:1:17 ','
+            regex:1:18 ' '
+            num|int|regex:1:19 '2'
+            regex 
+            char:1:20 ']'
+          regex 
+        regex 
+        char:1:21 ')'
+    regex 
+    char:1:22 ';'
+  regex:1:23 '
+'
+  regex 
+>>> 
+```
 
-The following tree would depict the expression above. 
-(insert diagram here)
+This abstract syntax tree is then parsed into an object tree:
 
-#### Modularity
+```
+>>> m = transpose([1, 2]);
+> LM_LAB_MAT
+  > LM_STATEMENT
+    > LM_STATEMENT_ASSIGNMENT
+      > m
+      > =
+      > LM_FUNCTION_CALL_EXPRESSION
+        > transpose
+        > LM_SIMPLE_EXPRESSION
+          > 
+[1 2]
+```
+
+The parsing functionality is contained within [otree.c](src/otree.c), where the code carries out two primary responsibilities:
+
+1. Observing the LabMat grammar (i.e., labeling nodes correctly) while condensing the abstract syntax tree to as simple a representation as possible.
+2. Converting strings representing data (i.e., numbers, matrix literals, variable names, operators, etc.) into their corresponding values in C.
 
 ### Evaluation
 
-To evaluate the result, we first run the operation based on the children. For instance, in the expression: 
+Evaluation (see [evaluate.c](src/evaluate.c)) is implemented recursively where base-case inputs is any object tree node with no other children. There exist several logical branches for different types of parent nodes, such as whether a node represents variable assignment or an expression. In the case of expressions and assignment statements, there is only one logical check that differentiates the interpreter's evaluation:
 
-```
-m = 1 + 2;
+```c
+// evaluate.c
+if (otree->label != LM_STATEMENT_ASSIGNMENT)
+    recurse_ret |= evaluate(otree_left);
 ```
 
-The children are 1, +, and 2. Therefore, the result of the addition of 1 and 2, which is 3. That 3 will be substituted into  
-#### Recursive Implementation
+In the case of assignment, `otree_left` contains the variable name; thus, this check prevents evaluation of a variable that has not yet been set.
+
+One of this project's stretch goals was to eliminate all memory leakage. While we did not achieve this goal, we make a step in the right direction by implementing the following appraoch: whenever an expression or statement is evaluated, the child nodes are deleted, and the parent node is replaced with the result of the evaluation. Not only does this delete-as-you-go approach reduce memory leakage, but the replacement of a parent's node with the result of evaluating its children is integral to the functionality of the language.
 
 #### Variable Binding
 
+To support variable assignment, a hash table was implemented (see [ht.c](ht.c)). When the `ws` command is printed, under the hood, all entries in the `workspace` hash table are retrieved and printed to the command line. The hash table is simple in that it does not support re-sizing and uses a simple division-based hashing algorithm instead of universal hashing, but it appropriately serves our needs. Whenever a variable is not being assigned to, it is evaluated by querying the hash table with the variable name and updating the object's pointers to match what is stored in the hash table.
+
+LabMat does not support scoping even syntactically, so this approach is sufficient. With a more advanced LabMat implementation that supports scopes, function definitions, and more, a single fixed-size hash table and absence of a stack would be inadequate.
+
+#### Operator Evaluation
+
+Operator evaluation in LabMat was built with efficiency in mind. When the abstract syntax tree is parsed, each string containing an operator is classified with an `enum` value. Exploiting the fact that C numbers `enum` values sequentially starting at 0, an array of function pointers (`binop_func_ptrs` in [binop_funcs.c](src/binop_funcs.c)) corresponding to the operator classification `enum` enables O(1) invocation of the correct operator function.
+
+Implementing the type casting for the binary operators proved challenging. Each function includes type checking as type compatibility is not included in the static parsing. The left and right operands are then checked again for their types to enable the correct type casting; the following snippet is an example of such casting from the `binop_arith_sub` (subtraction) function:
+
+```c
+// binop_funcs.c
+*(double *) ret->val = (!swap ? 1 : -1) * *(double *) new_l_val +
+                       (!swap ? -1 : 1) * (new_r_type == OTREE_VAL_LONG
+                                           ? ((double) *(long *) new_r_val)
+                                           : (*(double *) new_r_val));
+```
+
+##### Supported operators
+
+In addition to the assignment operator `=`, the following operators are supported:
+
+**Arithmetic operators** (between matrices and/or numbers unless otherwise specified):
+
+* Addition: `+`
+* Subtraction: `-`
+* Multiplication: `*` *(matrix multiplication dimension constraints apply)
+  You may write multiple operations in one line as long as they are valid)*
+* Division `/` (except between matrices)
+* Modulo: `%` (only between integers)
+
+**Logical and bit operators** (only between integers):
+
+* Bitwise AND: `&`
+* Bitwise XOR: `^`
+* Bitwise OR: `|`
+* Logical AND: `&&`
+* Logical OR: `||`
+
 #### Function Binding
+
+Only one function - `transpose` - is implemented as a built-in function. Function binding happens at runtime when LabMat is launched: a hash table called `builtins` (see [builtins.c](builtins.c)) is populated such that it maps the function names to the correct function pointers, enabling O(1) invocation. Though `transpose` requires a single argument, the function binding interface was designed to provide what is essentially a variadic wrapper to any external function. As with the operators, an array of function pointers maps function names to their pointers:
+
+```c
+// builtins.c
+void *(*builtins_func_ptrs[])(size_t, OTree *[]) = {
+        builtin_transpose,
+};
+
+void *builtin_transpose(size_t nargs, OTree **args) {
+  if (nargs != 1) {
+    fprintf(stderr,
+        "builtin_transpose provided with more than one argument");
+    exit(-1);
+  }
+  OTree *mat_otree = (OTree *) args[0];
+  *(matrix *) mat_otree->val = *matrix_transpose((matrix *) mat_otree->val);
+  return mat_otree;
+}
+```
+
+By accepting an array of `OTree` (object tree) pointers, any built-in function wrapper can support an arbitrary number of arguments.
 
 ### Matrices
 
@@ -222,31 +340,42 @@ matrix *matrix_add(matrix *mat1, matrix *mat2) {
 
 #### Matrix Literals
 
-An important feature of LabMat is support for matrix literals. Matrix literals are converted into `matrix` structures in when parsing the abstract syntax tree. We adopted the same matrix literal syntax used in MATLAB which enables efficient creation of matrices inline. Incorrect matrix dimensions are detected as a static semantic error and reported accordingly. Thanks to the `mpc` library's integration of regex, we implemented the grammar such that white space serves a column delimiter along with a comma - just as in MATLAB.
+An important feature of LabMat is support for matrix literals. Matrix literals are converted into `matrix` structures in when parsing the abstract syntax tree. We adopted the same matrix literal syntax used in MATLAB which enables efficient creation of matrices inline. Incorrect matrix dimensions are detected as a static semantic error and reported accordingly. Thanks to the `mpc` library's integration of regex, we implemented the grammar such that white space simultaneously serves a column delimiter along with a comma - just as in MATLAB - and can be treated as extraneous when appropriate. For example:
 
 ```
-m = [1, 2; 3, 4];        // Valid
+m = [1,2;3,4];           // Valid
 m = [1 2; 3       4;];   // Also valid
 m = [1, 2, 3; 4];        // Invalid dimensions reported
-
 ```
 
 ## Reflection
 
-We were able to achieve some of our original learning goals. We are happy that we got to the point where we could perform basic arithmetics on both numbers and matrices. We learned how to define matrices and make syntax design choices for LabMat. We also learned how interpreted languages are operated with tree structures.
+We were able to achieve many of our our learning goals and all of the originally-defined MVP with the exception of signal processing function integration. Though we didn't have the bandwidth to explore some of the stretch goals outlined, achieving the MVP was plenty challenging with implementation of basic arithmetic operations on both numbers *and* matrices as well as assigning and making use of variables. Given the infrastructure we built to support the transposition function, we see integration of signal processing functions like convolution and the fast Fourier Transform as a clear next step. We learned how to define matrices and make syntax design choices for LabMat.
 
-However, we didn't get to define signal processing functions with our LabMat. We spent too much time making basic functions for matrices and implementing arithmetic functions in LabMat that we didn't get to create syntax for signal processing functions like convolution and Fourier Transform. We know that if we had more time then we could've defined functions in LabMat that perform signal processing functions.
+### Duncan Learning Goals Reflection
+
+I was able to achieve some of my learning goals through this project. Namely, my understanding of language interpreters grew substantially, due to both realizing the merits of LabMat's implementation and becoming aware of its downfalls relative to other language interpreters. I also grew my confidence in writing C code, especially through this project's abundant use of pointers to heap-allocated data, `enum`s, and function pointers. 
+
+This project, however, made no use of any synchronization, so I did not achieve my learning goal of learning more about threading. I had also hoped that this project would improve my knowledge of mathematical theory relevant to signal processing, but that was not achieved within the bounds of the MVP. Having seen a peer in a different class dive into the implementation of the cross-correlation function to find that, under the hood, it can be implemented in better-than-quadratic time (as would be achieved with a naive implementation) using a theorem invoking the Fourier Transform, I realized this was the kind of learning I was hoping this project would provide.
+
+Though not all of my learning goals were achieved, I sufficiently challenged myself in this project and saw growth in SoftSys-relevant skills.
+
+### Junwon Learning Goals Reflection
+
+We are happy that we got to the point where we could perform basic arithmetics on both numbers and matrices. We learned how to define matrices and make syntax design choices for LabMat. We also learned how interpreted languages are operated with tree structures.
 
 ## Resources
 
-We have read documentations for some functions in MATLAB and Python to compare how they operate differently, along with other resources to create mpc abstract syntax tree builder:
+Following is the initial list of resources we outlined, with the bolded items having proved the most useful:
 
 * Numpy documentation
 * MATLAB documentation
 * Language interpreter resources: https://aosabook.org/en/500L/a-python-interpreter-written-in-python.html \[This and other similar resources on the Python interpreter will be helpful references on interpreter design and implementation\]
-* http://www.buildyourownlisp.com/ \[from Duncan’s first SoftSys project\]
+* **http://www.buildyourownlisp.com/ \[from Duncan’s first SoftSys project\]**
 https://www.gnu.org/software/octave/index \[Octave is an open-source IDE + programming language that borrows heavily from MATLAB, so it can be used as a reference for how to implement the MATLAB-like features we are desiring\]
-* Sestoft, Peter. Programming Language Concepts. Springer London, 2012. EBSCOhost, search.ebscohost.com/login.aspx?direct=true&db=edshlc&AN=edshlc.013282898.7&site=eds-live.
-* Lee, Kent D. ..author. Foundations of Programming Languages. 2014. EBSCOhost, search.ebscohost.com/login.aspx?direct=true&db=edshlc&AN=edshlc.014293420.8&site=eds-live.
+* **Sestoft, Peter. Programming Language Concepts. Springer London, 2012. EBSCOhost, search.ebscohost.com/login.aspx?direct=true&db=edshlc&AN=edshlc.013282898.7&site=eds-live.**
+* **Lee, Kent D. ..author. Foundations of Programming Languages. 2014. EBSCOhost, search.ebscohost.com/login.aspx?direct=true&db=edshlc&AN=edshlc.014293420.8&site=eds-live.**
 * Cache/Memory efficiency in matrix operation https://people.eecs.berkeley.edu/~demmel/cs267_Spr99/Lectures/Lect_02_1999b.pdf
 * https://cs.brown.edu/courses/cs033/lecture/18cacheX.pdf
+
+
