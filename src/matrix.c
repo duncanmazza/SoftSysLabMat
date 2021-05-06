@@ -10,7 +10,7 @@
 matrix *make_matrix(int row, int col) {
     struct matrix *mat = malloc(sizeof(matrix));
     mat->rows = row;
-    mat->column = col;
+    mat->cols = col;
     mat->data = (float **) malloc(sizeof(float *) * row);
     int k;
     for (k = 0; k < row; k++) {
@@ -27,10 +27,10 @@ char *matrix_str_repr(const matrix *const mat) {
     for (int x = 0; x < mat->rows; x++) {
         node = SLL_insert_after(sll, format_msg("%c", CTYPE_CHAR, 0, 1,
                                                 x == 0 ? '[' : ' '), node);
-        for (int y = 0; y < mat->column; y++) {
+        for (int y = 0; y < mat->cols; y++) {
             node = SLL_insert_after(sll, format_msg("%g", CTYPE_CHAR, 1, 1,
                                                     mat->data[x][y]), node);
-            if (y != mat->column - 1) {
+            if (y != mat->cols - 1) {
                 node = SLL_insert_after(sll, format_msg("%c", CTYPE_CHAR, 0, 1,
                                                         ' '), node);
             } else {
@@ -59,7 +59,7 @@ void print_matrix(const matrix *const mat) {
 
 
 int complete_matrix(matrix *mat, const float *input, int row, int col) {
-    if (mat->rows != row || mat->column != col) {
+    if (mat->rows != row || mat->cols != col) {
         fprintf(stderr, "Specified rows and columns of input array "
                         "do not match the matrix dimensions");
         return 0;
@@ -75,9 +75,9 @@ int complete_matrix(matrix *mat, const float *input, int row, int col) {
 
 
 matrix *matrix_add_scalar(matrix *mat, float k) {
-    matrix *total = make_matrix(mat->rows, mat->column);
+    matrix *total = make_matrix(mat->rows, mat->cols);
     for (int x = 0; x < mat->rows; x++) {
-        for (int y = 0; y < mat->column; y++) {
+        for (int y = 0; y < mat->cols; y++) {
             total->data[x][y] = mat->data[x][y] + k;
         }
     }
@@ -86,12 +86,12 @@ matrix *matrix_add_scalar(matrix *mat, float k) {
 
 
 matrix *matrix_add(matrix *mat1, matrix *mat2) {
-    if (mat1->rows != mat2->rows && mat1->column != mat2->column) {
+    if (mat1->rows != mat2->rows && mat1->cols != mat2->cols) {
         return NULL;
     }
-    matrix *total = make_matrix(mat1->rows, mat1->column);
+    matrix *total = make_matrix(mat1->rows, mat1->cols);
     for (int x = 0; x < total->rows; x++) {
-        for (int y = 0; y < total->column; y++) {
+        for (int y = 0; y < total->cols; y++) {
             total->data[x][y] = mat1->data[x][y] + mat2->data[x][y];
         }
     }
@@ -100,12 +100,12 @@ matrix *matrix_add(matrix *mat1, matrix *mat2) {
 
 
 matrix *matrix_sub(matrix *mat1, matrix *mat2) {
-    if (mat1->rows != mat2->rows && mat1->column != mat2->column) {
+    if (mat1->rows != mat2->rows && mat1->cols != mat2->cols) {
         return NULL;
     }
-    matrix *total = make_matrix(mat1->rows, mat1->column);
+    matrix *total = make_matrix(mat1->rows, mat1->cols);
     for (int x = 0; x < total->rows; x++) {
-        for (int y = 0; y < total->column; y++) {
+        for (int y = 0; y < total->cols; y++) {
             total->data[x][y] = mat1->data[x][y] - mat2->data[x][y];
         }
     }
@@ -114,13 +114,13 @@ matrix *matrix_sub(matrix *mat1, matrix *mat2) {
 
 
 matrix *matrix_multiply(matrix *mat1, matrix *mat2) {
-    if (mat1->column != mat2->rows) {
+    if (mat1->cols != mat2->rows) {
         return 0;
     }
-    matrix *product = make_matrix(mat1->rows, mat2->column);
+    matrix *product = make_matrix(mat1->rows, mat2->cols);
     for (int x = 0; x < product->rows; x++) {
-        for (int y = 0; y < product->column; y++) {
-            for (int z = 0; z < mat1->column; z++) {
+        for (int y = 0; y < product->cols; y++) {
+            for (int z = 0; z < mat1->cols; z++) {
                 product->data[x][y] += mat1->data[x][z] * mat2->data[z][y];
             }
         }
@@ -130,9 +130,9 @@ matrix *matrix_multiply(matrix *mat1, matrix *mat2) {
 
 
 matrix *matrix_multiply_scalar(matrix *mat, float k) {
-    matrix *total = make_matrix(mat->rows, mat->column);
+    matrix *total = make_matrix(mat->rows, mat->cols);
     for (int x = 0; x < mat->rows; x++) {
-        for (int y = 0; y < mat->column; y++) {
+        for (int y = 0; y < mat->cols; y++) {
             total->data[x][y] = mat->data[x][y] * k;
         }
     }
@@ -141,9 +141,9 @@ matrix *matrix_multiply_scalar(matrix *mat, float k) {
 
 
 matrix *matrix_transpose(matrix *mat) {
-    matrix *transposed = make_matrix(mat->column, mat->rows);
+    matrix *transposed = make_matrix(mat->cols, mat->rows);
     for (int x = 0; x < mat->rows; x++) {
-        for (int y = 0; y < mat->column; y++) {
+        for (int y = 0; y < mat->cols; y++) {
             transposed->data[y][x] = mat->data[x][y];
         }
     }

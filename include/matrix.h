@@ -17,7 +17,8 @@ extern "C" {
 #endif
 
 typedef struct matrix {
-    int rows, column;
+    int rows;
+    int cols;
     float **data;
 } matrix;
 

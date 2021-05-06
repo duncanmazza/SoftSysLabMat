@@ -27,26 +27,52 @@ This combination of characteristics has inspired us to create a new programming 
 
 Our goal is to create a programming language based on C so that we could define matrices and constants and run operations with these like basic arithmetic. We also wanted to implement at least 1 function from the signal processing library by adapting it to work with matrix data structures.  Our stretch goal was to implement multi-threading for matrix operations and add extra math operations like complex numbers and trig/exponetial functions.
 
+### MVP
+
+Building off of Duncan’s first SoftSys project (Lisp interpreter):
+* Define language grammar/syntax
+* Implement the language grammar into the mpc abstract syntax tree builder.
+* Implement evaluation of expressions from the command line
+
+* Implement the ability to create variables that are matrices.
+* Implement basic matrix operations (addition, multiplication). Supported as both dot-operations on matrix variables and as stand-alone functions.
+* Be conscious of CPU caching (e.g., being smart about what lines of memory are loaded into the cache).
+* Incorporate Junwon’s first SoftSys project: Implement at least 1 function from the signal processing library by adapting it to work with the matrix data structure.
+
+### Stretch Goals
+* Implement multi-threading for matrix operations
+* Data I/O (reading from CSV files, for example).
+* Define complex numbers & math functions (sine, cosine, exp, Pi, etc).
+* Implement some matrix generation functions (e.g., matrix generation with values randomly sampled from a standard normal distribution).
+* Ensure exactly zero memory leakage with memory profiling tools.
+
 ## Learning Goals
 
 ### Junwon
+
 I would like to learn how to write custom programming languages. I also want to be more conscious of memory/cache usage when writing code. I hope that by implementing signal processing functions with custom languages I could be introduced to other criteria for writing efficient codes like runtime operation.
 
 ### Duncan
+
 Building off of my first project, I am interested in learning more about how interpreted programming languages operate under the hood. I intend to use this project as a vehicle to increase my skills in general software topics, such as multi-threading, computation time optimization, etc. Because I have experience in signal processing applications, I hope for this project to reinforce my understanding of the relevant mathematical theory. If we are able to implement the MVP with time to spare, then implementing complex numbers, for example, will definitely progress me towards this goal.
 
-## What we have accomplished
+## Project Outcomes
 
-### Matrix Definition
+We have successfully implemented a minimal language interpreter that can assign numbers and matrices to variables and perform basic arithmetics and matrix operations on them. 
 
-In Duncan's first project, variables could be defined with numerical values like float & constants. However, we wanted to implement 2D matrices in this language. Therefore, we had to create separate functions for defining matrices. In matrix.c & matrix.h, there are functions that define matrices and perform addition and multiplications on them.
+### Matrices
+
+For this project, we aimed to implement a 2D matrix data structure that is a first-class citizen - that is, matrix literals (à la MATLAB's matrix literals) are supported along with matrix operations like transposition and multiplication.  
+
+In matrix.c & matrix.h, there are functions that define matrices and perform addition and multiplications on them. When we made these matrices, we were 
+
 ```
 // make_matrix, matrix_add, and matrix_multiply functions.
 
 matrix *make_matrix(int row, int col) {
     struct matrix *mat = malloc(sizeof(matrix));
     mat->rows = row;
-    mat->column = col;
+    mat->cols = col;
     mat->data = (float **) malloc(sizeof(float *) * row);
     int k;
     for (k = 0; k < row; k++) {
@@ -55,27 +81,15 @@ matrix *make_matrix(int row, int col) {
     return mat;
 }
 
-matrix *matrix_add(matrix *mat1, matrix *mat2) {
-    if (mat1->rows != mat2->rows && mat1->column != mat2->column) {
-        return NULL;
-    }
-    matrix *total = make_matrix(mat1->rows, mat1->column);
-    for (int x = 0; x < total->rows; x++) {
-        for (int y = 0; y < total->column; y++) {
-            total->data[x][y] = mat1->data[x][y] + mat2->data[x][y];
-        }
-    }
-    return total;
-}
 
 matrix *matrix_multiply(matrix *mat1, matrix *mat2) {
-    if (mat1->column != mat2->rows) {
+    if (mat1->cols != mat2->rows) {
       return 0;
     }
-    matrix *product = make_matrix(mat1->rows, mat2->column);
+    matrix *product = make_matrix(mat1->rows, mat2->cols);
     for (int x = 0; x < product->rows; x++) {
-        for (int y = 0; y < product->column; y++) {
-          for (int z = 0; z < mat1 ->column; z++) {
+        for (int y = 0; y < product->cols; y++) {
+          for (int z = 0; z < mat1 ->cols; z++) {
               product->data[x][y] += mat1->data[x][z] * mat2->data[z][y];
           }
         }

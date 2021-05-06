@@ -19,7 +19,7 @@
 namespace MATRIX_Gtests {
 #define ASSERT_EMPTY_MATRIX(mat) ({                                            \
     ASSERT_EQ((mat)->rows, 0);                                                 \
-    ASSERT_EQ((mat)->column, 0);                                               \
+    ASSERT_EQ((mat)->cols, 0);                                               \
 })
 
     TEST(MAT_Tests, MAT_Create) {
@@ -44,7 +44,7 @@ namespace MATRIX_Gtests {
         ASSERT_EQ(mat->data[1][1], 5);
         ASSERT_EQ(mat->data[1][2], 6);
         ASSERT_EQ(mat->rows, i);
-        ASSERT_EQ(mat->column, j);
+        ASSERT_EQ(mat->cols, j);
         free(mat);
     }
 
@@ -62,7 +62,7 @@ namespace MATRIX_Gtests {
       ASSERT_EQ(sum->data[1][1], 8);
       ASSERT_EQ(sum->data[1][2], 9);
       ASSERT_EQ(sum->rows, i);
-      ASSERT_EQ(sum->column, j);
+      ASSERT_EQ(sum->cols, j);
       free(mat);
       free(sum);
     }
@@ -83,7 +83,7 @@ namespace MATRIX_Gtests {
       ASSERT_EQ(sum->data[1][1], 10);
       ASSERT_EQ(sum->data[1][2], 12);
       ASSERT_EQ(sum->rows, i);
-      ASSERT_EQ(sum->column, j);
+      ASSERT_EQ(sum->cols, j);
       free(mat1);
       free(mat2);
       free(sum);
@@ -104,7 +104,7 @@ namespace MATRIX_Gtests {
       ASSERT_EQ(product->data[0][0], 2);
       ASSERT_EQ(product->data[1][0], 2);
       ASSERT_EQ(product->rows, i);
-      ASSERT_EQ(product->column, b);
+      ASSERT_EQ(product->cols, b);
       free(mat1);
       free(mat2);
       free(product);
@@ -124,7 +124,7 @@ namespace MATRIX_Gtests {
       matrix *product = matrix_multiply(mat1, mat2);
       ASSERT_EQ(product->data[0][0], 11);
       ASSERT_EQ(product->rows, i);
-      ASSERT_EQ(product->column, b);
+      ASSERT_EQ(product->cols, b);
       free(mat1);
       free(mat2);
       free(product);
@@ -142,7 +142,7 @@ namespace MATRIX_Gtests {
       ASSERT_EQ(product->data[1][0], 3);
       ASSERT_EQ(product->data[2][0], 3);
       ASSERT_EQ(product->rows, i);
-      ASSERT_EQ(product->column, j);
+      ASSERT_EQ(product->cols, j);
       free(mat1);
       free(product);
     }
