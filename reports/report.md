@@ -10,14 +10,19 @@ Junwon Lee, Duncan Mazza
 
 We [Junwon and Duncan] are both well versed with the MATLAB programming language and, between us, have used it in the contexts of digital signal processing, computer vision algorithm prototyping, solving ODEs, robotics, and more.
 Through our experiences with MATLAB we have developed an affinity for some aspects of MATLAB, particularly regarding the first-class nature of the matrix data structure and complex numbers, abundance of matrix operations, and excellent documentation. However, when compared to other programming languages such as Python, it deviates from programming language norms and is missing nice-to-have features. For example, MATLAB matrix indexing is 1-indexed, whereas in nearly every other language, array indexing is 0-indexed. Additionally, r-values of matrix-equivalent data structures in Python (e.g., Numpy arrays) support invocation of their associated methods, whereas MATLAB does not. For example:
+
 ```python
 # This is valid:
-mat = np.random.randn(3).transpose()
+mat = np.random.randn(3)
+mat.transpose()
 ```
+
 ```matlab
 % This is not possible:
-mat = randn([3, 1]).transpose()
+mat = randn([3, 1]);
+mat.transpose();
 ```
+
 This combination of characteristics has inspired us to create a new programming language that combines some of the best (in our opinion) features of MATLAB and traditional programming languages. Additionally, between both of us, our first SoftSys projects included a language interpreter and a signal processing library. The combination of both of these projects provides a natural jumping-off point for this project.
 
 Our goal is to create a programming language based on C so that we could define matrices and constants and run operations with these like basic arithmetic. We also wanted to implement at least 1 function from the signal processing library by adapting it to work with matrix data structures.  Our stretch goal was to implement multi-threading for matrix operations and add extra math operations like complex numbers and trig/exponetial functions.
