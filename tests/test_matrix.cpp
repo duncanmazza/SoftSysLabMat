@@ -110,6 +110,26 @@ namespace MATRIX_Gtests {
       free(product);
     }
 
+    TEST(MAT_Tests, MAT_multiply_matrix2) {
+      int i = 1;
+      int j = 2;
+      int a = 2;
+      int b = 1;
+      matrix* mat1 = make_matrix(i,j);
+      float test1[] = {1,2};
+      matrix* mat2 = make_matrix(a,b);
+      float test2[] = {3,4};
+      complete_matrix(mat1, test1, i, j);
+      complete_matrix(mat2, test2, a, b);
+      matrix *product = matrix_multiply(mat1, mat2);
+      ASSERT_EQ(product->data[0][0], 11);
+      ASSERT_EQ(product->rows, i);
+      ASSERT_EQ(product->column, b);
+      free(mat1);
+      free(mat2);
+      free(product);
+    }
+
     TEST(MAT_Tests, MAT_multiply_scalar) {
       int i = 3;
       int j = 1;

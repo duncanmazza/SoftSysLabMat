@@ -20,7 +20,7 @@ mat = randn([3, 1]).transpose()
 ```
 This combination of characteristics has inspired us to create a new programming language that combines some of the best (in our opinion) features of MATLAB and traditional programming languages. Additionally, between both of us, our first SoftSys projects included a language interpreter and a signal processing library. The combination of both of these projects provides a natural jumping-off point for this project.
 
-Our goal is to create a programming language based on C so that we could define matrices and constants and run operations with these like basic arithmetic. Our stretch goal was to implement multi-threading for matrix operations and add extra math operations like complex numbers and trig/exponetial functions.
+Our goal is to create a programming language based on C so that we could define matrices and constants and run operations with these like basic arithmetic. We also wanted to implement at least 1 function from the signal processing library by adapting it to work with matrix data structures.  Our stretch goal was to implement multi-threading for matrix operations and add extra math operations like complex numbers and trig/exponetial functions.
 
 ## Learning Goals
 
@@ -102,13 +102,18 @@ You may write multiple operations in one line as long as they are valid.
 a = 1 + 2;
 b = 2 + [1,1;1,1]; // this will add 2 to all elements.
 c = [1,1;1,1] * [1;1]; // Multiplying 2*2 matrix with 2*1 matrix is valid.
+d = [1,1;1,1] / 2; // This will divide all elements by 2.
 
 // These are not valid;
-a = [1 2;3 4] / [1;1] // This is impossible
+a = [1 2;3 4] / [1;1] // This is impossible. You can't divide matrices.
+b = 2 / [1,1;1,1]; // This is impossible
 
 ```
 ## Reflection
 
+We were able to achieve some of our original learning goals. We are happy that we got to the point where we could perform basic arithmetics on both numbers and matrices. We learned how to define matrices and make syntax design choices for LabMat. We also learned how interpreted languages are operated with tree structures.
+
+However, we didn't get to define signal processing functions with our LabMat. We spent too much time making basic functions for matrices and implementing arithmetic functions in LabMat that we didn't get to create syntax for signal processing functions like convolution and Fourier Transform. We know that if we had more time then we could've defined functions in LabMat that perform signal processing functions.  
 
 ## Resources
 
