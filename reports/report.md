@@ -156,14 +156,6 @@ a = [1 2;3 4] / [1;1]  // This is impossible. You can't divide matrices.
 b = 2 / [1,1;1,1];     // This is impossible
 ```
 
-#### Transposition
-
-In addition, matrices can be transposed.
-
-```
-m = transpose[1,2,3;4,5,6];
-n = m.transpose();
-```
 
 ### Syntax and Object Tree Creation and Parsing
 
