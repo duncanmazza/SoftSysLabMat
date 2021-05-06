@@ -100,7 +100,7 @@ int mpc_setup(mpc_parser_t **parser) {
             "expr    : <anyexpr> ;"  // This enables mutual recursion with anyexpr
             //            "a_stmt  : <name> <name> <assmt> <expr> "  // Assignment statement
             //            "        | <name> <assmt> <expr> ;"
-            "a_stmt  : <name> <assmt> <expr> ;"
+            "a_stmt  : <name> <assmt> (<method> | <expr>) ;"
             "stmt    : (<a_stmt> | <fexpr> | <method>)';' ;"
             "lab_mat : /^/ ((<stmt>)/\s*/)+ /$/ ;";
 #pragma clang diagnostic pop

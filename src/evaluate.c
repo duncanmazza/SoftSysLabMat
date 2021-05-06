@@ -20,7 +20,8 @@ int eval_func_call(OTree *otree) {
 
         OTree *argument_list = ((OTree *) rval->children->s->next->next->val);
         if (!argument_list) {
-            argument_list = rval->children->s->next->next->val = make_empty_otree();
+            argument_list = rval->children->s->next->next->val =
+                    make_empty_otree();
             argument_list->label = LM_ARGUMENT_LIST;
             argument_list->type = OTREE_VAL_PARENT;
             argument_list->children = DLL_create();
@@ -34,18 +35,22 @@ int eval_func_call(OTree *otree) {
         }
 
         int recurse_ret = evaluate(lval);
-
         if (recurse_ret) return recurse_ret;
+
+        // Insert variable whose method was invoked as the first argument to the
+        // function.
+        // TODO: check whether the invoked method belongs to the object.
         DLL_insert(argument_list->children, lval);
 
         recurse_ret = evaluate(rval);
-
         if (recurse_ret) return recurse_ret;
         child_replace_current(rval_node, otree);
 
-        // TODO: free remaining memory as necessary
+        // TODO: do memory cleanup
         return 0;
     }
+
+    // If this point is reached, then otree is a function call
 
     DLL_Node *func_otree_node = otree->children->s->next;
     OTree *func_otree = (OTree *) func_otree_node->val;
@@ -67,6 +72,7 @@ int eval_func_call(OTree *otree) {
         arg_list_otree_node->val = arg_list_otree;
     }
 
+    // Get the function pointer
     char *func_name = (char *) func_otree->val;
     void *(*func_ptr)(size_t, OTree *[]);
     int ht_ret = HT_get(builtins, (HT_KEY_TYPE) func_name, (void **) &func_ptr);
@@ -75,6 +81,7 @@ int eval_func_call(OTree *otree) {
         return 1;
     }
 
+    // Turn linked list of arguments into an array
     size_t nargs = arg_list_otree->children->len / 2 + 1;
     OTree **arg_list = (OTree **) malloc(sizeof(OTree *) * nargs);
     DLL_Node *arg = arg_list_otree->children->s->next;
@@ -88,7 +95,6 @@ int eval_func_call(OTree *otree) {
 
     OTree *ret_val;
     ret_val = (OTree *) func_ptr(nargs, arg_list);
-
     func_otree_node->val = ret_val;
     child_replace_current(func_otree_node, otree);
     return 0;
