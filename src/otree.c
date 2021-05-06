@@ -239,42 +239,50 @@ int otree_atomic_parse_op(const char *symb, OTree *otree) {
 
 
 int otree_construct_matrix(const mpc_ast_t *ast, OTree *otree) {
-    size_t rows = 0;
+    size_t rows = 1;
     size_t columns_check = 1;
     size_t columns = 1;
     OTreeLabel ast_label_record[ast->children_num];
+    int first_semicolon_seen = 0;
+    int trailing_semicolon = 0;
+    int trailing_comma = 0;
     for (int i = 0; i < ast->children_num; i++) {
         OTreeLabel label = get_tree_label_enum(ast->children[i]->tag);
         ast_label_record[i] = label;
         if (label == LM_MATRIX_COMMA_DELIMITER) {
             columns_check++;
+            trailing_comma = 1;
         } else if (label == LM_MATRIX_SEMICOLON_DELIMITER) {
-            rows++;
-            if (columns != 1 && columns_check != columns) {
+            if (first_semicolon_seen && columns_check != columns) {
                 fprintf(stderr, "Inconsistent columns given in the "
                                 "matrix literal\n");
                 return 1;
             }
+            rows++;
             columns = columns_check;
-            if (strncmp(ast->children[i + 2]->contents, "]", 1) != 0)
-                columns_check = 1;
+            columns_check = 1;
+            first_semicolon_seen = 1;
+            trailing_semicolon = 1;
         } else if (label == LM_CHAR) {
             if (strncmp(ast->children[i]->contents, "]", 1) == 0) {
-                if (columns != 1 && columns_check != columns) {
-                    fprintf(stderr, "Inconsistent columns given in the "
-                                    "matrix literal\n");
-                    return 1;
+                if (trailing_semicolon) {
+                    rows--;
+                } else {
+                    if (first_semicolon_seen && columns_check != columns) {
+                        fprintf(stderr, "Inconsistent columns given in the "
+                                        "matrix literal\n");
+                        return 1;
+                    }
+                    columns = columns_check;
                 }
-                if (!(ast_label_record[i - 2] == LM_MATRIX_COMMA_DELIMITER ||
-                      ast_label_record[i - 2] ==
-                      LM_MATRIX_SEMICOLON_DELIMITER)) {
-                    rows++;
-                }
+                if (trailing_comma) columns--;
                 break;
             }
+        } else if (label == LM_INT || label == LM_FLOAT) {
+            trailing_semicolon = 0;
+            trailing_comma = 0;
         }
     }
-    columns = columns_check;
 
     float input[rows * columns];
     size_t input_counter = 0;

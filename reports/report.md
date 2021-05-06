@@ -60,51 +60,13 @@ Building off of my first project, I am interested in learning more about how int
 
 We have successfully implemented a minimal language interpreter that can assign numbers and matrices to variables and perform basic arithmetics and matrix operations on them. 
 
-### Matrices
-
-For this project, we aimed to implement a 2D matrix data structure that is a first-class citizen - that is, matrix literals (à la MATLAB's matrix literals) are supported along with matrix operations like transposition and multiplication.  
-
-In matrix.c & matrix.h, there are functions that define matrices and perform addition and multiplications on them. When we made these matrices, we were 
-
-```
-// make_matrix, matrix_add, and matrix_multiply functions.
-
-matrix *make_matrix(int row, int col) {
-    struct matrix *mat = malloc(sizeof(matrix));
-    mat->rows = row;
-    mat->cols = col;
-    mat->data = (float **) malloc(sizeof(float *) * row);
-    int k;
-    for (k = 0; k < row; k++) {
-        mat->data[k] = (float *) malloc(sizeof(float *) * col);
-    }
-    return mat;
-}
-
-
-matrix *matrix_multiply(matrix *mat1, matrix *mat2) {
-    if (mat1->cols != mat2->rows) {
-      return 0;
-    }
-    matrix *product = make_matrix(mat1->rows, mat2->cols);
-    for (int x = 0; x < product->rows; x++) {
-        for (int y = 0; y < product->cols; y++) {
-          for (int z = 0; z < mat1 ->cols; z++) {
-              product->data[x][y] += mat1->data[x][z] * mat2->data[z][y];
-          }
-        }
-    }
-    return product;
-}
-
-```
 ### Syntax of LabMat
 
-Our LabMat syntax allows the variable definition like the following:
+Our LabMat syntax allows variable definitions like the following:
 ```
 m = 1 + 2;
 ```
-For each variable definition, a height 2 tree is constructed. The parent of the tree will be the operation that needs to happen, and the children of the parent would be the numbers or matrices involved in the operation. For instance, in the sample code, the parent would be the addition operation, and the children would be two integers 1 and 2. The code will do operation on those two values (addition in this case) and substitute the parent with the result.
+For each variable definition, a height n tree is constructed. The height depends on the number of operations involved in the expression. The parent of the tree will be the operation that needs to happen, and the children of the parent would be the numbers or matrices involved in the operation. For instance, in the sample code, the parent would be the addition operation, and the children would be two integers 1 and 2. The code will do operation on those two values (addition in this case) and substitute the parent with the result.
 
 All lines must end with a semicolon.
 
@@ -125,39 +87,42 @@ m = `hello world`;
 
 #### Numbers
 
-Any numbers can be parsed, bot positive and negative.
+Any real numbers can be defined.
 ```
 // all these lines are valid
 a = 2;
 a = -1;
 a = 2.2343;
-
+a = 2/3;
 ```
 
 #### Matrices
 
 Matrix definition follows similarly to MATLAB's syntax, but not exactly as shown below.
+
 ```
-// Any of these are considered valid.
+// All of these are considered valid.
 a = [1, 2;3, 4];
 a = [1,2;3,4;];
 
+// This is not valid. 
+a = [1,2;3]; // invalid matrix definition. 
 // This is not valid (even though this works in MATLAB).
-a = [1 2;3 4]
-
+a = [1 2;3 4];
 ```
-There must be comments separating each element in each row. When the matrix.  
+
+There must be commas separating elements in each row. Semicolons separate each row.
 
 #### Arithmetics
 
 Basic arithmetics can be done with matrices and numbers.
-* Addition: +
-* Subtraction: -
-* Multiplication: *
-* Division: /
-* Modulo: %
-Note that there are rules that must be followed for matrix operations (ex) restrictions on matrix dimensions, etc.)
-You may write multiple operations in one line as long as they are valid.
+* Addition: `+`
+* Subtraction: `-`
+* Multiplication: `*`
+* Division `/` (except between matrices)
+* Modulo: `%`
+  Note that there are rules that must be followed for matrix operations (ex) restrictions on matrix dimensions, etc.)
+  You may write multiple operations in one line as long as they are valid.
 
 ```
 // Any of these are considered valid.
@@ -165,6 +130,7 @@ a = 1 + 2;
 b = 2 + [1,1;1,1]; // this will add 2 to all elements.
 c = [1,1;1,1] * [1;1]; // Multiplying 2*2 matrix with 2*1 matrix is valid.
 d = [1,1;1,1] / 2; // This will divide all elements by 2.
+e = 5 - 1 + 2; 
 
 // These are not valid;
 a = [1 2;3 4] / [1;1] // This is impossible. You can't divide matrices.
@@ -180,20 +146,106 @@ In addition, matrices can be transposed.
 m = transpose[1,2,3;4,5,6];
 n = m.transpose();
 ```
+
+### Syntax and Object Tree Creation and Parsing
+
+When an expression is written for these variables, a height 2 tree is constructed. The parent of the tree would represent the expression in the line, and the children would be either another operation or a number/matrix. 
+
+For instance, in an expression: 
+```
+m = 1 + 2;
+```
+
+The following tree would depict the expression above. 
+(insert diagram here)
+
+Another example: 
+```
+a = 5 * 2 + 1;
+
+```
+
+The following tree would depict the expression above. 
+(insert diagram here)
+
+#### Modularity
+
+### Evaluation
+
+To evaluate the result, we first run the operation based on the children. For instance, in the expression: 
+
+```
+m = 1 + 2;
+```
+
+The children are 1, +, and 2. Therefore, the result of the addition of 1 and 2, which is 3. That 3 will be substituted into  
+#### Recursive Implementation
+
+#### Variable Binding
+
+#### Function Binding
+
+### Matrices
+
+For this project, we implemented a 2D matrix data structure that is a first-class citizen - that is, matrix literals (à la MATLAB's matrix literals) are supported along with matrix operations like transposition and multiplication.
+
+#### Matrix Structure
+
+In matrix.c & matrix.h, there are functions that define matrices and perform addition and multiplications on them. When we made these matrices, we were 
+
+```c
+// matrix.h
+typedef struct matrix {
+    int rows;
+    int cols;
+    float **data;
+} matrix;
+```
+
+We decided to use a 2D array (`float **data`) to store the matrix; this is as opposed to a 1D array (like what Python's Numpy uses) where two-dimensional coordinates need to be explicitly converted into a single index. Because our implementation is not parallelized, this is to the benefit of performance in functions like `matrix_add` where the second dimension of the array is iterated through by the inner `for` loop (i.e., the inner for loop exhibits spatial locality).  
+
+```c
+// matrix.c
+matrix *matrix_add(matrix *mat1, matrix *mat2) {
+    if (mat1->rows != mat2->rows && mat1->cols != mat2->cols) {
+        return NULL;
+    }
+    matrix *total = make_matrix(mat1->rows, mat1->cols);
+    for (int x = 0; x < total->rows; x++) {
+        for (int y = 0; y < total->cols; y++) {
+            total->data[x][y] = mat1->data[x][y] + mat2->data[x][y];
+        }
+    }
+    return total;
+}
+```
+
+#### Matrix Literals
+
+An important feature of LabMat is support for matrix literals. Matrix literals are converted into `matrix` structures in when parsing the abstract syntax tree. We adopted the same matrix literal syntax used in MATLAB which enables efficient creation of matrices inline. Incorrect matrix dimensions are detected as a static semantic error and reported accordingly. Thanks to the `mpc` library's integration of regex, we implemented the grammar such that white space serves a column delimiter along with a comma - just as in MATLAB.
+
+```
+m = [1, 2; 3, 4];        // Valid
+m = [1 2; 3       4;];   // Also valid
+m = [1, 2, 3; 4];        // Invalid dimensions reported
+
+```
+
 ## Reflection
 
 We were able to achieve some of our original learning goals. We are happy that we got to the point where we could perform basic arithmetics on both numbers and matrices. We learned how to define matrices and make syntax design choices for LabMat. We also learned how interpreted languages are operated with tree structures.
 
-However, we didn't get to define signal processing functions with our LabMat. We spent too much time making basic functions for matrices and implementing arithmetic functions in LabMat that we didn't get to create syntax for signal processing functions like convolution and Fourier Transform. We know that if we had more time then we could've defined functions in LabMat that perform signal processing functions.  
+However, we didn't get to define signal processing functions with our LabMat. We spent too much time making basic functions for matrices and implementing arithmetic functions in LabMat that we didn't get to create syntax for signal processing functions like convolution and Fourier Transform. We know that if we had more time then we could've defined functions in LabMat that perform signal processing functions.
 
 ## Resources
 
-We have read documentations for some of the functions in MATLAB and Python to compare how they operate differently, along with other resources to create mpc abstract syntax tree builder:
+We have read documentations for some functions in MATLAB and Python to compare how they operate differently, along with other resources to create mpc abstract syntax tree builder:
+
 * Numpy documentation
 * MATLAB documentation
-* Language interpreter resources: https://aosabook.org/en/500L/a-python-interpreter-written-in-python.html [This and other similar resources on the Python interpreter will be helpful references on interpreter design and implementation]
-* http://www.buildyourownlisp.com/ [from Duncan’s first SoftSys project]
-https://www.gnu.org/software/octave/index [Octave is an open-source IDE + programming language that borrows heavily from MATLAB, so it can be used as a reference for how to implement the MATLAB-like features we are desiring]
+* Language interpreter resources: https://aosabook.org/en/500L/a-python-interpreter-written-in-python.html \[This and other similar resources on the Python interpreter will be helpful references on interpreter design and implementation\]
+* http://www.buildyourownlisp.com/ \[from Duncan’s first SoftSys project\]
+https://www.gnu.org/software/octave/index \[Octave is an open-source IDE + programming language that borrows heavily from MATLAB, so it can be used as a reference for how to implement the MATLAB-like features we are desiring\]
 * Sestoft, Peter. Programming Language Concepts. Springer London, 2012. EBSCOhost, search.ebscohost.com/login.aspx?direct=true&db=edshlc&AN=edshlc.013282898.7&site=eds-live.
 * Lee, Kent D. ..author. Foundations of Programming Languages. 2014. EBSCOhost, search.ebscohost.com/login.aspx?direct=true&db=edshlc&AN=edshlc.014293420.8&site=eds-live.
 * Cache/Memory efficiency in matrix operation https://people.eecs.berkeley.edu/~demmel/cs267_Spr99/Lectures/Lect_02_1999b.pdf

@@ -9,7 +9,7 @@
 
 
 SLL *mpc_rules_match(const char *const to_match) {
-    const char *rule_matcher = "^\\w+[^\\s]";\
+    const char *rule_matcher = "^\\w+[^\\\s]";\
     const char *delimiter = " ;";
     size_t delimiter_len = strlen(delimiter);
 
@@ -67,8 +67,6 @@ SLL *mpc_rules_match(const char *const to_match) {
 
 
 int mpc_setup(mpc_parser_t **parser) {
-#pragma clang diagnostic push
-#pragma clang diagnostic ignored "-Wunknown-escape-sequence"
     const char *grammar =
             // -- Atomic rules --
             "int     : /-?[0-9]+/ ;"  // Integer number
@@ -80,30 +78,27 @@ int mpc_setup(mpc_parser_t **parser) {
 
             "allchar : /[^\"]*/ ;"  // Do not allow double quotes
             "name    : /[a-zA-Z_][a-zA-Z0-9_]*/ ;"  // Any valid token name
-            "matcdlm : /\s*/ (',' | ' ') /\s*/ ;"  // Matrix comma delimiter
-            "matsdlm : /\s*/ ';' /\s*/ ;"  // Matrix semicolon delimiter
-            "al_dlm  : /\s*/ ',' /\s*/ ;"  // Argument list delimiter
+            "matcdlm : (',' | ' ') ;"  // Matrix comma delimiter
+            "matsdlm : ';' ;"  // Matrix semicolon delimiter
+            "al_dlm  : /\\s*/ ',' /\\s*/ ;"  // Argument list delimiter
 
             // -- Compound rules --
-            "num     : <float> | <int> ;"  // [order matters] Any number
+            "num     : <float>|<int> ;"  // [order matters] Any number
             "str_lit : '\"'<allchar>'\"' ;"  // String literal
-            "mat_lit : '['/\s*/((<num>/\s*/(<matcdlm> | <matsdlm>))+ <num>?)/\s*/']' "
-            "        | '['/\s*/<num>/\s*/<matcdlm>?/\s*/']' ;"  // Matrix literal
-            "smpexpr : (<num>|<name>|<str_lit>|<mat_lit>) "
-            "          (((<math_op>|<log_op>|<bit_op>) "
+            "mat_lit : '[' (<num>((<matcdlm>/\\s*/)|(<matsdlm>/\\s*/)))+ <num>? /\\s*/']' "
+            "        | '['/\\s*/<num>/\\s*/<matcdlm>?/\\s*/']' ;"  // Matrix literal
+            "smpexpr : (<num>|<name>|<str_lit>|<mat_lit>)"
+            "          (/\\s*/((<math_op>|<log_op>|<bit_op>) /\\s+/"
             "           (<anyexpr>|<name>|<num>|<str_lit>|<mat_lit>))*)? ;"  // Simple expression
             "arglist : ((<anyexpr><al_dlm>)+<anyexpr> | <anyexpr>) ;"
 
-            "fexpr   : <name>'('/\s*/<arglist>?/\s*/')' ;"  // Expression: function call
+            "fexpr   : <name>'('/\\s*/<arglist>?/\\s*/')' ;"  // Expression: function call
             "method  : <name>'.'<fexpr> ;"
             "anyexpr : <fexpr> | '(' <expr>+ ')' | <smpexpr> ;"
             "expr    : <anyexpr> ;"  // This enables mutual recursion with anyexpr
-            //            "a_stmt  : <name> <name> <assmt> <expr> "  // Assignment statement
-            //            "        | <name> <assmt> <expr> ;"
-            "a_stmt  : <name> <assmt> (<method> | <expr>) ;"
-            "stmt    : (<a_stmt> | <fexpr> | <method>)';' ;"
-            "lab_mat : /^/ ((<stmt>)/\s*/)+ /$/ ;";
-#pragma clang diagnostic pop
+            "a_stmt  : <name>/\\s*/<assmt>/\\s*/(<method> | <expr>) ;"
+            "stmt    : (<a_stmt> | <fexpr> | <method>)/\\s*/';' ;"
+            "lab_mat : /^/ ((<stmt>)/\\s*/)+ /$/ ;";
 
     SLL *matched_rule_names = mpc_rules_match(grammar);
     char *rule_names_arr[matched_rule_names->len];
@@ -140,7 +135,7 @@ int mpc_setup(mpc_parser_t **parser) {
     mpc_parser_t *p20 = mpc_new(rule_names_arr[20]);
     mpc_parser_t *p21 = mpc_new(rule_names_arr[21]);
     mpc_parser_t *p22 = mpc_new(rule_names_arr[22]);
-    mpca_lang(MPCA_LANG_DEFAULT, grammar, p00, p01, p02, p03, p04, p05,
+    mpca_lang(MPCA_LANG_WHITESPACE_SENSITIVE, grammar, p00, p01, p02, p03, p04, p05,
               p06, p07, p08, p09, p10, p11, p12, p13, p14, p15, p16, p17, p18,
               p19, p20, p21, p22);
     *parser = p22;
