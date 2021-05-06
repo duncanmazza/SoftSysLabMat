@@ -134,7 +134,7 @@ a = [1 2;3 4]
 ```
 There must be comments separating each element in each row. When the matrix.  
 
-#### Operations
+#### Arithmetics
 
 Basic arithmetics can be done with matrices and numbers.
 * Addition: +
@@ -157,6 +157,15 @@ a = [1 2;3 4] / [1;1] // This is impossible. You can't divide matrices.
 b = 2 / [1,1;1,1]; // This is impossible
 
 ```
+
+#### Transposition
+
+In addition, matrices can be transposed.
+
+```
+m = transpose[1,2,3;4,5,6];
+n = m.transpose();
+```
 ## Reflection
 
 We were able to achieve some of our original learning goals. We are happy that we got to the point where we could perform basic arithmetics on both numbers and matrices. We learned how to define matrices and make syntax design choices for LabMat. We also learned how interpreted languages are operated with tree structures.
@@ -165,8 +174,7 @@ However, we didn't get to define signal processing functions with our LabMat. We
 
 ## Resources
 
-Resources
-We will need to read documentations for some of the functions in MATLAB and Python to compare how they operate differently:
+We have read documentations for some of the functions in MATLAB and Python to compare how they operate differently, along with other resources to create mpc abstract syntax tree builder:
 * Numpy documentation
 * MATLAB documentation
 * Language interpreter resources: https://aosabook.org/en/500L/a-python-interpreter-written-in-python.html [This and other similar resources on the Python interpreter will be helpful references on interpreter design and implementation]
