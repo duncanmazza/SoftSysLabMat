@@ -35,7 +35,50 @@ Building off of my first project, I am interested in learning more about how int
 ### Matrix Definition
 
 In Duncan's first project, variables could be defined with numerical values like float & constants. However, we wanted to implement 2D matrices in this language. Therefore, we had to create separate functions for defining matrices. In matrix.c & matrix.h, there are functions that define matrices and perform addition and multiplications on them.
+```
+// make_matrix, matrix_add, and matrix_multiply functions.
 
+matrix *make_matrix(int row, int col) {
+    struct matrix *mat = malloc(sizeof(matrix));
+    mat->rows = row;
+    mat->column = col;
+    mat->data = (float **) malloc(sizeof(float *) * row);
+    int k;
+    for (k = 0; k < row; k++) {
+        mat->data[k] = (float *) malloc(sizeof(float *) * col);
+    }
+    return mat;
+}
+
+matrix *matrix_add(matrix *mat1, matrix *mat2) {
+    if (mat1->rows != mat2->rows && mat1->column != mat2->column) {
+        return NULL;
+    }
+    matrix *total = make_matrix(mat1->rows, mat1->column);
+    for (int x = 0; x < total->rows; x++) {
+        for (int y = 0; y < total->column; y++) {
+            total->data[x][y] = mat1->data[x][y] + mat2->data[x][y];
+        }
+    }
+    return total;
+}
+
+matrix *matrix_multiply(matrix *mat1, matrix *mat2) {
+    if (mat1->column != mat2->rows) {
+      return 0;
+    }
+    matrix *product = make_matrix(mat1->rows, mat2->column);
+    for (int x = 0; x < product->rows; x++) {
+        for (int y = 0; y < product->column; y++) {
+          for (int z = 0; z < mat1 ->column; z++) {
+              product->data[x][y] += mat1->data[x][z] * mat2->data[z][y];
+          }
+        }
+    }
+    return product;
+}
+
+```
 ### Syntax of LabMat
 
 Our LabMat syntax allows the variable definition like the following:
