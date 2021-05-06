@@ -38,6 +38,7 @@ typedef enum {
     LM_ANY_EXPRESSION,
     LM_EXPRESSION,
     LM_FUNCTION_CALL_EXPRESSION,
+    LM_METHOD,
     LM_SIMPLE_EXPRESSION,
     LM_MATRIX_LITERAL,
     LM_STRING_LITERAL,
@@ -71,7 +72,7 @@ typedef enum {
     OTREE_VAL_BINOP_ENUM,
     OTREE_VAL_DELIM,
 } OTreeValType;
-extern const char* const otree_val_type_enum_strs[];
+extern const char *const otree_val_type_enum_strs[];
 
 typedef struct {
     OTreeValType arg1;

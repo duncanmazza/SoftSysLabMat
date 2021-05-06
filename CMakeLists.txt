@@ -24,6 +24,7 @@ add_library(
         ${LIB_SRC_DIR_NAME}/evaluate.c
         ${LIB_SRC_DIR_NAME}/binop_funcs.c
         ${LIB_SRC_DIR_NAME}/matrix.c
+        ${LIB_SRC_DIR_NAME}/builtins.c
 )
 
 add_executable(

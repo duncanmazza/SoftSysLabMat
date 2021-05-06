@@ -16,7 +16,7 @@ extern "C" {
 #pragma clang diagnostic push
 #pragma ide diagnostic ignored "EndlessLoop"
 
-const char* const help_msg = \
+const char *const help_msg = \
     "Enter mathematical expressions similar to how you would use MatLab. "
     "Example:\n"
     "\t>>> three = 1 + 2;\n"
@@ -43,9 +43,13 @@ const char* const help_msg = \
 
 int main(int argc, char **argv) {
     mpc_parser_t *parser;
-    int num_parsers = mpc_setup(&parser);
+    mpc_setup(&parser);  // TODO: clean memory on exit
     workspace = HT_create(WORKSPACE_N_SLOTS);
     var_name_to_str_hash = HT_create(VAR_NAME_TO_STR_HASH_N_SLOTS);
+    if (bind_builtins()) {
+        fprintf(stderr, "Failed binding built-in functions");
+        exit(-1);
+    }
 
     printf("(enter \"ws\" to print the workspace, \"quit\" to exit, or "
            "\"help\" to display the help message)\n\n");
@@ -73,14 +77,13 @@ int main(int argc, char **argv) {
         /* Attempt to Parse the user Input */
         mpc_result_t r;
         if (mpc_parse("input", most_recently_entered, parser, &r)) {
-
             int status = 0;
             OTree *otree = ast_2_otree(r.output, &status);
             if (status != 0) {
-                fprintf(stderr, "Cannot evaluate due to static parsing error\n");
+                fprintf(stderr,
+                        "Cannot evaluate due to static parsing error\n");
                 continue;
             }
-
             evaluate(otree);
             mpc_ast_delete(r.output);
         } else {

@@ -37,7 +37,7 @@ char *format_msg(const char *templ, CType type,
 int check_str_formatting(const char *templ, size_t num_occurrences,
                          CType type);
 
-char *sll_strs_to_str(const SLL *const sll, const char *const join_str,
-                      const char *const term_str);
+char *sll_strs_to_str(const SLL *sll, const char *join_str,
+                      const char *term_str);
 
 #endif //SOFTSYSSOFTSYSLABMAT_STR_UTILS_H

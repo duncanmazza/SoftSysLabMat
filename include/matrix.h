@@ -48,6 +48,10 @@ matrix *matrix_multiply(matrix *mat1, matrix *mat2);
 
 matrix *matrix_multiply_scalar(matrix *mat, float k);
 
+matrix *matrix_transpose(matrix *mat);
+
+void matrix_free(matrix *mat);
+
 #ifdef __cplusplus
 }
 #endif

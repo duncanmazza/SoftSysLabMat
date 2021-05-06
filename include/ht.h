@@ -60,7 +60,7 @@ int HT_insert(HashTable *ht, const unsigned char *key, void *value);
  * @param str_hash Key to search for
  * @return Pointer to the node if it is contained, NULL otherwise.
  */
-DLL_Node * HT_slot_contains(const DLL* slot, size_t str_hash);
+DLL_Node *HT_slot_contains(const DLL *slot, size_t str_hash);
 
 /** Gets the value associated with the provided key.
  *
@@ -70,7 +70,7 @@ DLL_Node * HT_slot_contains(const DLL* slot, size_t str_hash);
  *              in the hash table
  * @return 0 if the key is present and 1 otherwise
  */
-int HT_get(const HashTable * ht, const unsigned char * key, void **value);
+int HT_get(const HashTable *ht, const unsigned char *key, void **value);
 
 
 int HT_get_by_str_hash(const HashTable *ht, size_t str_hash, void **value);

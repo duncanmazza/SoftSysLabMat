@@ -25,12 +25,13 @@
 #include "grammar.h"
 #include "cl_input.h"
 #include "otree.h"
+#include "builtins.h"
 
 #ifdef __cplusplus
 extern "C" {
 #endif
 
-extern const char* const help_msg;
+extern const char *const help_msg;
 
 
 #ifdef __cplusplus

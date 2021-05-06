@@ -26,17 +26,18 @@ char *matrix_str_repr(const matrix *const mat) {
 
     for (int x = 0; x < mat->rows; x++) {
         node = SLL_insert_after(sll, format_msg("%c", CTYPE_CHAR, 0, 1,
-                                         x == 0 ? '[' : ' '), node);
+                                                x == 0 ? '[' : ' '), node);
         for (int y = 0; y < mat->column; y++) {
             node = SLL_insert_after(sll, format_msg("%g", CTYPE_CHAR, 1, 1,
-                                             mat->data[x][y]), node);
+                                                    mat->data[x][y]), node);
             if (y != mat->column - 1) {
                 node = SLL_insert_after(sll, format_msg("%c", CTYPE_CHAR, 0, 1,
-                                                 ' '), node);
+                                                        ' '), node);
             } else {
                 if (x != mat->rows - 1)
-                    node = SLL_insert_after(sll, format_msg("%c", CTYPE_CHAR, 0, 1,
-                                                     '\n'), node);
+                    node = SLL_insert_after(sll,
+                                            format_msg("%c", CTYPE_CHAR, 0, 1,
+                                                       '\n'), node);
             }
         }
     }
@@ -114,14 +115,14 @@ matrix *matrix_sub(matrix *mat1, matrix *mat2) {
 
 matrix *matrix_multiply(matrix *mat1, matrix *mat2) {
     if (mat1->column != mat2->rows) {
-      return 0;
+        return 0;
     }
     matrix *product = make_matrix(mat1->rows, mat2->column);
     for (int x = 0; x < product->rows; x++) {
         for (int y = 0; y < product->column; y++) {
-          for (int z = 0; z < mat1 ->column; z++) {
-              product->data[x][y] += mat1->data[x][z] * mat2->data[z][y];
-          }
+            for (int z = 0; z < mat1->column; z++) {
+                product->data[x][y] += mat1->data[x][z] * mat2->data[z][y];
+            }
         }
     }
     return product;
@@ -136,6 +137,24 @@ matrix *matrix_multiply_scalar(matrix *mat, float k) {
         }
     }
     return total;
+}
+
+
+matrix *matrix_transpose(matrix *mat) {
+    matrix *transposed = make_matrix(mat->column, mat->rows);
+    for (int x = 0; x < mat->rows; x++) {
+        for (int y = 0; y < mat->column; y++) {
+            transposed->data[y][x] = mat->data[x][y];
+        }
+    }
+
+    return transposed;
+}
+
+void matrix_free(matrix *mat) {
+    free(*mat->data);
+    free(mat->data);
+    free(mat);
 }
 
 /*

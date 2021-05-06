@@ -11,17 +11,93 @@ HashTable *workspace;
 HashTable *var_name_to_str_hash;
 
 
-int eval_func_call_expr(OTree *otree) {
-    if (otree->label != LM_FUNCTION_CALL_EXPRESSION) {
-        fprintf(stderr, "Attempted to evaluate an otree object as a function "
-                        "call expression but it was labeled in stead as %s\n",
-                otree_label_strs[otree->label]);
-        exit(-1);
+int eval_func_call(OTree *otree) {
+    if (otree->label == LM_METHOD) {
+        DLL_Node *lval_node = otree->children->s->next;
+        OTree *lval = (OTree *) lval_node->val;
+        DLL_Node *rval_node = lval_node->next->next;
+        OTree *rval = (OTree *) rval_node->val;
+
+        OTree *argument_list = ((OTree *) rval->children->s->next->next->val);
+        if (!argument_list) {
+            argument_list = rval->children->s->next->next->val =
+                    make_empty_otree();
+            argument_list->label = LM_ARGUMENT_LIST;
+            argument_list->type = OTREE_VAL_PARENT;
+            argument_list->children = DLL_create();
+        }
+
+        if (argument_list->children->len != 0) {
+            OTree *delimiter = make_empty_otree();
+            delimiter->label = LM_ARGUMENT_LIST_DELIMITER;
+            delimiter->type = OTREE_VAL_DELIM;
+            DLL_insert(argument_list->children, delimiter);
+        }
+
+        int recurse_ret = evaluate(lval);
+        if (recurse_ret) return recurse_ret;
+
+        // Insert variable whose method was invoked as the first argument to the
+        // function.
+        // TODO: check whether the invoked method belongs to the object.
+        DLL_insert(argument_list->children, lval);
+
+        recurse_ret = evaluate(rval);
+        if (recurse_ret) return recurse_ret;
+        child_replace_current(rval_node, otree);
+
+        // TODO: do memory cleanup
+        return 0;
     }
 
-    fprintf(stderr, "Function call expression evaluation has not yet "
-                    "been implemented\n");
-    return 1;
+    // If this point is reached, then otree is a function call
+
+    DLL_Node *func_otree_node = otree->children->s->next;
+    OTree *func_otree = (OTree *) func_otree_node->val;
+    DLL_Node *arg_list_otree_node = func_otree_node->next;
+    OTree *arg_list_otree = (OTree *) arg_list_otree_node->val;
+
+    // Because of how mpc collapses the abstract syntax tree hierarchy and how
+    // our code processes it, single arguments populate not the argument list
+    // but the argument list node itself. Address this here by creating an
+    // argument list
+    if (arg_list_otree->type != OTREE_VAL_PARENT) {
+        DLL *arg_list_dll = DLL_create();
+        DLL_insert(arg_list_dll, arg_list_otree);
+        arg_list_otree = make_empty_otree();
+        arg_list_otree->val = NULL;
+        arg_list_otree->children = arg_list_dll;
+        arg_list_otree->type = OTREE_VAL_PARENT;
+        arg_list_otree->label = LM_ARGUMENT_LIST;
+        arg_list_otree_node->val = arg_list_otree;
+    }
+
+    // Get the function pointer
+    char *func_name = (char *) func_otree->val;
+    void *(*func_ptr)(size_t, OTree *[]);
+    int ht_ret = HT_get(builtins, (HT_KEY_TYPE) func_name, (void **) &func_ptr);
+    if (ht_ret) {
+        fprintf(stderr, "No function named %s", func_name);
+        return 1;
+    }
+
+    // Turn linked list of arguments into an array
+    size_t nargs = arg_list_otree->children->len / 2 + 1;
+    OTree **arg_list = (OTree **) malloc(sizeof(OTree *) * nargs);
+    DLL_Node *arg = arg_list_otree->children->s->next;
+    int recurse_ret;
+    for (int i = 0; i < nargs; i++) {
+        recurse_ret = evaluate((OTree *) arg->val);
+        if (recurse_ret) return recurse_ret;
+        arg_list[i] = (OTree *) arg->val;
+        arg = arg->next->next;  // Skip over delimiter
+    }
+
+    OTree *ret_val;
+    ret_val = (OTree *) func_ptr(nargs, arg_list);
+    func_otree_node->val = ret_val;
+    child_replace_current(func_otree_node, otree);
+    return 0;
 }
 
 
@@ -34,14 +110,13 @@ int replace_var_name_with_var(OTree *otree) {
                 (char *) otree->val);
         return not_a_var;
     }
-    otree->label = to_replace_with->label;
-    otree->type = to_replace_with->type;
-    otree->val = to_replace_with->val;
+    *otree = *to_replace_with;
     return 0;
 }
 
 
 int evaluate(OTree *otree) {
+    int recurse_ret = 0;
     switch (otree->type) {
         case OTREE_VAL_PARENT:
             break;
@@ -62,7 +137,7 @@ int evaluate(OTree *otree) {
     // This point is only reached if otree->type = OTREE_VAL_PARENT
 
     DLL_Node *child;
-    int recurse_ret = 0;
+
     switch (otree->label) {
         case LM_LAB_MAT:
             child = otree->children->s->next;
@@ -79,7 +154,8 @@ int evaluate(OTree *otree) {
             child_replace_current(child, otree);
             return 0;
         case LM_FUNCTION_CALL_EXPRESSION:
-            return eval_func_call_expr(otree);
+        case LM_METHOD:
+            return eval_func_call(otree);
         case LM_STATEMENT_ASSIGNMENT:
         case LM_SIMPLE_EXPRESSION:
             break;
