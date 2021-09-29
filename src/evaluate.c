@@ -231,8 +231,13 @@ int evaluate(OTree *otree) {
         DLL_remove(otree->children, child_middle);
         DLL_remove(otree->children, child_left);
 
-        if (otree_right_is_rvalue) free(otree_right->val);
-        if (otree_left_is_rvalue) free(otree_left->val);
+        // TODO: Previously had these statements un-commented, but led to
+        //  segmentation faults under certain scenarios. For now, leave un-
+        //  commented. Figure out how to correctly free memory to avoid memory
+        //  leaks.
+        // if (otree_right_is_rvalue) free(otree_right->val);
+        // if (otree_left_is_rvalue) free(otree_left->val);
+
         free(otree_middle->val);
 
         DLL_NODE_FREE(child_right);
