@@ -65,6 +65,12 @@ int binop_arith_add(OTree *left, OTree *right, OTree *ret) {
                                 ((double) *(long *) new_r_val) :
                                 (*(double *) new_r_val));
     } else if (new_l_type == OTREE_VAL_MAT && new_r_type == OTREE_VAL_MAT) {
+        if (!matrix_dims_eq(new_l_val, new_r_val)) {
+            fprintf(stderr, "Matrix dimensions must be equal for matrix "
+                            "addition/subtraction");
+            return 1;
+        }
+
         ret->val = (void *) matrix_add((matrix *) new_l_val,
                                        (matrix *) new_r_val);
     } else {
@@ -110,6 +116,13 @@ int binop_arith_sub(OTree *left, OTree *right, OTree *ret) {
                                                    ? ((double) *(long *) new_r_val)
                                                    : (*(double *) new_r_val));
     } else if (new_l_type == OTREE_VAL_MAT && new_r_type == OTREE_VAL_MAT) {
+
+        if (!matrix_dims_eq(new_l_val, new_r_val)) {
+            fprintf(stderr, "Matrix dimensions must be equal for matrix "
+                            "addition/subtraction");
+            return 1;
+        }
+
         ret->val = (void *) matrix_sub((matrix *) new_l_val,
                                        (matrix *) new_r_val);
     } else {
@@ -153,6 +166,14 @@ int binop_arith_mult(OTree *left, OTree *right, OTree *ret) {
                                 ((double) *(long *) new_r_val) :
                                 (*(double *) new_r_val));
     } else if (new_l_type == OTREE_VAL_MAT && new_r_type == OTREE_VAL_MAT) {
+        int l_cols = ((matrix *) new_l_val)->cols;
+        int r_rows = ((matrix *) new_r_val)->rows;
+        if (l_cols != r_rows) {
+            fprintf(stderr, "Incompatible matrix dimensions (inner dimensions "
+                            "of %i and %i, respectively)\n", l_cols, r_rows);
+            return 1;
+        }
+
         ret->val = (void *) matrix_multiply((matrix *) new_l_val,
                                             (matrix *) new_r_val);
     } else {

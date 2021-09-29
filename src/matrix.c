@@ -24,6 +24,7 @@ char *matrix_str_repr(const matrix *const mat) {
     SLL *sll = SLL_create();
     SLL_Node *node = sll->head;
 
+    // mat can become null here
     for (int x = 0; x < mat->rows; x++) {
         node = SLL_insert_after(sll, format_msg("%c", CTYPE_CHAR, 0, 1,
                                                 x == 0 ? '[' : ' '), node);
@@ -115,7 +116,7 @@ matrix *matrix_sub(matrix *mat1, matrix *mat2) {
 
 matrix *matrix_multiply(matrix *mat1, matrix *mat2) {
     if (mat1->cols != mat2->rows) {
-        return 0;
+        return NULL;
     }
     matrix *product = make_matrix(mat1->rows, mat2->cols);
     for (int x = 0; x < product->rows; x++) {
@@ -150,6 +151,15 @@ matrix *matrix_transpose(matrix *mat) {
 
     return transposed;
 }
+
+
+int matrix_dims_eq(matrix *m1, matrix *m2) {
+    if (m1 == NULL || m2 == NULL) {
+        return 0;
+    }
+    return (m1->rows == m2->rows) && (m1->cols == m2->cols);
+}
+
 
 void matrix_free(matrix *mat) {
     free(*mat->data);

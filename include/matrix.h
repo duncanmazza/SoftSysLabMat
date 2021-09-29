@@ -53,6 +53,13 @@ matrix *matrix_transpose(matrix *mat);
 
 void matrix_free(matrix *mat);
 
+/** Checks whether the matrices have equivalent dimensions.
+ *
+ * @return 1 if matrix dimensions match and 0 otherwise. If any null values are
+ *  encountered, 0 is returned.
+ */
+int matrix_dims_eq(matrix *m1, matrix* m2);
+
 #ifdef __cplusplus
 }
 #endif

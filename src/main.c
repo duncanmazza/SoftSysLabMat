@@ -77,7 +77,7 @@ int main(int argc, char **argv) {
         /* Attempt to Parse the user Input */
         mpc_result_t r;
         if (mpc_parse("input", most_recently_entered, parser, &r)) {
-            // mpc_ast_print(r.output);
+//            mpc_ast_print(r.output);
             int status = 0;
             OTree *otree = ast_2_otree(r.output, &status);
             if (status != 0) {
